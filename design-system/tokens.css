@@ -1,0 +1,94 @@
+/* Igreja do Rosário — gerado de tokens.json. Não editar à mão. */
+:root, [data-theme="claro"] {
+  --fundo: #fbf7ee;
+  --fundo-elevado: #fffdf8;
+  --fundo-afundado: #f5efe1;
+  --texto: #4a3726;
+  --texto-suave: #7d6853;
+  --linha: #ece2cf;
+  --linha-forte: #988670;
+  --marrom: #3f2610;
+  --acao: #7a5538;
+  --sobre-acao: #fdfaf0;
+  --creme: #fbf8cd;
+  --sobre-marrom: var(--creme);
+  --mariano: #4a6491;
+  --sobre-mariano: #fffdf8;
+  --mariano-suave: #ecf0f7;
+  --ouro: #d6b862;
+  --sobre-ouro: #4a3726;
+  --ouro-texto: #86661c;
+  --ouro-suave: #f6eed6;
+  --terracota: #93603a;
+  --terracota-suave: #f7eee4;
+  --verde: #4a7a62;
+  --alerta: #b04a3c;
+  --foco: var(--mariano);
+  --liturgico-verde: #2e7d4f;
+  --liturgico-roxo: #5b2c83;
+  --liturgico-branco: #f4efe2;
+  --liturgico-vermelho: #b3261e;
+  --liturgico-rosa: #d47fa6;
+  --sombra-card: 0 1px 2px rgba(74,55,38,0.05), 0 4px 14px rgba(74,55,38,0.04);
+}
+[data-theme="escuro"] {
+  --fundo: #211a14;
+  --fundo-elevado: #2b231c;
+  --fundo-afundado: #1a140f;
+  --texto: #efe6d6;
+  --texto-suave: #bfae98;
+  --linha: #42362a;
+  --linha-forte: #7d6c59;
+  --marrom: #6b4423;
+  --acao: #c9a27e;
+  --sobre-acao: #211a14;
+  --creme: #fbf8cd;
+  --sobre-marrom: var(--creme);
+  --mariano: #a9bbdc;
+  --sobre-mariano: #211a14;
+  --mariano-suave: #2a3346;
+  --ouro: #d8bb6a;
+  --sobre-ouro: #211a14;
+  --ouro-texto: #e2c878;
+  --ouro-suave: #3a3020;
+  --terracota: #d6a682;
+  --terracota-suave: #3a2a1f;
+  --verde: #8cc2a6;
+  --alerta: #eb9a8e;
+  --foco: var(--mariano);
+  --sombra-card: 0 1px 2px rgba(0,0,0,0.3);
+}
+:root {
+  --espaco-1: 4px;
+  --espaco-2: 8px;
+  --espaco-3: 12px;
+  --espaco-4: 16px;
+  --espaco-6: 24px;
+  --espaco-8: 32px;
+  --espaco-12: 48px;
+  --espaco-16: 64px;
+  --raio-p: 4px;
+  --raio-m: 8px;
+  --raio-g: 16px;
+  --raio-arco: 999px;
+  --container-max: 1200px;
+  --medida-texto: 68ch;
+  --toque-min: 44px;
+  --bp-celular: 0px;
+  --bp-tablet: 640px;
+  --bp-desktop: 1024px;
+  --bp-largo: 1280px;
+  --font-serif: "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-sans: "Nunito Sans", "Segoe UI", system-ui, sans-serif;
+}
+.display { font-family: var(--font-serif); font-size: 56px; line-height: 60px; font-weight: 600; }
+.display-italico { font-family: var(--font-serif); font-size: 56px; line-height: 60px; font-weight: 500; font-style: italic; }
+.titulo-1 { font-family: var(--font-serif); font-size: 36px; line-height: 42px; font-weight: 600; }
+.titulo-2 { font-family: var(--font-serif); font-size: 26px; line-height: 32px; font-weight: 600; }
+.titulo-italico { font-family: var(--font-serif); font-size: 26px; line-height: 32px; font-weight: 500; font-style: italic; }
+.subtitulo { font-family: var(--font-sans); font-size: 20px; line-height: 28px; font-weight: 700; }
+.corpo-grande { font-family: var(--font-sans); font-size: 18px; line-height: 28px; font-weight: 400; }
+.corpo { font-family: var(--font-sans); font-size: 17px; line-height: 26px; font-weight: 400; }
+.pequeno { font-family: var(--font-sans); font-size: 15px; line-height: 22px; font-weight: 400; }
+.sobrelinha { font-family: var(--font-sans); font-size: 13px; line-height: 16px; font-weight: 700; letter-spacing: 0.16em; }
+.horario { font-family: var(--font-sans); font-size: 28px; line-height: 32px; font-weight: 700; }

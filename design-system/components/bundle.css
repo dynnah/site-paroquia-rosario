@@ -1,0 +1,277 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&display=swap');
+
+/* ---------- base ---------- */
+body { margin: 0; font-family: var(--font-sans); font-size: 17px; line-height: 26px; background: var(--fundo); color: var(--texto); -webkit-font-smoothing: antialiased; }
+.ros-pv { padding: var(--espaco-4); display: flex; flex-wrap: wrap; gap: var(--espaco-4); align-items: flex-start; }
+.ros-pv-col { padding: var(--espaco-4); display: grid; gap: var(--espaco-4); }
+.ros-pv-label { font-size: 12px; line-height: 16px; color: var(--texto-suave); margin: 0 0 var(--espaco-2); letter-spacing: .08em; text-transform: uppercase; font-weight: 700; }
+.ros-sobrelinha { font-family: var(--font-sans); font-size: 13px; line-height: 16px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--ouro-texto); margin: 0; }
+.ros-serif { font-family: var(--font-serif); }
+.ros-italico { font-family: var(--font-serif); font-style: italic; font-weight: 500; }
+:where(a, button, input, [tabindex]):focus-visible { outline: 2px solid var(--foco); outline-offset: 2px; }
+
+/* ---------- botão ---------- */
+.ros-btn { font: inherit; font-weight: 600; font-size: 16px; line-height: 20px; min-height: var(--toque-min); padding: 0 var(--espaco-6); display: inline-flex; align-items: center; justify-content: center; gap: var(--espaco-2); border-radius: var(--raio-m); border: 1.5px solid transparent; cursor: pointer; text-decoration: none; transition: background-color .15s, color .15s; }
+.ros-btn svg { width: 18px; height: 18px; flex: none; }
+.ros-btn--primario { background: var(--acao); color: var(--sobre-acao); }
+.ros-btn--primario:hover { background: var(--marrom); color: var(--sobre-marrom); }
+.ros-btn--secundario { background: transparent; color: var(--mariano); border-color: var(--mariano); }
+.ros-btn--secundario:hover { background: var(--mariano-suave); }
+.ros-btn--fantasma { background: transparent; color: var(--mariano); padding: 0 var(--espaco-3); text-decoration: underline; text-underline-offset: 4px; }
+.ros-btn--claro { background: var(--creme); color: var(--marrom); }
+.ros-btn--bloco { width: 100%; }
+.ros-btn[disabled] { opacity: .45; cursor: not-allowed; }
+
+/* ---------- cabeçalho ---------- */
+.ros-header { container-type: inline-size; background: var(--fundo-elevado); border-bottom: 1px solid var(--linha); }
+.ros-header__in { display: flex; align-items: center; gap: var(--espaco-3); padding: var(--espaco-2) var(--espaco-4); min-height: 64px; box-sizing: border-box; }
+.ros-marca { display: flex; align-items: center; gap: var(--espaco-2); text-decoration: none; color: var(--texto); margin-right: auto; }
+.ros-marca img { width: 40px; height: 40px; }
+.ros-marca__nome { display: block; font-weight: 700; font-size: 13px; line-height: 18px; letter-spacing: .08em; text-transform: uppercase; }
+.ros-marca__sub { display: none; font-size: 13px; line-height: 16px; color: var(--texto-suave); }
+.ros-nav { display: none; gap: var(--espaco-1); }
+.ros-nav a { color: var(--texto); text-decoration: none; font-weight: 600; font-size: 16px; padding: var(--espaco-2) var(--espaco-3); border-radius: var(--raio-m); }
+.ros-nav a:hover, .ros-nav a[aria-current="page"] { background: var(--fundo-afundado); }
+.ros-nav a[aria-current="page"] { box-shadow: inset 0 -2px 0 var(--ouro); }
+.ros-menu-btn { font: inherit; font-weight: 700; font-size: 15px; display: inline-flex; align-items: center; gap: var(--espaco-2); min-height: var(--toque-min); padding: 0 var(--espaco-3); background: transparent; border: 1.5px solid var(--linha-forte); color: var(--texto); border-radius: var(--raio-m); cursor: pointer; }
+.ros-header .ros-btn { padding: 0 var(--espaco-3); }
+.ros-menu-btn__txt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@container (min-width: 520px) { .ros-marca__sub { display: block; } .ros-marca__nome { font-size: 15px; } .ros-menu-btn__txt { position: static; width: auto; height: auto; clip: auto; } .ros-header .ros-btn { padding: 0 var(--espaco-4); } }
+@container (min-width: 960px) {
+  .ros-header__in { padding: var(--espaco-3) var(--espaco-8); }
+  .ros-nav { display: flex; }
+  .ros-menu-btn { display: none; }
+  .ros-marca img { width: 48px; height: 48px; }
+  .ros-marca__sub { display: none; }
+  .ros-marca__nome { white-space: nowrap; }
+  .ros-nav a { padding: var(--espaco-2) 10px; }
+}
+@container (min-width: 1180px) { .ros-marca__sub { display: block; } .ros-nav a { padding: var(--espaco-2) var(--espaco-3); } }
+
+/* ---------- hero ---------- */
+.ros-hero { container-type: inline-size; background: var(--fundo-afundado); }
+.ros-hero__in { display: grid; gap: var(--espaco-6); padding: var(--espaco-8) var(--espaco-4); }
+.ros-hero__titulo { font-family: var(--font-serif); font-weight: 600; font-size: 36px; line-height: 42px; margin: var(--espaco-2) 0 0; color: var(--texto); }
+.ros-hero__titulo em { display: block; font-style: italic; font-weight: 500; color: var(--mariano); }
+.ros-hero__texto { font-size: 18px; line-height: 28px; color: var(--texto-suave); margin: var(--espaco-3) 0 0; max-width: var(--medida-texto); }
+.ros-hero__acoes { display: flex; flex-wrap: wrap; gap: var(--espaco-3); margin-top: var(--espaco-6); }
+.ros-hero__proxima { display: flex; align-items: center; gap: var(--espaco-3); background: var(--fundo-elevado); border: 1px solid var(--linha); border-radius: var(--raio-m); padding: var(--espaco-3) var(--espaco-4); margin-top: var(--espaco-6); max-width: 420px; }
+.ros-hero__proxima strong { font-size: 28px; line-height: 32px; font-weight: 700; }
+.ros-hero__proxima span { font-size: 15px; line-height: 20px; color: var(--texto-suave); }
+.ros-arco { display: none; aspect-ratio: 4 / 5; border-radius: var(--raio-arco) var(--raio-arco) var(--raio-m) var(--raio-m); background: var(--fundo-elevado); place-items: center; overflow: hidden; border: 3px solid var(--ouro); box-sizing: border-box; max-width: 360px; width: 100%; justify-self: center; }
+.ros-arco img { width: 62%; height: auto; }
+.ros-arco--foto img { width: 100%; height: 100%; object-fit: cover; }
+@container (min-width: 600px) { .ros-arco { display: grid; max-width: 280px; } }
+@container (min-width: 900px) {
+  .ros-arco { max-width: 360px; }
+  .ros-hero__in { grid-template-columns: 1.3fr 1fr; align-items: center; padding: var(--espaco-16) var(--espaco-8); gap: var(--espaco-12); }
+  .ros-hero__titulo { font-size: 56px; line-height: 60px; }
+}
+
+/* ---------- horários ---------- */
+.ros-horarios { container-type: inline-size; background: var(--fundo-elevado); border: 1px solid var(--linha); border-radius: var(--raio-g); box-shadow: var(--sombra-card); padding: var(--espaco-4); }
+.ros-horarios__topo { display: flex; align-items: baseline; justify-content: space-between; gap: var(--espaco-3); flex-wrap: wrap; margin-bottom: var(--espaco-3); }
+.ros-horarios__topo h3 { font-family: var(--font-serif); font-weight: 600; font-size: 26px; line-height: 32px; margin: 0; }
+.ros-horarios__lista { list-style: none; margin: 0; padding: 0; display: grid; }
+.ros-horarios__dia { display: flex; align-items: center; justify-content: space-between; gap: var(--espaco-3); padding: var(--espaco-3) 0; border-top: 1px solid var(--linha); }
+.ros-horarios__nome { font-weight: 700; font-size: 18px; line-height: 24px; }
+.ros-horarios__nota { display: block; font-weight: 400; font-size: 15px; line-height: 20px; color: var(--texto-suave); }
+.ros-horarios__horas { display: flex; gap: var(--espaco-2); flex-wrap: wrap; justify-content: flex-end; }
+.ros-hora { font-weight: 600; font-size: 22px; line-height: 28px; padding: 2px var(--espaco-3); border-radius: var(--raio-m); background: var(--fundo-afundado); color: var(--texto); font-variant-numeric: tabular-nums; }
+.ros-horarios__dia--hoje { background: var(--mariano-suave); margin: 0 calc(var(--espaco-4) * -1); padding-left: var(--espaco-4); padding-right: var(--espaco-4); border-top-color: transparent; }
+.ros-horarios__dia--hoje .ros-hora { background: var(--fundo-elevado); color: var(--mariano); box-shadow: inset 0 0 0 1px var(--mariano); }
+.ros-hoje { font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--mariano); margin-left: var(--espaco-2); }
+@container (min-width: 640px) {
+  .ros-horarios { padding: var(--espaco-6); }
+  .ros-horarios__lista { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--espaco-3); }
+  .ros-horarios__dia { flex-direction: column; align-items: flex-start; justify-content: flex-start; border: 1px solid var(--linha); border-radius: var(--raio-m); padding: var(--espaco-3) var(--espaco-4); }
+  .ros-horarios__dia--hoje { margin: 0; border-color: var(--mariano-suave); }
+  .ros-horarios__horas { justify-content: flex-start; }
+}
+
+/* ---------- evento ---------- */
+.ros-evento { container-type: inline-size; display: block; text-decoration: none; color: inherit; }
+.ros-evento__in { display: flex; gap: var(--espaco-4); align-items: flex-start; background: var(--fundo-elevado); border: 1px solid var(--linha); border-radius: var(--raio-m); padding: var(--espaco-4); box-shadow: var(--sombra-card); }
+.ros-data { flex: none; width: 64px; text-align: center; background: var(--mariano-suave); color: var(--mariano); border-radius: var(--raio-arco) var(--raio-arco) var(--raio-p) var(--raio-p); padding: var(--espaco-4) 0 var(--espaco-2); }
+.ros-data b { display: block; font-family: var(--font-serif); font-size: 28px; line-height: 28px; font-weight: 700; }
+.ros-data span { display: block; font-size: 12px; line-height: 16px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; margin-top: 2px; }
+.ros-data--franciscano { background: var(--terracota-suave); color: var(--terracota); }
+.ros-data--festa { background: var(--ouro-suave); color: var(--ouro-texto); }
+.ros-evento__titulo { font-family: var(--font-serif); font-size: 22px; line-height: 28px; font-weight: 600; margin: var(--espaco-1) 0 0; }
+.ros-evento__titulo em { font-weight: 500; }
+.ros-evento__meta { font-size: 15px; line-height: 22px; color: var(--texto-suave); margin: var(--espaco-1) 0 0; }
+@container (min-width: 520px) { .ros-evento__in { padding: var(--espaco-6); gap: var(--espaco-6); } .ros-data { width: 76px; } .ros-evento__titulo { font-size: 26px; line-height: 32px; } }
+
+/* ---------- pastoral ---------- */
+.ros-pastoral { container-type: inline-size; background: var(--fundo-elevado); border: 1px solid var(--linha); border-radius: var(--raio-g); overflow: hidden; display: flex; flex-direction: column; }
+.ros-pastoral__faixa { height: 4px; background: var(--acao); }
+.ros-pastoral--franciscano .ros-pastoral__faixa { background: var(--terracota); }
+.ros-pastoral--mariano .ros-pastoral__faixa { background: var(--mariano); }
+.ros-pastoral--social .ros-pastoral__faixa { background: var(--verde); }
+.ros-pastoral__corpo { padding: var(--espaco-4); display: grid; gap: var(--espaco-2); }
+.ros-pastoral__corpo h3 { font-family: var(--font-serif); font-weight: 600; font-size: 24px; line-height: 30px; margin: 0; }
+.ros-pastoral__corpo p { margin: 0; color: var(--texto-suave); }
+.ros-pastoral__info { list-style: none; padding: 0; margin: var(--espaco-2) 0; display: grid; gap: var(--espaco-1); font-size: 15px; line-height: 22px; }
+.ros-pastoral__info b { color: var(--texto); }
+@container (min-width: 400px) { .ros-pastoral__corpo { padding: var(--espaco-6); } }
+.ros-grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--espaco-6); }
+
+/* ---------- aviso ---------- */
+.ros-aviso { display: flex; gap: var(--espaco-3); align-items: flex-start; border-radius: var(--raio-m); padding: var(--espaco-4); background: var(--mariano-suave); color: var(--texto); border: 1px solid transparent; }
+.ros-aviso svg { flex: none; width: 22px; height: 22px; color: var(--mariano); margin-top: 2px; }
+.ros-aviso p { margin: 0; }
+.ros-aviso strong { display: block; }
+.ros-aviso--festa { background: var(--ouro-suave); color: var(--texto); }
+.ros-aviso--festa svg { color: var(--ouro-texto); }
+.ros-aviso--festa a { color: var(--mariano); }
+.ros-aviso--mudanca { background: var(--fundo-elevado); border-color: var(--alerta); border-left-width: 1px; }
+.ros-aviso--mudanca svg { color: var(--alerta); }
+
+/* ---------- selo litúrgico ---------- */
+.ros-selo { display: inline-flex; align-items: center; gap: var(--espaco-2); font-size: 15px; line-height: 20px; font-weight: 600; padding: var(--espaco-1) var(--espaco-3) var(--espaco-1) var(--espaco-2); border-radius: var(--raio-arco); background: var(--fundo-elevado); border: 1px solid var(--linha); color: var(--texto); }
+.ros-selo i { width: 14px; height: 14px; border-radius: 50%; display: inline-block; }
+.ros-selo--verde i { background: var(--liturgico-verde); }
+.ros-selo--roxo i { background: var(--liturgico-roxo); }
+.ros-selo--branco i { background: var(--liturgico-branco); box-shadow: inset 0 0 0 2px var(--ouro); }
+.ros-selo--vermelho i { background: var(--liturgico-vermelho); }
+.ros-selo--rosa i { background: var(--liturgico-rosa); }
+
+/* ---------- divisor terço ---------- */
+.ros-terco { display: flex; align-items: center; justify-content: center; gap: 7px; padding: var(--espaco-6) 0; }
+.ros-terco::before, .ros-terco::after { content: ""; flex: 1; max-width: 160px; height: 1px; background: var(--linha); }
+.ros-terco i { width: 5px; height: 5px; border-radius: 50%; background: var(--ouro); display: block; }
+.ros-terco i.grande { width: 10px; height: 10px; margin: 0 4px; }
+
+/* ---------- doação pix ---------- */
+.ros-pix { container-type: inline-size; background: var(--terracota-suave); border-radius: var(--raio-g); padding: var(--espaco-6) var(--espaco-4); }
+.ros-pix h3 { font-family: var(--font-serif); font-weight: 600; font-size: 26px; line-height: 32px; margin: var(--espaco-2) 0 var(--espaco-2); }
+.ros-pix h3 em { font-weight: 500; }
+.ros-pix p { margin: 0 0 var(--espaco-4); color: var(--texto); max-width: var(--medida-texto); }
+.ros-pix__chave { display: flex; flex-direction: column; gap: var(--espaco-3); }
+.ros-pix__valor { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 16px; line-height: 22px; background: var(--fundo-elevado); border: 1px dashed var(--linha-forte); border-radius: var(--raio-m); padding: var(--espaco-3) var(--espaco-4); word-break: break-all; color: var(--texto); }
+.ros-pix .ros-pix__titular { font-size: 15px; color: var(--texto-suave); margin: var(--espaco-2) 0 0; }
+.ros-pix .ros-sobrelinha { color: var(--terracota); }
+@container (min-width: 560px) { .ros-pix { padding: var(--espaco-8); } .ros-pix__chave { flex-direction: row; align-items: stretch; } .ros-pix__valor { flex: 1; } }
+
+/* ---------- liturgia do dia ---------- */
+.ros-liturgia { container-type: inline-size; background: var(--fundo-elevado); border: 1px solid var(--linha); border-radius: var(--raio-g); padding: var(--espaco-6) var(--espaco-4); }
+.ros-liturgia__data { font-size: 15px; line-height: 22px; color: var(--texto-suave); margin: 0; }
+.ros-liturgia__titulo { font-family: var(--font-serif); font-weight: 600; font-size: 26px; line-height: 32px; margin: var(--espaco-1) 0 0; color: var(--texto); }
+.ros-liturgia__celebracao { display: flex; align-items: center; gap: var(--espaco-2); font-size: 15px; line-height: 22px; color: var(--texto-suave); margin: var(--espaco-2) 0 0; }
+.ros-liturgia__cor { width: 10px; height: 10px; border-radius: 50%; flex: none; box-shadow: inset 0 0 0 1px rgba(74,55,38,0.25); }
+.ros-liturgia__barra { display: flex; align-items: center; gap: var(--espaco-2); margin-top: var(--espaco-6); border-bottom: 1px solid var(--linha); }
+.ros-liturgia__abas { display: flex; gap: var(--espaco-4); overflow-x: auto; scrollbar-width: none; flex: 1; }
+.ros-liturgia__abas input { position: absolute; opacity: 0; pointer-events: none; }
+.ros-aba { flex: none; font-weight: 600; font-size: 16px; line-height: 22px; min-height: var(--toque-min); display: inline-flex; align-items: center; color: var(--texto-suave); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.ros-aba:hover { color: var(--texto); }
+.ros-liturgia__abas input:checked + .ros-aba { color: var(--texto); border-bottom-color: var(--ouro); }
+.ros-liturgia__abas input:focus-visible + .ros-aba { outline: 2px solid var(--foco); outline-offset: 2px; }
+.ros-aa { flex: none; font: inherit; font-family: var(--font-serif); font-size: 17px; min-width: var(--toque-min); min-height: var(--toque-min); background: transparent; border: 0; color: var(--texto-suave); cursor: pointer; border-radius: var(--raio-m); }
+.ros-aa:hover { background: var(--fundo-afundado); color: var(--texto); }
+.ros-leitura { display: none; padding-top: var(--espaco-6); }
+.ros-leitura__ref { font-size: 15px; line-height: 22px; font-weight: 600; color: var(--mariano); margin: 0; }
+.ros-leitura__texto { font-size: 19px; line-height: 32px; max-width: var(--medida-texto); margin: var(--espaco-3) 0 0; color: var(--texto); }
+.ros-leitura__texto p { margin: 0 0 var(--espaco-4); }
+.ros-leitura__aclamacao { font-size: 16px; line-height: 24px; font-style: italic; color: var(--texto-suave); margin: var(--espaco-2) 0 0; }
+.ros-liturgia__fonte { font-size: 13px; line-height: 18px; color: var(--texto-suave); margin: var(--espaco-6) 0 0; }
+.ros-liturgia__fonte a { color: inherit; }
+@container (min-width: 640px) {
+  .ros-liturgia { padding: var(--espaco-8); }
+  .ros-liturgia__titulo { font-size: 30px; line-height: 36px; }
+  .ros-liturgia__abas { gap: var(--espaco-6); }
+}
+/* resumo para a página inicial */
+.ros-liturgia-resumo { display: flex; gap: var(--espaco-4); align-items: center; background: var(--fundo-elevado); border: 1px solid var(--linha); border-radius: var(--raio-m); padding: var(--espaco-4); text-decoration: none; color: inherit; }
+.ros-liturgia-resumo__icone { flex: none; width: 48px; height: 48px; border-radius: var(--raio-arco) var(--raio-arco) var(--raio-p) var(--raio-p); background: var(--mariano-suave); color: var(--mariano); display: grid; place-items: center; }
+.ros-liturgia-resumo__icone svg { width: 24px; height: 24px; }
+.ros-liturgia-resumo b { display: block; color: var(--texto); font-family: var(--font-serif); font-weight: 600; font-size: 20px; line-height: 26px; }
+.ros-liturgia-resumo__meta { display: block; font-size: 15px; line-height: 22px; color: var(--texto-suave); }
+
+/* ---------- santo do dia ---------- */
+.ros-santo { container-type: inline-size; background: var(--fundo-elevado); border: 1px solid var(--linha); border-radius: var(--raio-g); padding: var(--espaco-6) var(--espaco-4); }
+.ros-santo__rotulo { font-size: 15px; line-height: 22px; color: var(--texto-suave); margin: 0; }
+.ros-santo__nome { font-family: var(--font-serif); font-weight: 600; font-size: 26px; line-height: 32px; margin: var(--espaco-1) 0 0; color: var(--texto); }
+.ros-santo__nome em { font-weight: 500; }
+.ros-santo__meta { font-size: 15px; line-height: 22px; color: var(--texto-suave); margin: var(--espaco-2) 0 0; }
+.ros-santo__familia { color: var(--terracota); font-weight: 600; }
+.ros-santo--mariano .ros-santo__familia { color: var(--mariano); }
+.ros-santo__bio { font-size: 17px; line-height: 28px; margin: var(--espaco-4) 0 0; max-width: var(--medida-texto); color: var(--texto); }
+.ros-santo__link { display: inline-flex; align-items: center; min-height: var(--toque-min); margin-top: var(--espaco-2); font-weight: 600; color: var(--mariano); text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
+@container (min-width: 520px) { .ros-santo { padding: var(--espaco-8); } .ros-santo__nome { font-size: 30px; line-height: 36px; } }
+
+/* ---------- página liturgia (composição) ---------- */
+.ros-pagina { container-type: inline-size; background: var(--fundo); }
+.ros-pagina__in { display: grid; gap: var(--espaco-6); padding: var(--espaco-6) var(--espaco-4) var(--espaco-12); }
+.ros-pagina__titulo { font-family: var(--font-serif); font-weight: 600; font-size: 36px; line-height: 42px; margin: var(--espaco-1) 0 0; }
+.ros-pagina__lateral { display: grid; gap: var(--espaco-6); align-content: start; }
+@container (min-width: 1000px) {
+  .ros-pagina__in { grid-template-columns: minmax(0, 1.6fr) minmax(320px, 1fr); padding: var(--espaco-12) var(--espaco-8) var(--espaco-16); gap: var(--espaco-8); }
+  .ros-pagina__cab { grid-column: 1 / -1; }
+}
+/* abas sem JavaScript: o rádio marcado mostra a leitura correspondente */
+.ros-liturgia:has(input[value="l1"]:checked) .ros-leitura[data-leitura="l1"],
+.ros-liturgia:has(input[value="sl"]:checked) .ros-leitura[data-leitura="sl"],
+.ros-liturgia:has(input[value="l2"]:checked) .ros-leitura[data-leitura="l2"],
+.ros-liturgia:has(input[value="ev"]:checked) .ros-leitura[data-leitura="ev"] { display: block; }
+
+/* ---------- blog: card de post ---------- */
+.ros-post { container-type: inline-size; display: flex; flex-direction: column; background: var(--fundo-elevado); border: 1px solid var(--linha); border-radius: var(--raio-g); overflow: hidden; text-decoration: none; color: inherit; height: 100%; }
+.ros-post:hover .ros-post__titulo { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+.ros-post__corpo { padding: var(--espaco-6) var(--espaco-4); display: flex; flex-direction: column; gap: var(--espaco-2); flex: 1; }
+.ros-coluna { font-size: 14px; line-height: 20px; font-weight: 700; color: var(--texto-suave); margin: 0; }
+.ros-coluna--paroco { color: var(--terracota); }
+.ros-coluna--juventude { color: var(--mariano); }
+.ros-post__titulo { font-family: var(--font-serif); font-weight: 600; font-size: 22px; line-height: 28px; margin: 0; color: var(--texto); }
+.ros-post__resumo { font-size: 16px; line-height: 26px; color: var(--texto-suave); margin: 0; }
+.ros-post__meta { font-size: 14px; line-height: 20px; color: var(--texto-suave); margin: auto 0 0; padding-top: var(--espaco-2); }
+@container (min-width: 420px) { .ros-post__corpo { padding: var(--espaco-6); } }
+
+/* miniatura de vídeo (fachada leve do YouTube) */
+.ros-video { position: relative; aspect-ratio: 16 / 9; background: var(--fundo-afundado); display: grid; place-items: center; overflow: hidden; border: 0; padding: 0; width: 100%; cursor: pointer; font: inherit; color: inherit; }
+.ros-video img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.ros-video__play { position: relative; width: 56px; height: 56px; border-radius: 50%; background: var(--fundo-elevado); color: var(--texto); display: grid; place-items: center; box-shadow: 0 1px 3px rgba(74,55,38,0.15); }
+.ros-video__play svg { width: 22px; height: 22px; margin-left: 3px; }
+.ros-video__duracao { position: absolute; right: var(--espaco-2); bottom: var(--espaco-2); font-size: 13px; line-height: 18px; font-weight: 600; padding: 2px var(--espaco-2); border-radius: var(--raio-p); background: var(--fundo-elevado); color: var(--texto); }
+.ros-video--grande { border-radius: var(--raio-g); }
+.ros-video--grande .ros-video__play { width: 72px; height: 72px; }
+.ros-video--grande .ros-video__play svg { width: 28px; height: 28px; }
+
+/* filtros (mesmo desenho das abas da liturgia) */
+.ros-filtros { display: flex; gap: var(--espaco-6); overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--linha); }
+.ros-filtros a { flex: none; font-weight: 600; font-size: 16px; line-height: 22px; min-height: var(--toque-min); display: inline-flex; align-items: center; color: var(--texto-suave); text-decoration: none; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.ros-filtros a:hover { color: var(--texto); }
+.ros-filtros a[aria-current="true"] { color: var(--texto); border-bottom-color: var(--ouro); }
+
+/* página do blog */
+.ros-blog { container-type: inline-size; background: var(--fundo); }
+.ros-blog__in { display: grid; gap: var(--espaco-6); padding: var(--espaco-8) var(--espaco-4) var(--espaco-12); }
+.ros-blog__intro { font-size: 18px; line-height: 28px; color: var(--texto-suave); margin: var(--espaco-2) 0 0; max-width: var(--medida-texto); }
+.ros-blog__grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--espaco-6); }
+.ros-blog__destaque .ros-post__titulo { font-size: 26px; line-height: 32px; }
+@container (min-width: 900px) {
+  .ros-blog__in { padding: var(--espaco-12) var(--espaco-8) var(--espaco-16); gap: var(--espaco-8); }
+  .ros-blog__destaque .ros-post { display: grid; grid-template-columns: 1.4fr 1fr; }
+  .ros-blog__destaque .ros-video { height: 100%; aspect-ratio: auto; min-height: 320px; }
+  .ros-blog__destaque .ros-post__corpo { padding: var(--espaco-8); justify-content: center; }
+  .ros-blog__destaque .ros-post__titulo { font-size: 32px; line-height: 40px; }
+}
+
+/* página do post */
+.ros-artigo { container-type: inline-size; background: var(--fundo); }
+.ros-artigo__in { max-width: 720px; margin: 0 auto; padding: var(--espaco-8) var(--espaco-4) var(--espaco-12); }
+.ros-artigo__voltar { font-size: 15px; color: var(--texto-suave); text-decoration: none; display: inline-flex; min-height: var(--toque-min); align-items: center; }
+.ros-artigo__titulo { font-family: var(--font-serif); font-weight: 600; font-size: 32px; line-height: 40px; margin: var(--espaco-2) 0 0; color: var(--texto); }
+.ros-artigo__autor { font-size: 15px; line-height: 22px; color: var(--texto-suave); margin: var(--espaco-3) 0 0; }
+.ros-artigo__autor b { color: var(--texto); font-weight: 600; }
+.ros-artigo__midia { margin: var(--espaco-8) 0 0; }
+.ros-artigo__midia figcaption { font-size: 14px; line-height: 20px; color: var(--texto-suave); margin-top: var(--espaco-2); }
+.ros-artigo__texto { font-size: 19px; line-height: 32px; color: var(--texto); margin-top: var(--espaco-8); }
+.ros-artigo__texto p { margin: 0 0 var(--espaco-6); }
+.ros-artigo__texto h2 { font-family: var(--font-serif); font-weight: 600; font-size: 24px; line-height: 32px; margin: var(--espaco-8) 0 var(--espaco-3); }
+.ros-artigo__texto blockquote { margin: var(--espaco-8) 0; padding: 0; font-family: var(--font-serif); font-style: italic; font-size: 24px; line-height: 34px; color: var(--mariano); }
+.ros-artigo__rodape { border-top: 1px solid var(--linha); margin-top: var(--espaco-8); padding-top: var(--espaco-6); font-size: 15px; line-height: 24px; color: var(--texto-suave); }
+.ros-artigo__rodape b { display: block; color: var(--texto); font-weight: 600; font-size: 16px; }
+@container (min-width: 640px) {
+  .ros-artigo__in { padding: var(--espaco-12) var(--espaco-8) var(--espaco-16); }
+  .ros-artigo__titulo { font-size: 44px; line-height: 52px; }
+}
