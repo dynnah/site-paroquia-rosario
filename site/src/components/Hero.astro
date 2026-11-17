@@ -1,0 +1,101 @@
+---
+import type { NomeIcone } from '../lib/icones';
+import Botao from './Botao.astro';
+import Icone from './Icone.astro';
+
+interface Acao {
+  rotulo: string;
+  href: string;
+  icone?: NomeIcone;
+}
+
+interface Props {
+  /** Ex.: "Jaguaribe · João Pessoa". */
+  sobrelinha?: string;
+  /** Primeira linha do título (romano): "Nossa Senhora". */
+  titulo: string;
+  /** Segunda linha (itálico, cor mariano): "do Rosário". */
+  tituloItalico?: string;
+  texto?: string;
+  /** Calculada a partir da tabela de horários. Ex.: { quando: "hoje", hora: "17h" } ou { quando: "amanhã", hora: "7h" }. */
+  proximaMissa?: { quando: string; hora: string };
+  /** Uma ação primária (Ver horários) e no máximo uma secundária. */
+  acaoPrimaria?: Acao;
+  acaoSecundaria?: Acao;
+  /** Foto na moldura em arco (a fachada ou o altar, com boa luz). Sem foto, usa o logo. */
+  foto?: { src: string; alt: string };
+}
+
+const {
+  sobrelinha,
+  titulo,
+  tituloItalico,
+  texto,
+  proximaMissa,
+  acaoPrimaria,
+  acaoSecundaria,
+  foto,
+} = Astro.props;
+---
+
+<section class="ros-hero">
+  <div class="ros-hero__in">
+    <div>
+      {sobrelinha && <p class="ros-sobrelinha">{sobrelinha}</p>}
+      <h1 class="ros-hero__titulo">
+        {titulo}
+        {tituloItalico && (
+          <>
+            {' '}
+            <em>{tituloItalico}</em>
+          </>
+        )}
+      </h1>
+      {texto && <p class="ros-hero__texto">{texto}</p>}
+      {proximaMissa && (
+        <div class="ros-hero__proxima">
+          <Icone nome="relogio" />
+          <div>
+            <span>Próxima missa · {proximaMissa.quando}</span>
+            <br />
+            <strong>{proximaMissa.hora}</strong>
+          </div>
+        </div>
+      )}
+      {(acaoPrimaria || acaoSecundaria) && (
+        <div class="ros-hero__acoes">
+          {acaoPrimaria && (
+            <Botao href={acaoPrimaria.href} icone={acaoPrimaria.icone}>
+              {acaoPrimaria.rotulo}
+            </Botao>
+          )}
+          {acaoSecundaria && (
+            <Botao variante="secundario" href={acaoSecundaria.href} icone={acaoSecundaria.icone}>
+              {acaoSecundaria.rotulo}
+            </Botao>
+          )}
+        </div>
+      )}
+    </div>
+    <div class:list={['ros-arco', { 'ros-arco--foto': foto }]}>
+      <img
+        src={foto?.src ?? '/logo-fachada-transparente.png'}
+        alt={foto?.alt ?? 'Fachada da Igreja do Rosário'}
+        width={foto ? undefined : 447}
+        height={foto ? undefined : 447}
+        loading="lazy"
+        decoding="async"
+      />
+    </div>
+  </div>
+</section>
+
+<style>
+  /* o ícone é um componente filho: o seletor precisa ser global */
+  .ros-hero__proxima :global(svg) {
+    width: 28px;
+    height: 28px;
+    color: var(--mariano);
+    flex: none;
+  }
+</style>

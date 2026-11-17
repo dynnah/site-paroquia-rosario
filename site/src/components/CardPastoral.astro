@@ -1,0 +1,40 @@
+---
+import type { FamiliaPastoral, LinkSimples } from '../lib/tipos';
+import Botao from './Botao.astro';
+
+interface Props {
+  /** Define a cor do filete: paroquial (padrão), mariano, franciscano ou social. */
+  familia?: FamiliaPastoral;
+  /** Sobrelinha: "Movimento", "Ação social", "Formação". */
+  categoria: string;
+  nome: string;
+  /** Uma frase do que a pastoral faz. */
+  descricao: string;
+  /** Quando se reúne, como entrar, contato. */
+  info?: { rotulo: string; valor: string }[];
+  acao: LinkSimples;
+}
+
+const { familia = 'paroquial', categoria, nome, descricao, info = [], acao } = Astro.props;
+---
+
+<article class:list={['ros-pastoral', { [`ros-pastoral--${familia}`]: familia !== 'paroquial' }]}>
+  <div class="ros-pastoral__faixa"></div>
+  <div class="ros-pastoral__corpo">
+    <p class="ros-sobrelinha">{categoria}</p>
+    <h3>{nome}</h3>
+    <p>{descricao}</p>
+    {info.length > 0 && (
+      <ul class="ros-pastoral__info">
+        {info.map((item) => (
+          <li>
+            <b>{item.rotulo}:</b> {item.valor}
+          </li>
+        ))}
+      </ul>
+    )}
+    <Botao variante="secundario" href={acao.href}>
+      {acao.rotulo}
+    </Botao>
+  </div>
+</article>

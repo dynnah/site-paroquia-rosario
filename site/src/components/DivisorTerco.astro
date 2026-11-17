@@ -1,0 +1,17 @@
+---
+/**
+ * Fileira de contas em ouro: cinco pequenas, uma grande, cinco pequenas.
+ * Entre seções da página, nunca dentro de cards. No máximo dois por página.
+ */
+const contas = Array.from({ length: 5 });
+---
+
+<div role="separator" class="ros-terco">
+  {contas.map(() => (
+    <i />
+  ))}
+  <i class="grande"></i>
+  {contas.map(() => (
+    <i />
+  ))}
+</div>

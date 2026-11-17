@@ -1,0 +1,97 @@
+---
+import Icone from './Icone.astro';
+
+interface Props {
+  horariosHref?: string;
+  /** "Como chegar" (veja urlMapa em lib/paroquia.ts). */
+  mapaHref: string;
+  /** Sem WhatsApp cadastrado, o atalho some. */
+  whatsappHref?: string;
+  /** Fixa no rodapé da tela (só abaixo de 1024px). Desligada, vira um bloco comum. */
+  fixa?: boolean;
+}
+
+const { horariosHref = '/horarios', mapaHref, whatsappHref, fixa = true } = Astro.props;
+---
+
+<nav class:list={['barra', { 'barra--fixa': fixa }]} aria-label="Atalhos">
+  <ul>
+    <li>
+      <a href={horariosHref}>
+        <Icone nome="relogio" />
+        <span>Horários</span>
+      </a>
+    </li>
+    <li>
+      <a href={mapaHref}>
+        <Icone nome="local" />
+        <span>Como chegar</span>
+      </a>
+    </li>
+    {whatsappHref && (
+      <li>
+        <a href={whatsappHref}>
+          <Icone nome="mensagem" />
+          <span>WhatsApp</span>
+        </a>
+      </li>
+    )}
+  </ul>
+</nav>
+{fixa && <div class="barra-espaco" aria-hidden="true"></div>}
+
+<style>
+  .barra {
+    background: var(--fundo-elevado);
+    border-top: 1px solid var(--linha);
+  }
+
+  .barra--fixa {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 40;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  ul {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--espaco-1);
+    min-height: calc(var(--toque-min) + var(--espaco-3));
+    padding: var(--espaco-2);
+    color: var(--texto);
+    font-size: 14px;
+    line-height: 18px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  a :global(svg) {
+    width: 22px;
+    height: 22px;
+    color: var(--mariano);
+  }
+
+  /* Reserva o espaço da barra no fim da página, para ela não cobrir o rodapé. */
+  .barra-espaco {
+    height: calc(var(--toque-min) + var(--espaco-3) + env(safe-area-inset-bottom));
+  }
+
+  @media (min-width: 1024px) {
+    .barra--fixa,
+    .barra-espaco {
+      display: none;
+    }
+  }
+</style>

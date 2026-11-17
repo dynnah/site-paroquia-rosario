@@ -1,0 +1,40 @@
+---
+import CopiarChave from './CopiarChave.vue';
+
+interface Props {
+  /** Chave Pix oficial da paróquia. */
+  chave: string;
+  /** Mostre sempre o titular, para quem doa conferir antes de pagar. */
+  titular: string;
+  /** Distingue blocos repetidos na mesma página. */
+  id?: string;
+  sobrelinha?: string;
+  titulo?: string;
+  /** Parte do título em itálico. */
+  destaque?: string;
+  texto?: string;
+}
+
+const {
+  chave,
+  titular,
+  id = 'doacao-pix',
+  sobrelinha = 'Dízimo e doações',
+  titulo = 'Faça parte',
+  destaque = 'desta obra',
+  texto = 'Como na campanha do centavo de Frei Martinho, cada contribuição ajuda a manter a igreja e os projetos da paróquia.',
+} = Astro.props;
+---
+
+<section class="ros-pix" aria-labelledby={`${id}-titulo`}>
+  <p class="ros-sobrelinha">{sobrelinha}</p>
+  <h3 id={`${id}-titulo`}>
+    {titulo} <em>{destaque}</em>
+  </h3>
+  <p>{texto}</p>
+  <div class="ros-pix__chave">
+    <div class="ros-pix__valor">{chave}</div>
+    <CopiarChave client:visible chave={chave} />
+  </div>
+  <p class="ros-pix__titular">Titular: {titular}</p>
+</section>

@@ -1,0 +1,51 @@
+---
+import { estaAtivo } from '../lib/navegacao';
+import type { LinkSimples } from '../lib/tipos';
+import Botao from './Botao.astro';
+import MenuGaveta from './MenuGaveta.vue';
+
+interface Props {
+  links: LinkSimples[];
+  /** Caminho da página atual (ex.: Astro.url.pathname), para marcar o link ativo. */
+  caminhoAtual?: string;
+  horariosHref?: string;
+  /** Cabeçalho fixo no topo ao rolar. */
+  fixo?: boolean;
+  nome?: string;
+  assinatura?: string;
+}
+
+const {
+  links,
+  caminhoAtual = '',
+  horariosHref = '/horarios',
+  fixo = true,
+  nome = 'Igreja do Rosário',
+  assinatura = 'Paróquia Nossa Senhora do Rosário',
+} = Astro.props;
+
+const itens = links.map((link) => ({ ...link, atual: estaAtivo(link.href, caminhoAtual) }));
+---
+
+<header class:list={['ros-header', { 'cabecalho-fixo': fixo }]}>
+  <div class="ros-header__in">
+    <a class="ros-marca" href="/">
+      <img src="/logo-fachada-transparente.png" alt="" width="48" height="48" />
+      <span>
+        <span class="ros-marca__nome">{nome}</span>
+        <span class="ros-marca__sub">{assinatura}</span>
+      </span>
+    </a>
+    <nav class="ros-nav" aria-label="Principal">
+      {itens.map((item) => (
+        <a href={item.href} aria-current={item.atual ? 'page' : undefined}>
+          {item.rotulo}
+        </a>
+      ))}
+    </nav>
+    <Botao href={horariosHref} icone="relogio">
+      Horários
+    </Botao>
+    <MenuGaveta client:visible links={itens} />
+  </div>
+</header>

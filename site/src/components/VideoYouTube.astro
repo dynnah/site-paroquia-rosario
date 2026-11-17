@@ -1,0 +1,83 @@
+---
+import { miniaturaYouTube, urlYouTube } from '../lib/youtube';
+import Icone from './Icone.astro';
+
+interface Props {
+  /** ID do vídeo (veja extrairIdYouTube em lib/youtube.ts). */
+  id: string;
+  titulo: string;
+  /** "6:40" */
+  duracao?: string;
+  /** Moldura grande, para a página do post. */
+  grande?: boolean;
+}
+
+const { id, titulo, duracao, grande = true } = Astro.props;
+---
+
+<div class="video-yt" data-video-yt data-id={id} data-titulo={titulo} data-grande={String(grande)}>
+  <!-- Sem JavaScript, o link leva ao vídeo no YouTube. Com JavaScript, o clique troca a miniatura pelo player. -->
+  <a
+    class:list={['ros-video', { 'ros-video--grande': grande }, 'fachada']}
+    href={urlYouTube(id)}
+    aria-label={`Assistir ao vídeo: ${titulo}`}
+  >
+    <img
+      src={miniaturaYouTube(id)}
+      alt=""
+      loading="lazy"
+      decoding="async"
+      referrerpolicy="no-referrer"
+    />
+    <span class="ros-video__play">
+      <Icone nome="play" />
+    </span>
+    {duracao && <span class="ros-video__duracao">{duracao}</span>}
+  </a>
+</div>
+
+<script>
+  import { urlPlayerYouTube } from '../lib/youtube';
+
+  // Um único ouvinte para todos os vídeos da página.
+  document.addEventListener('click', (evento) => {
+    const alvo = evento.target;
+    if (!(alvo instanceof Element)) return;
+
+    const fachada = alvo.closest<HTMLAnchorElement>('[data-video-yt] .fachada');
+    if (!fachada) return;
+
+    // Ctrl/Cmd/Shift/Alt ou botão do meio: deixa abrir o YouTube normalmente.
+    if (
+      evento.button !== 0 ||
+      evento.metaKey ||
+      evento.ctrlKey ||
+      evento.shiftKey ||
+      evento.altKey
+    ) {
+      return;
+    }
+
+    const raiz = fachada.closest<HTMLElement>('[data-video-yt]');
+    if (!raiz?.dataset.id) return;
+
+    evento.preventDefault();
+
+    const player = document.createElement('iframe');
+    player.className = 'video-yt__player';
+    player.classList.toggle('video-yt__player--grande', raiz.dataset.grande === 'true');
+    player.src = urlPlayerYouTube(raiz.dataset.id);
+    player.title = raiz.dataset.titulo ?? 'Vídeo do YouTube';
+    player.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+    player.referrerPolicy = 'strict-origin-when-cross-origin';
+
+    fachada.replaceWith(player);
+    player.focus();
+  });
+</script>
+
+<style>
+  .fachada {
+    text-decoration: none;
+  }
+</style>

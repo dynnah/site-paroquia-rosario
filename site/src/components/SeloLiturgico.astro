@@ -1,0 +1,16 @@
+---
+import type { CorLiturgica } from '../lib/tipos';
+
+interface Props {
+  cor: CorLiturgica;
+  /** O texto diz o tempo litúrgico; a bolinha mostra a cor. A cor nunca aparece sozinha. */
+  rotulo: string;
+}
+
+const { cor, rotulo } = Astro.props;
+---
+
+<span class={`ros-selo ros-selo--${cor}`}>
+  <i aria-hidden="true"></i>
+  {rotulo}
+</span>

@@ -1,0 +1,111 @@
+---
+import { dataLonga } from '../lib/formatacao';
+import type { CorLiturgica } from '../lib/tipos';
+import Botao from './Botao.astro';
+import TamanhoTexto from './TamanhoTexto.vue';
+
+type IdLeitura = 'l1' | 'sl' | 'l2' | 'ev';
+
+interface Leitura {
+  /** 1ª leitura, salmo, 2ª leitura (só domingos e solenidades) e evangelho. O CSS depende destes ids. */
+  id: IdLeitura;
+  rotulo: string;
+  referencia: string;
+  /** Parágrafos. Sem texto, o card mostra só a referência e o link da liturgia oficial. */
+  texto?: string[];
+  aclamacao?: string;
+}
+
+interface Props {
+  /** Distingue cards repetidos na mesma página (ids dos campos e do título). */
+  id: string;
+  data: string | Date;
+  /** "33ª Semana do Tempo Comum" */
+  semana: string;
+  /** "Santa Isabel da Hungria · Memória" */
+  celebracao: string;
+  cor: CorLiturgica;
+  leituras: Leitura[];
+  /** Aba aberta. Padrão: o Evangelho. */
+  aberta?: IdLeitura;
+  fonte?: { rotulo: string; href: string; prefixo?: string };
+  /** Link da liturgia oficial, para as leituras sem texto integral. */
+  linkOficial?: string;
+}
+
+const { id, data, semana, celebracao, cor, leituras, aberta, fonte, linkOficial } = Astro.props;
+
+const abertaId = aberta ?? (leituras.some((l) => l.id === 'ev') ? 'ev' : leituras[0]?.id);
+const tituloId = `lt-${id}`;
+---
+
+<article class="ros-liturgia" aria-labelledby={tituloId}>
+  <p class="ros-liturgia__data">{dataLonga(data)}</p>
+  <h2 class="ros-liturgia__titulo" id={tituloId}>
+    {semana}
+  </h2>
+  <p class="ros-liturgia__celebracao">
+    <span
+      class="ros-liturgia__cor"
+      style={`background:var(--liturgico-${cor})`}
+      aria-hidden="true"
+    ></span>
+    {celebracao}
+  </p>
+
+  <div class="ros-liturgia__barra">
+    <div class="ros-liturgia__abas" role="radiogroup" aria-label="Leituras do dia">
+      {leituras.map((leitura) => (
+        <>
+          <input
+            type="radio"
+            name={`leit-${id}`}
+            id={`${leitura.id}-${id}`}
+            value={leitura.id}
+            checked={leitura.id === abertaId}
+          />
+          <label class="ros-aba" for={`${leitura.id}-${id}`}>
+            {leitura.rotulo}
+          </label>
+        </>
+      ))}
+    </div>
+    <TamanhoTexto client:visible />
+  </div>
+
+  {leituras.map((leitura) => (
+    <section class="ros-leitura" data-leitura={leitura.id}>
+      <p class="ros-leitura__ref">{leitura.referencia}</p>
+      {leitura.texto ? (
+        <div class="ros-leitura__texto">
+          {leitura.texto.map((paragrafo) => (
+            <p>{paragrafo}</p>
+          ))}
+        </div>
+      ) : (
+        linkOficial && (
+          <p class="acao-leitura">
+            <Botao variante="secundario" href={linkOficial}>
+              Ler na Liturgia Diária
+            </Botao>
+          </p>
+        )
+      )}
+      {leitura.aclamacao && leitura.texto && (
+        <p class="ros-leitura__aclamacao">{leitura.aclamacao}</p>
+      )}
+    </section>
+  ))}
+
+  {fonte && (
+    <p class="ros-liturgia__fonte">
+      {fonte.prefixo ?? 'Texto'}: <a href={fonte.href}>{fonte.rotulo}</a>
+    </p>
+  )}
+</article>
+
+<style>
+  .acao-leitura {
+    margin: var(--espaco-4) 0 0;
+  }
+</style>

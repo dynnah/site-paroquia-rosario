@@ -1,0 +1,71 @@
+---
+import { dataCurta } from '../lib/formatacao';
+import { miniaturaYouTube } from '../lib/youtube';
+import Icone from './Icone.astro';
+
+interface Props {
+  href: string;
+  /** Quem escreve: "Palavra do Pároco", "Juventude", "Catequese"… */
+  coluna: string;
+  /** pároco: cor terracota. juventude: cor mariano. outra: sem cor. */
+  colunaTipo?: 'paroco' | 'juventude' | 'outra';
+  titulo: string;
+  /** Uma ou duas frases. Opcional nos posts de vídeo. */
+  resumo?: string;
+  autor: string;
+  data: string | Date;
+  /** Só para posts de texto. */
+  minutosLeitura?: number;
+  /** Presente = post de vídeo. `id` é o ID do YouTube (veja extrairIdYouTube). */
+  video?: { id: string; duracao?: string };
+}
+
+const {
+  href,
+  coluna,
+  colunaTipo = 'outra',
+  titulo,
+  resumo,
+  autor,
+  data,
+  minutosLeitura,
+  video,
+} = Astro.props;
+
+const fecho = video ? 'vídeo' : minutosLeitura ? `${minutosLeitura} min de leitura` : undefined;
+const meta = [autor, dataCurta(data), fecho].filter(Boolean).join(' · ');
+---
+
+<a class="ros-post" href={href}>
+  {video && (
+    <div class="ros-video" role="img" aria-label={`Vídeo: ${titulo}`}>
+      <img
+        src={miniaturaYouTube(video.id)}
+        alt=""
+        loading="lazy"
+        decoding="async"
+        referrerpolicy="no-referrer"
+      />
+      <span class="ros-video__play">
+        <Icone nome="play" />
+      </span>
+      {video.duracao && <span class="ros-video__duracao">{video.duracao}</span>}
+    </div>
+  )}
+  <div class="ros-post__corpo">
+    <p
+      class:list={[
+        'ros-coluna',
+        {
+          'ros-coluna--paroco': colunaTipo === 'paroco',
+          'ros-coluna--juventude': colunaTipo === 'juventude',
+        },
+      ]}
+    >
+      {coluna}
+    </p>
+    <h3 class="ros-post__titulo">{titulo}</h3>
+    {resumo && <p class="ros-post__resumo">{resumo}</p>}
+    <p class="ros-post__meta">{meta}</p>
+  </div>
+</a>

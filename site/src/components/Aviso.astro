@@ -1,0 +1,42 @@
+---
+import type { NomeIcone } from '../lib/icones';
+import type { LinkSimples } from '../lib/tipos';
+import Icone from './Icone.astro';
+
+interface Props {
+  /** informativo: avisos da semana. festa: novena e solenidades (um por vez). mudança: horário alterado ou cancelado. */
+  tipo?: 'informativo' | 'festa' | 'mudanca';
+  titulo: string;
+  /** Uma frase. Nada de parágrafos longos. */
+  texto?: string;
+  link?: LinkSimples;
+}
+
+const { tipo = 'informativo', titulo, texto, link } = Astro.props;
+
+const icones: Record<NonNullable<Props['tipo']>, NomeIcone> = {
+  informativo: 'info',
+  festa: 'estrela',
+  mudanca: 'alerta',
+};
+---
+
+<div
+  class:list={[
+    'ros-aviso',
+    { 'ros-aviso--festa': tipo === 'festa', 'ros-aviso--mudanca': tipo === 'mudanca' },
+  ]}
+  role={tipo === 'mudanca' ? 'alert' : undefined}
+>
+  <Icone nome={icones[tipo]} />
+  <p>
+    <strong>{titulo}</strong>
+    {texto}
+    {link && (
+      <>
+        {' '}
+        <a href={link.href}>{link.rotulo}</a>
+      </>
+    )}
+  </p>
+</div>

@@ -1,0 +1,51 @@
+---
+import { diaEMes } from '../lib/formatacao';
+
+interface Props {
+  href: string;
+  /** Data do evento: "2026-10-07" ou um instante (lido no fuso de São Paulo). */
+  data: string | Date;
+  /** Ex.: "Quarta-feira · Festa da padroeira". */
+  sobrelinha: string;
+  titulo: string;
+  /** Parte do título em itálico, como o nome da festa: "Nossa Senhora" + "do Rosário". */
+  destaque?: string;
+  /** Local e horário: "Missa solene às 17h na Matriz". */
+  meta?: string;
+  /** festa: solenidades e padroeira. franciscano: datas dos frades. */
+  variante?: 'padrao' | 'festa' | 'franciscano';
+}
+
+const { href, data, sobrelinha, titulo, destaque, meta, variante = 'padrao' } = Astro.props;
+const { dia, mes } = diaEMes(data);
+---
+
+<a class="ros-evento" href={href}>
+  <div class="ros-evento__in">
+    <div
+      class:list={[
+        'ros-data',
+        {
+          'ros-data--festa': variante === 'festa',
+          'ros-data--franciscano': variante === 'franciscano',
+        },
+      ]}
+    >
+      <b>{dia}</b>
+      <span>{mes}</span>
+    </div>
+    <div>
+      <p class="ros-sobrelinha">{sobrelinha}</p>
+      <h3 class="ros-evento__titulo">
+        {titulo}
+        {destaque && (
+          <>
+            {' '}
+            <em>{destaque}</em>
+          </>
+        )}
+      </h3>
+      {meta && <p class="ros-evento__meta">{meta}</p>}
+    </div>
+  </div>
+</a>

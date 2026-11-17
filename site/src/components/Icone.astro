@@ -1,0 +1,13 @@
+---
+import { ICONES, atributosIcone, type NomeIcone } from '../lib/icones';
+
+interface Props {
+  nome: NomeIcone;
+  /** Largura e altura em px. Sem isso, o tamanho vem do CSS do componente que o usa. */
+  tamanho?: number;
+}
+
+const { nome, tamanho } = Astro.props;
+---
+
+<svg {...atributosIcone(nome)} width={tamanho} height={tamanho} set:html={ICONES[nome].corpo} />

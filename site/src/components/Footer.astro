@@ -1,0 +1,230 @@
+---
+import { partesData } from '../lib/formatacao';
+import type { LinkSimples } from '../lib/tipos';
+
+interface Props {
+  nome: string;
+  assinatura: string;
+  /** [rua, "bairro · cidade – UF"] (veja enderecoEmLinhas em lib/paroquia.ts). */
+  endereco: [string, string];
+  mapaHref: string;
+  navegacao: LinkSimples[];
+  institucional: LinkSimples[];
+  /** Instagram, YouTube… Só entram os que a paróquia tem. */
+  redes?: LinkSimples[];
+  /** Telefone, WhatsApp, e-mail… Só entram os que a paróquia tem. */
+  contato?: LinkSimples[];
+  /** Prefixo dos ids dos títulos; mude se houver dois rodapés na mesma página. */
+  idBase?: string;
+}
+
+const {
+  nome,
+  assinatura,
+  endereco,
+  mapaHref,
+  navegacao,
+  institucional,
+  redes = [],
+  contato = [],
+  idBase = 'rodape',
+} = Astro.props;
+
+const ano = partesData().ano;
+const externo = (href: string) => /^https?:\/\//.test(href);
+---
+
+<footer class="rodape">
+  <div class="container grade">
+    <div class="marca">
+      <a class="marca__link" href="/">
+        <img src="/logo-fachada-transparente.png" alt="" width="48" height="48" loading="lazy" />
+        <span>
+          <span class="marca__nome">{assinatura}</span>
+          <span class="marca__sub">{nome}</span>
+        </span>
+      </a>
+      <address>
+        {endereco[0]}
+        <br />
+        {endereco[1]}
+      </address>
+      <a class="como-chegar" href={mapaHref} rel="noopener noreferrer">
+        Como chegar
+      </a>
+    </div>
+
+    <nav aria-labelledby={`${idBase}-navegue`}>
+      <h2 class="titulo" id={`${idBase}-navegue`}>
+        Navegue
+      </h2>
+      <ul>
+        {navegacao.map((link) => (
+          <li>
+            <a href={link.href}>{link.rotulo}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <nav aria-labelledby={`${idBase}-paroquia`}>
+      <h2 class="titulo" id={`${idBase}-paroquia`}>
+        A paróquia
+      </h2>
+      <ul>
+        {institucional.map((link) => (
+          <li>
+            <a href={link.href}>{link.rotulo}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    {(redes.length > 0 || contato.length > 0) && (
+      <div>
+        <h2 class="titulo">Fale com a gente</h2>
+        <ul>
+          {contato.map((link) => (
+            <li>
+              <a href={link.href} rel={externo(link.href) ? 'noopener noreferrer' : undefined}>
+                {link.rotulo}
+              </a>
+            </li>
+          ))}
+          {redes.map((link) => (
+            <li>
+              <a href={link.href} rel="noopener noreferrer">
+                {link.rotulo}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+  </div>
+
+  <div class="base">
+    <div class="container">
+      <p>
+        © {ano} {nome}.
+      </p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .rodape {
+    /* container queries, como os demais componentes: a grade segue a largura do rodapé */
+    container-type: inline-size;
+    background: var(--fundo-afundado);
+    color: var(--texto-suave);
+    border-top: 1px solid var(--linha);
+  }
+
+  .grade {
+    display: grid;
+    gap: var(--espaco-8);
+    padding-block: var(--espaco-12) var(--espaco-8);
+  }
+
+  @container (min-width: 640px) {
+    .grade {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @container (min-width: 1024px) {
+    .grade {
+      grid-template-columns: 1.4fr 1fr 1fr 1fr;
+      gap: var(--espaco-12);
+      padding-block: var(--espaco-16) var(--espaco-12);
+    }
+  }
+
+  .marca {
+    display: grid;
+    gap: var(--espaco-3);
+    align-content: start;
+  }
+
+  .marca__link {
+    display: flex;
+    align-items: center;
+    gap: var(--espaco-2);
+    color: var(--texto);
+    text-decoration: none;
+  }
+
+  .marca__link img {
+    width: 48px;
+    height: 48px;
+  }
+
+  .marca__nome {
+    display: block;
+    font-weight: 700;
+    font-size: 15px;
+    line-height: 20px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .marca__sub {
+    display: block;
+    font-size: 15px;
+    line-height: 20px;
+    color: var(--texto-suave);
+  }
+
+  address {
+    font-style: normal;
+    font-size: 16px;
+    line-height: 24px;
+  }
+
+  .titulo {
+    margin: 0 0 var(--espaco-2);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 22px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--texto);
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .rodape a:not(.marca__link) {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--toque-min);
+    color: var(--texto);
+    font-size: 16px;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+  }
+
+  .rodape a:not(.marca__link):hover {
+    color: var(--mariano);
+  }
+
+  .como-chegar {
+    justify-self: start;
+  }
+
+  .base {
+    border-top: 1px solid var(--linha);
+    padding-block: var(--espaco-6);
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  .base p {
+    margin: 0;
+  }
+</style>

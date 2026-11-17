@@ -1,0 +1,92 @@
+---
+import { diaDaSemana, formatarHora } from '../lib/formatacao';
+import type { CorLiturgica } from '../lib/tipos';
+import SeloLiturgico from './SeloLiturgico.astro';
+
+interface Linha {
+  /** "Domingo", "Quarta a sexta". Agrupe dias iguais. */
+  rotulo: string;
+  /** Dias da semana a que a linha se refere (0 = domingo … 6 = sábado). Serve para destacar o "hoje". */
+  dias: number[];
+  /** "07:00" ou "7h". Vazio = sem horário (use `nota: "Sem missa"`: o dia nunca some). */
+  horas: string[];
+  nota?: string;
+}
+
+interface Props {
+  /** Um card por tipo: "Santa Missa", "Confissões", "Adoração", "Secretaria". */
+  titulo: string;
+  linhas: Linha[];
+  selo?: { cor: CorLiturgica; rotulo: string };
+  /** Dia a destacar. Padrão: hoje em São Paulo. Um script leve reavalia no navegador. */
+  hoje?: number;
+}
+
+const { titulo, linhas, selo, hoje = diaDaSemana() } = Astro.props;
+---
+
+<div class="ros-horarios" data-horarios>
+  <div class="ros-horarios__topo">
+    <h3>{titulo}</h3>
+    {selo && <SeloLiturgico cor={selo.cor} rotulo={selo.rotulo} />}
+  </div>
+  <ul class="ros-horarios__lista">
+    {linhas.map((linha) => {
+      const ehHoje = linha.dias.includes(hoje);
+      return (
+        <li
+          class:list={['ros-horarios__dia', { 'ros-horarios__dia--hoje': ehHoje }]}
+          data-dias={linha.dias.join(',')}
+          aria-current={ehHoje ? 'date' : undefined}
+        >
+          <span class="ros-horarios__nome">
+            {linha.rotulo}
+            {ehHoje && <span class="ros-hoje">hoje</span>}
+            {linha.nota && <span class="ros-horarios__nota">{linha.nota}</span>}
+          </span>
+          <span class="ros-horarios__horas">
+            {linha.horas.map((hora) => (
+              <span class="ros-hora">{formatarHora(hora)}</span>
+            ))}
+          </span>
+        </li>
+      );
+    })}
+  </ul>
+</div>
+
+<script>
+  // O site é estático e pode ficar em cache: reavalia o "hoje" no navegador, no fuso de São Paulo.
+  import { diaDaSemana } from '../lib/formatacao';
+
+  function marcarHoje() {
+    const hoje = diaDaSemana();
+
+    document.querySelectorAll<HTMLElement>('[data-horarios] li[data-dias]').forEach((linha) => {
+      const dias = (linha.dataset.dias ?? '').split(',').map(Number);
+      const ehHoje = dias.includes(hoje);
+
+      linha.classList.toggle('ros-horarios__dia--hoje', ehHoje);
+      if (ehHoje) linha.setAttribute('aria-current', 'date');
+      else linha.removeAttribute('aria-current');
+
+      const nome = linha.querySelector('.ros-horarios__nome');
+      const marca = nome?.querySelector('.ros-hoje');
+      if (ehHoje && nome && !marca) {
+        const novaMarca = document.createElement('span');
+        novaMarca.className = 'ros-hoje';
+        novaMarca.textContent = 'hoje';
+        if (nome.firstChild) nome.firstChild.after(novaMarca);
+        else nome.append(novaMarca);
+      } else if (!ehHoje && marca) {
+        marca.remove();
+      }
+    });
+  }
+
+  marcarHoje();
+  // aba aberta de um dia para o outro
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) marcarHoje();
+  });
+</script>

@@ -1,0 +1,54 @@
+---
+interface Props {
+  /** "Santa Isabel" + `destaque` "da Hungria". */
+  nome: string;
+  destaque?: string;
+  grau?: 'Memória' | 'Festa' | 'Solenidade';
+  /** franciscana: cor terracota. mariana: cor mariano. Sem família, sem cor. */
+  familia?: 'franciscana' | 'mariana';
+  /** "1207–1231" */
+  datas?: string;
+  /** Duas ou três frases, escritas pela paróquia. */
+  bio: string;
+  /** Página com a história completa. */
+  href?: string;
+}
+
+const { nome, destaque, grau, familia, datas, bio, href } = Astro.props;
+
+const rotuloFamilia = familia === 'franciscana' ? 'Família franciscana' : 'Família mariana';
+---
+
+<article class:list={['ros-santo', { 'ros-santo--mariano': familia === 'mariana' }]}>
+  <p class="ros-santo__rotulo">Santo do dia</p>
+  <h3 class="ros-santo__nome">
+    {nome}
+    {destaque && (
+      <>
+        {' '}
+        <em>{destaque}</em>
+      </>
+    )}
+  </h3>
+  {(grau || familia || datas) && (
+    <p class="ros-santo__meta">
+      {grau}
+      {grau && (familia || datas) && ' · '}
+      {familia && <span class="ros-santo__familia">{rotuloFamilia}</span>}
+      {familia && datas && ' · '}
+      {datas && <span class="sem-quebra">{datas}</span>}
+    </p>
+  )}
+  <p class="ros-santo__bio">{bio}</p>
+  {href && (
+    <a class="ros-santo__link" href={href}>
+      Ler a história
+    </a>
+  )}
+</article>
+
+<style>
+  .sem-quebra {
+    white-space: nowrap;
+  }
+</style>

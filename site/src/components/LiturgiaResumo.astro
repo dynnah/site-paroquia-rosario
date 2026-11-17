@@ -1,0 +1,24 @@
+---
+import Icone from './Icone.astro';
+
+interface Props {
+  /** Página de Liturgia. */
+  href: string;
+  /** Referência do Evangelho: "Lc 19,1-10". */
+  referencia: string;
+  /** Título curto do trecho. Sem ele, o resumo convida a ler o Evangelho. */
+  titulo?: string;
+}
+
+const { href, referencia, titulo = 'Ler o Evangelho de hoje' } = Astro.props;
+---
+
+<a class="ros-liturgia-resumo" href={href}>
+  <span class="ros-liturgia-resumo__icone">
+    <Icone nome="livro" />
+  </span>
+  <span>
+    <span class="ros-liturgia-resumo__meta">Evangelho de hoje · {referencia}</span>
+    <b>{titulo}</b>
+  </span>
+</a>

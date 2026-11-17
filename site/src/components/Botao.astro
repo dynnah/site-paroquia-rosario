@@ -1,0 +1,47 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import type { NomeIcone } from '../lib/icones';
+import Icone from './Icone.astro';
+
+type Props = Omit<HTMLAttributes<'a'>, 'type'> & {
+  /** primário: a ação principal da tela (uma só). secundário: apoio. fantasma: "saiba mais". claro: só sobre fundo marrom. */
+  variante?: 'primario' | 'secundario' | 'fantasma' | 'claro';
+  /** Ocupa a largura toda (útil no celular, no fim de um card). */
+  bloco?: boolean;
+  icone?: NomeIcone;
+  /** Tipo do <button>; só vale quando não há `href`. */
+  tipo?: 'button' | 'submit' | 'reset';
+  desabilitado?: boolean;
+};
+
+const {
+  variante = 'primario',
+  bloco = false,
+  icone,
+  tipo = 'button',
+  desabilitado = false,
+  href,
+  class: classeExtra,
+  ...resto
+} = Astro.props;
+
+const classes = ['ros-btn', `ros-btn--${variante}`, { 'ros-btn--bloco': bloco }, classeExtra];
+const externo = typeof href === 'string' && /^https?:\/\//.test(href);
+---
+
+{href && !desabilitado ? (
+  <a class:list={classes} href={href} rel={externo ? 'noopener noreferrer' : undefined} {...resto}>
+    {icone && <Icone nome={icone} />}
+    <slot />
+  </a>
+) : (
+  <button
+    class:list={classes}
+    type={tipo}
+    disabled={desabilitado}
+    {...(resto as HTMLAttributes<'button'>)}
+  >
+    {icone && <Icone nome={icone} />}
+    <slot />
+  </button>
+)}
