@@ -15,3 +15,6 @@ dist/
 *.log
 .idea/
 .vscode/
+
+# seed gerado (npm run seed:gerar -w studio)
+studio/seed/*.ndjson
