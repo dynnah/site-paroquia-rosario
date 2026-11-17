@@ -1,0 +1,36 @@
+{
+  "name": "site-paroquia-rosario",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Site da Paróquia Nossa Senhora do Rosário — Jaguaribe, João Pessoa",
+  "workspaces": [
+    "site",
+    "studio"
+  ],
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "dev": "npm run dev -w site",
+    "build": "npm run build -w site",
+    "check": "npm run check -w site",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "sync:design": "node scripts/sync-design-system.mjs"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.15.0",
+    "eslint-plugin-astro": "^1.7.0",
+    "eslint-plugin-vue": "^10.12.1",
+    "globals": "^17.14.0",
+    "prettier": "^3.10.1",
+    "prettier-plugin-astro": "^1.1.2",
+    "sharp": "^0.35.5",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.73.0",
+    "vue-eslint-parser": "^10.4.2"
+  }
+}

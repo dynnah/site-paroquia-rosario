@@ -1,0 +1,28 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const emDesenvolvimento = import.meta.env.DEV;
+---
+
+<BaseLayout title="Início">
+  <section class="container provisoria">
+    <p class="ros-sobrelinha">Jaguaribe · João Pessoa</p>
+    <h1 class="titulo-1">
+      Nossa Senhora <span class="ros-italico">do Rosário</span>
+    </h1>
+    <p class="corpo-grande">Página inicial provisória. O site completo entra nas próximas fases.</p>
+    {emDesenvolvimento && (
+      <p>
+        <a class="ros-btn ros-btn--secundario" href="/styleguide">
+          Ver o styleguide
+        </a>
+      </p>
+    )}
+  </section>
+</BaseLayout>
+
+<style>
+  .provisoria {
+    padding-block: var(--espaco-12);
+  }
+</style>

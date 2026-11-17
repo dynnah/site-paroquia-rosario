@@ -1,0 +1,86 @@
+/*
+  Estilos globais do site. Só usa variáveis de tokens.css; as classes `ros-*`
+  dos componentes vêm de bundle.css. Aqui ficam apenas o reset e utilitários.
+*/
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+img,
+svg,
+video {
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+}
+
+a {
+  color: var(--mariano);
+}
+
+/* Container de página: 16px no celular, 24px no tablet, 32px no desktop, máx. 1200px */
+.container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--espaco-4);
+}
+
+@media (min-width: 640px) {
+  .container {
+    padding-inline: var(--espaco-6);
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    padding-inline: var(--espaco-8);
+  }
+}
+
+/* Só para leitores de tela */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Link "Pular para o conteúdo": aparece só com o foco do teclado */
+.pular {
+  position: absolute;
+  top: calc(var(--espaco-12) * -2);
+  left: var(--espaco-4);
+  z-index: 100;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--toque-min);
+  padding: 0 var(--espaco-4);
+  background: var(--fundo-elevado);
+  color: var(--texto);
+  font-weight: 600;
+  border: 1.5px solid var(--linha-forte);
+  border-radius: var(--raio-m);
+}
+
+.pular:focus {
+  top: var(--espaco-2);
+}

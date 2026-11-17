@@ -1,0 +1,140 @@
+---
+/*
+  Styleguide (só em desenvolvimento): renderiza a marcação de cada
+  design-system/components/<Nome>/preview.html para comparar com o design system.
+  No build de produção a rota não é gerada (getStaticPaths vazio).
+  Na Fase 2 ele passa a usar os componentes Astro reais.
+*/
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export function getStaticPaths() {
+  return import.meta.env.DEV ? [{ params: { page: undefined } }] : [];
+}
+
+interface Previa {
+  id: string;
+  nome: string;
+  grupo: string;
+  subtitulo: string;
+  estilos: string;
+  corpo: string;
+}
+
+const arquivos = import.meta.glob<string>('../../../../design-system/components/*/preview.html', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+});
+
+function atributo(texto: string, nome: string): string {
+  return texto.match(new RegExp(`${nome}="([^"]*)"`))?.[1] ?? '';
+}
+
+const previas: Previa[] = Object.entries(arquivos)
+  .map(([caminho, html]) => {
+    const id = caminho.split('/').at(-2) ?? caminho;
+    const cartao = html.match(/<!--\s*@dsCard\s+([^>]*?)-->/)?.[1] ?? '';
+    const corpo = html.match(/<body[^>]*>([\s\S]*?)<\/body>/)?.[1] ?? '';
+    const estilos = [...html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)]
+      .map((m) => m[1])
+      .join('\n');
+
+    return {
+      id,
+      nome: html.match(/<title>([^<]*)<\/title>/)?.[1] ?? id,
+      grupo: atributo(cartao, 'group') || 'Outros',
+      subtitulo: atributo(cartao, 'subtitle'),
+      estilos,
+      // o logo vem de /public no site; no design system é um caminho relativo
+      corpo: corpo.replaceAll(/(?:\.\.\/)+assets\/Logos\//g, '/'),
+    };
+  })
+  .sort((a, b) => a.grupo.localeCompare(b.grupo, 'pt-BR') || a.nome.localeCompare(b.nome, 'pt-BR'));
+
+const grupos = Map.groupBy(previas, (p) => p.grupo);
+---
+
+<BaseLayout title="Styleguide" description="Componentes do design system (apenas desenvolvimento).">
+  <div class="sg">
+    <header class="container sg-topo">
+      <p class="ros-sobrelinha">Apenas desenvolvimento</p>
+      <h1 class="titulo-1">Styleguide</h1>
+      <p class="corpo">
+        Marcação de referência de cada <code>design-system/components/*/preview.html</code>. Compare
+        com os componentes reais da Fase 2.
+      </p>
+      <nav aria-label="Componentes" class="sg-indice">
+        {[...grupos].map(([grupo, itens]) => (
+          <div>
+            <p class="sg-grupo">{grupo}</p>
+            <ul>
+              {itens.map((p) => (
+                <li>
+                  <a href={`#${p.id}`}>{p.nome}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </nav>
+    </header>
+
+    {previas.map((p) => (
+      <section class="container sg-secao" id={p.id} aria-labelledby={`${p.id}-titulo`}>
+        <h2 class="titulo-2" id={`${p.id}-titulo`}>
+          {p.nome}
+        </h2>
+        <p class="pequeno sg-meta">
+          {p.grupo}
+          {p.subtitulo && ` · ${p.subtitulo}`} · <code>components/{p.id}</code>
+        </p>
+        <div class="sg-previa" tabindex="0" role="region" aria-label={`Prévia: ${p.nome}`}>
+          <Fragment set:html={(p.estilos ? `<style>${p.estilos}</style>` : '') + p.corpo} />
+        </div>
+      </section>
+    ))}
+  </div>
+</BaseLayout>
+
+<style>
+  .sg {
+    padding-bottom: var(--espaco-16);
+  }
+  .sg-topo {
+    padding-block: var(--espaco-12) var(--espaco-6);
+  }
+  .sg-indice {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--espaco-8);
+    margin-top: var(--espaco-6);
+  }
+  .sg-indice ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .sg-indice a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--toque-min);
+  }
+  .sg-grupo {
+    margin: 0;
+    font-weight: 700;
+    color: var(--texto-suave);
+  }
+  .sg-secao {
+    padding-block: var(--espaco-8) 0;
+  }
+  .sg-meta {
+    margin: var(--espaco-1) 0 var(--espaco-4);
+    color: var(--texto-suave);
+  }
+  .sg-previa {
+    overflow-x: auto;
+    background: var(--fundo);
+    border: 1px solid var(--linha);
+    border-radius: var(--raio-m);
+  }
+</style>
