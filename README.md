@@ -102,7 +102,9 @@ O `/styleguide` (http://localhost:4321/styleguide) mostra todos os componentes. 
 | ------------------------------------ | ------------------------------------------- |
 | `npm run build -w site`              | Gera o site estático em `site/dist`         |
 | `npm run check -w site`              | Verifica tipos (`astro check`)              |
-| `npm run test -w site`               | Roda os testes das funções auxiliares       |
+| `npm run test -w site`               | Roda os testes das funções auxiliares e das consultas GROQ |
+| `npm run test -w studio`             | Testa as validações dos schemas e o seed    |
+| `npm run seed:gerar -w studio`       | Gera o conteúdo de exemplo para importar    |
 | `npm run lint`                       | ESLint                                      |
 | `npm run format` / `format:check`    | Prettier                                    |
 | `npm run sync:design`                | Copia o design system para o site           |
@@ -115,6 +117,28 @@ Copie os exemplos e preencha. Os arquivos `.env` nunca vão para o repositório.
 cp site/.env.example site/.env       # ID/dataset do Sanity e flag da liturgia
 cp studio/.env.example studio/.env   # ID/dataset usados pelo Studio
 ```
+
+### Sanity Studio e conteúdo
+
+Os tipos de conteúdo ficam em [`studio/schemas`](studio/schemas) e o menu lateral do Studio, em português, é organizado em **Início · Agenda · Comunidade · Blog · Liturgia · Configurações** (`studio/estrutura.ts`). No site, `site/src/lib/sanity.ts` traz o cliente e uma consulta GROQ tipada para cada necessidade das páginas.
+
+Para ligar tudo a um projeto do Sanity (uma vez só):
+
+```bash
+# 1. Crie o projeto em https://www.sanity.io/manage (plano Free, dataset "production")
+#    e preencha o ID em site/.env (PUBLIC_SANITY_PROJECT_ID) e studio/.env (SANITY_STUDIO_PROJECT_ID).
+cd studio
+npx sanity login
+npm run seed:gerar                                                        # gera seed/exemplos.ndjson
+npx sanity dataset import seed/exemplos.ndjson production --missing       # importa o conteúdo [EXEMPLO]
+npx sanity cors add http://localhost:4321 --credentials                   # site local
+npx sanity cors add http://localhost:3333 --credentials                   # Studio local
+npx sanity deploy                                                         # publica em <nome>.sanity.studio
+```
+
+`--missing` pula o que já existe, então rodar o import de novo não sobrescreve nada. Depois de publicar o site com o domínio final, adicione-o também com `sanity cors add`. Tudo que o seed cria leva `[EXEMPLO]` no texto e deve ser trocado pelo conteúdo real (Fase 8).
+
+**Quem pode publicar:** o plano Free do Sanity só tem os papéis **Administrator** e **Viewer** (Editor e Contributor são do plano Growth). Como todo Administrator pode publicar, a revisão dos posts é feita pelo campo **Status de revisão** (_Rascunho_, _Em revisão_, _Aprovado_): quem escreve deixa em rascunho ou em revisão, e o site só publica posts **Aprovados**. No Studio, _Blog_ tem listas separadas por status para a pessoa que aprova.
 
 ## Design system
 
@@ -166,7 +190,7 @@ Algumas regras importantes:
 | ---- | ------------------------------------------------------ | ------------- |
 | 1    | Estrutura: Astro, Vue, Sanity Studio e design system   | Concluída     |
 | 2    | Componentes do design system em Astro                  | Concluída     |
-| 3    | Modelo de conteúdo no Sanity                           | A fazer       |
+| 3    | Modelo de conteúdo no Sanity                           | Em andamento  |
 | 4    | Páginas lendo do Sanity                                | A fazer       |
 | 5    | Liturgia e santo do dia automáticos                    | A fazer       |
 | 6    | Qualidade: SEO, acessibilidade e desempenho            | A fazer       |
