@@ -16,12 +16,14 @@
   },
   "dependencies": {
     "@astrojs/vue": "^7.1.6",
+    "@sanity/client": "^8.16.0",
     "astro": "^7.4.12",
     "vue": "^3.5.45"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.12",
     "@types/node": "^24.19.2",
+    "groq-js": "^2.0.1",
     "typescript": "~6.0.3",
     "vue-tsc": "^3.3.14"
   }
