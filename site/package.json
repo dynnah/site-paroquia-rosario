@@ -10,7 +10,8 @@
     "prebuild": "npm run sync:design",
     "build": "astro build",
     "preview": "astro preview",
-    "check": "astro check",
+    "check": "astro check && vue-tsc --noEmit",
+    "test": "node --test \"src/**/*.test.ts\"",
     "astro": "astro"
   },
   "dependencies": {
@@ -20,6 +21,8 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.12",
-    "typescript": "~6.0.3"
+    "@types/node": "^24.19.2",
+    "typescript": "~6.0.3",
+    "vue-tsc": "^3.3.14"
   }
 }

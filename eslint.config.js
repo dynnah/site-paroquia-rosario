@@ -18,7 +18,9 @@ export default defineConfig([
   js.configs.recommended,
   tseslint.configs.recommended,
   astro.configs.recommended,
-  vue.configs['flat/recommended'],
+  // "essential": só regras de correção. O estilo (quebras de linha, atributos) é do Prettier.
+  vue.configs['flat/essential'],
+  { files: ['**/*.vue'], rules: { 'vue/no-v-html': 'warn' } },
 
   {
     languageOptions: {
