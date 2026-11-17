@@ -1,0 +1,46 @@
+---
+interface Props {
+  rotulo: string;
+  /** Largura fixa em px (ex.: 360 para o celular). Sem isso, ocupa a largura toda. */
+  largura?: number;
+  /** Sem o fundo da página e a moldura: para o que já traz a própria aparência. */
+  semFundo?: boolean;
+}
+
+const { rotulo, largura, semFundo = false } = Astro.props;
+---
+
+<div class="quadro">
+  <p class="ros-pv-label">{rotulo}</p>
+  <div
+    class:list={['moldura', { 'moldura--fundo': !semFundo }]}
+    tabindex="0"
+    role="region"
+    aria-label={rotulo}
+  >
+    <div class="conteudo" style={largura ? `width:min(${largura}px,100%)` : undefined}>
+      <slot />
+    </div>
+  </div>
+</div>
+
+<style>
+  .quadro {
+    margin-block: var(--espaco-4);
+  }
+
+  .moldura {
+    overflow-x: auto;
+  }
+
+  .moldura--fundo {
+    background: var(--fundo);
+    border: 1px solid var(--linha);
+    border-radius: var(--raio-m);
+    padding: var(--espaco-4);
+  }
+
+  .conteudo {
+    max-width: 100%;
+  }
+</style>

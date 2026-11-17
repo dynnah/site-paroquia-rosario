@@ -1,0 +1,67 @@
+---
+/**
+ * Layout das páginas do site: cabeçalho, conteúdo, rodapé e, se pedida,
+ * a barra de atalhos do celular. O /styleguide usa o BaseLayout direto.
+ */
+import BarraMobile from '../components/BarraMobile.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { LINKS_INSTITUCIONAIS, LINKS_PRINCIPAIS } from '../lib/navegacao';
+import { PAROQUIA, enderecoEmLinhas, urlInstagram, urlMapa, urlWhatsApp } from '../lib/paroquia';
+import type { LinkSimples } from '../lib/tipos';
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  /** Barra fixa no celular: Horários · Como chegar · WhatsApp. */
+  barraMobile?: boolean;
+}
+
+const { barraMobile = false, ...base } = Astro.props;
+
+const mapaHref = urlMapa(PAROQUIA);
+const whatsappHref = urlWhatsApp(PAROQUIA.whatsapp);
+const instagramHref = urlInstagram(PAROQUIA.instagram);
+
+const redes: LinkSimples[] = [];
+if (instagramHref)
+  redes.push({ rotulo: `Instagram · @${PAROQUIA.instagram}`, href: instagramHref });
+if (PAROQUIA.youtube) redes.push({ rotulo: 'YouTube', href: PAROQUIA.youtube });
+
+const contato: LinkSimples[] = [];
+if (whatsappHref) contato.push({ rotulo: 'WhatsApp da secretaria', href: whatsappHref });
+if (PAROQUIA.telefone) {
+  contato.push({
+    rotulo: PAROQUIA.telefone,
+    href: `tel:${PAROQUIA.telefone.replace(/[^\d+]/g, '')}`,
+  });
+}
+if (PAROQUIA.email) contato.push({ rotulo: PAROQUIA.email, href: `mailto:${PAROQUIA.email}` });
+---
+
+<BaseLayout {...base}>
+  <Header
+    slot="cabecalho"
+    links={LINKS_PRINCIPAIS}
+    caminhoAtual={Astro.url.pathname}
+    nome={PAROQUIA.assinatura}
+    assinatura={PAROQUIA.nome}
+  />
+
+  <slot />
+
+  <Fragment slot="rodape">
+    <Footer
+      nome={PAROQUIA.nome}
+      assinatura={PAROQUIA.assinatura}
+      endereco={enderecoEmLinhas(PAROQUIA)}
+      mapaHref={mapaHref}
+      navegacao={LINKS_PRINCIPAIS}
+      institucional={LINKS_INSTITUCIONAIS}
+      redes={redes}
+      contato={contato}
+    />
+    {barraMobile && <BarraMobile mapaHref={mapaHref} whatsappHref={whatsappHref} />}
+  </Fragment>
+</BaseLayout>

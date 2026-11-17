@@ -1,97 +1,405 @@
 ---
 /*
-  Styleguide (só em desenvolvimento): renderiza a marcação de cada
-  design-system/components/<Nome>/preview.html para comparar com o design system.
+  Styleguide (só em desenvolvimento): os componentes reais, com dados de exemplo,
+  para comparar com design-system/components/<Nome>/preview.html.
   No build de produção a rota não é gerada (getStaticPaths vazio).
-  Na Fase 2 ele passa a usar os componentes Astro reais.
 */
+import Aviso from '../../components/Aviso.astro';
+import BarraMobile from '../../components/BarraMobile.astro';
+import Botao from '../../components/Botao.astro';
+import CardEvento from '../../components/CardEvento.astro';
+import CardHorarios from '../../components/CardHorarios.astro';
+import CardPastoral from '../../components/CardPastoral.astro';
+import CardPost from '../../components/CardPost.astro';
+import DivisorTerco from '../../components/DivisorTerco.astro';
+import DoacaoPix from '../../components/DoacaoPix.astro';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import Hero from '../../components/Hero.astro';
+import LiturgiaDoDia from '../../components/LiturgiaDoDia.astro';
+import LiturgiaResumo from '../../components/LiturgiaResumo.astro';
+import SantoDoDia from '../../components/SantoDoDia.astro';
+import SeloLiturgico from '../../components/SeloLiturgico.astro';
+import VideoYouTube from '../../components/VideoYouTube.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { LINKS_INSTITUCIONAIS, LINKS_PRINCIPAIS } from '../../lib/navegacao';
+import { PAROQUIA, enderecoEmLinhas, urlMapa } from '../../lib/paroquia';
+import Quadro from '../../styleguide/Quadro.astro';
+import Secao from '../../styleguide/Secao.astro';
+import {
+  VIDEO_EXEMPLO,
+  horariosConfissao,
+  horariosMissa,
+  liturgia,
+  pastorais,
+  pix,
+  posts,
+  santo,
+} from '../../styleguide/exemplos';
 
 export function getStaticPaths() {
   return import.meta.env.DEV ? [{ params: { page: undefined } }] : [];
 }
 
-interface Previa {
-  id: string;
-  nome: string;
-  grupo: string;
-  subtitulo: string;
-  estilos: string;
-  corpo: string;
-}
+// Composições de página: ainda não são componentes (entram na Fase 4).
+// Aqui aparece só a marcação de referência do design system.
+const arquivos = import.meta.glob<string>(
+  '../../../../design-system/components/Pagina*/preview.html',
+  { query: '?raw', import: 'default', eager: true },
+);
 
-const arquivos = import.meta.glob<string>('../../../../design-system/components/*/preview.html', {
-  query: '?raw',
-  import: 'default',
-  eager: true,
-});
+const composicoes = Object.entries(arquivos).map(([caminho, html]) => ({
+  id: `ref-${(caminho.split('/').at(-2) ?? caminho).toLowerCase()}`,
+  nome: html.match(/<title>([^<]*)<\/title>/)?.[1] ?? caminho,
+  origem: `components/${caminho.split('/').at(-2)}`,
+  estilos: [...html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)].map((m) => m[1]).join('\n'),
+  // o logo vem de /public no site; no design system é um caminho relativo
+  corpo: (html.match(/<body[^>]*>([\s\S]*?)<\/body>/)?.[1] ?? '').replaceAll(
+    /(?:\.\.\/)+assets\/Logos\//g,
+    '/',
+  ),
+}));
 
-function atributo(texto: string, nome: string): string {
-  return texto.match(new RegExp(`${nome}="([^"]*)"`))?.[1] ?? '';
-}
+const secoes = [
+  ['botao', 'Botão'],
+  ['cabecalho', 'Cabeçalho'],
+  ['hero', 'Hero'],
+  ['aviso', 'Aviso'],
+  ['selo', 'Selo litúrgico'],
+  ['terco', 'Divisor terço'],
+  ['horarios', 'Horários'],
+  ['evento', 'Evento'],
+  ['pastoral', 'Pastoral'],
+  ['liturgia', 'Liturgia do dia'],
+  ['santo', 'Santo do dia'],
+  ['post', 'Card de post'],
+  ['video', 'Vídeo do YouTube'],
+  ['pix', 'Doação Pix'],
+  ['rodape', 'Rodapé'],
+  ['barra', 'Barra do celular'],
+];
 
-const previas: Previa[] = Object.entries(arquivos)
-  .map(([caminho, html]) => {
-    const id = caminho.split('/').at(-2) ?? caminho;
-    const cartao = html.match(/<!--\s*@dsCard\s+([^>]*?)-->/)?.[1] ?? '';
-    const corpo = html.match(/<body[^>]*>([\s\S]*?)<\/body>/)?.[1] ?? '';
-    const estilos = [...html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)]
-      .map((m) => m[1])
-      .join('\n');
-
-    return {
-      id,
-      nome: html.match(/<title>([^<]*)<\/title>/)?.[1] ?? id,
-      grupo: atributo(cartao, 'group') || 'Outros',
-      subtitulo: atributo(cartao, 'subtitle'),
-      estilos,
-      // o logo vem de /public no site; no design system é um caminho relativo
-      corpo: corpo.replaceAll(/(?:\.\.\/)+assets\/Logos\//g, '/'),
-    };
-  })
-  .sort((a, b) => a.grupo.localeCompare(b.grupo, 'pt-BR') || a.nome.localeCompare(b.nome, 'pt-BR'));
-
-const grupos = Map.groupBy(previas, (p) => p.grupo);
+const mapaHref = urlMapa(PAROQUIA);
 ---
 
 <BaseLayout title="Styleguide" description="Componentes do design system (apenas desenvolvimento).">
   <div class="sg">
-    <header class="container sg-topo">
+    <header class="container topo">
       <p class="ros-sobrelinha">Apenas desenvolvimento</p>
       <h1 class="titulo-1">Styleguide</h1>
       <p class="corpo">
-        Marcação de referência de cada <code>design-system/components/*/preview.html</code>. Compare
-        com os componentes reais da Fase 2.
+        Componentes reais com dados de exemplo. Compare com os previews em
+        <code>design-system/components</code>.
       </p>
-      <nav aria-label="Componentes" class="sg-indice">
-        {[...grupos].map(([grupo, itens]) => (
-          <div>
-            <p class="sg-grupo">{grupo}</p>
-            <ul>
-              {itens.map((p) => (
-                <li>
-                  <a href={`#${p.id}`}>{p.nome}</a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
+      <nav aria-label="Componentes" class="indice">
+        <ul>
+          {secoes.map(([id, nome]) => (
+            <li>
+              <a href={`#${id}`}>{nome}</a>
+            </li>
+          ))}
+          {composicoes.map((c) => (
+            <li>
+              <a href={`#${c.id}`}>{c.nome} (referência)</a>
+            </li>
+          ))}
+        </ul>
       </nav>
     </header>
 
-    {previas.map((p) => (
-      <section class="container sg-secao" id={p.id} aria-labelledby={`${p.id}-titulo`}>
-        <h2 class="titulo-2" id={`${p.id}-titulo`}>
-          {p.nome}
-        </h2>
-        <p class="pequeno sg-meta">
-          {p.grupo}
-          {p.subtitulo && ` · ${p.subtitulo}`} · <code>components/{p.id}</code>
-        </p>
-        <div class="sg-previa" tabindex="0" role="region" aria-label={`Prévia: ${p.nome}`}>
-          <Fragment set:html={(p.estilos ? `<style>${p.estilos}</style>` : '') + p.corpo} />
+    <Secao id="botao" titulo="Botão" origem="components/Botao">
+      <Quadro rotulo="Variações">
+        <div class="linha">
+          <Botao icone="relogio">Ver horários</Botao>
+          <Botao variante="secundario" href="#">
+            Quero participar
+          </Botao>
+          <Botao variante="fantasma" href="#">
+            Saiba mais
+          </Botao>
+          <Botao desabilitado>Inscrições encerradas</Botao>
         </div>
-      </section>
+      </Quadro>
+      <Quadro rotulo="Claro, sobre fundo marrom" semFundo>
+        <div class="faixa-marrom">
+          <Botao variante="claro" href="#">
+            Fale com a secretaria
+          </Botao>
+        </div>
+      </Quadro>
+      <Quadro rotulo="Em bloco · 360px" largura={360}>
+        <Botao href="#" bloco>
+          Botão em bloco (celular)
+        </Botao>
+      </Quadro>
+    </Secao>
+
+    <Secao id="cabecalho" titulo="Cabeçalho" origem="components/Header + MenuGaveta">
+      <Quadro rotulo="Desktop · ≥ 960px" semFundo>
+        <Header links={LINKS_PRINCIPAIS} caminhoAtual="/" fixo={false} />
+      </Quadro>
+      <Quadro rotulo="Celular · 360px (toque em Menu para abrir a gaveta)" largura={360} semFundo>
+        <Header links={LINKS_PRINCIPAIS} caminhoAtual="/liturgia" fixo={false} />
+      </Quadro>
+    </Secao>
+
+    <Secao id="hero" titulo="Hero" origem="components/Hero">
+      <Quadro rotulo="Desktop · ≥ 900px" semFundo>
+        <Hero
+          sobrelinha="Jaguaribe · João Pessoa"
+          titulo="Nossa Senhora"
+          tituloItalico="do Rosário"
+          texto="Uma comunidade franciscana no coração de Jaguaribe desde 1929. Venha rezar com a gente."
+          proximaMissa={{ quando: 'hoje', hora: '17h' }}
+          acaoPrimaria={{ rotulo: 'Ver todos os horários', href: '#' }}
+          acaoSecundaria={{ rotulo: 'Como chegar', href: mapaHref, icone: 'local' }}
+        />
+      </Quadro>
+      <Quadro rotulo="Celular · 360px" largura={360} semFundo>
+        <Hero
+          sobrelinha="Jaguaribe · João Pessoa"
+          titulo="Nossa Senhora"
+          tituloItalico="do Rosário"
+          texto="Uma comunidade franciscana no coração de Jaguaribe desde 1929. Venha rezar com a gente."
+          proximaMissa={{ quando: 'hoje', hora: '17h' }}
+          acaoPrimaria={{ rotulo: 'Ver todos os horários', href: '#' }}
+          acaoSecundaria={{ rotulo: 'Como chegar', href: mapaHref, icone: 'local' }}
+        />
+      </Quadro>
+    </Secao>
+
+    <Secao id="aviso" titulo="Aviso" origem="components/Aviso">
+      <Quadro rotulo="Informativo, festa e mudança">
+        <div class="pilha">
+          <Aviso
+            titulo="Secretaria em novo horário"
+            texto="Terça a sexta, das 8h às 12h e das 14h às 17h."
+          />
+          <Aviso
+            tipo="festa"
+            titulo="Festa de Nossa Senhora do Rosário"
+            texto="Novena de 28/09 a 06/10."
+            link={{ rotulo: 'Ver programação', href: '#' }}
+          />
+          <Aviso
+            tipo="mudanca"
+            titulo="Sem missa das 7h neste domingo"
+            texto="A celebração será só às 17h, por causa da procissão."
+          />
+        </div>
+      </Quadro>
+    </Secao>
+
+    <Secao id="selo" titulo="Selo litúrgico" origem="components/SeloLiturgico">
+      <Quadro rotulo="Cores litúrgicas">
+        <div class="linha">
+          <SeloLiturgico cor="verde" rotulo="Tempo Comum" />
+          <SeloLiturgico cor="roxo" rotulo="Advento" />
+          <SeloLiturgico cor="branco" rotulo="Tempo Pascal" />
+          <SeloLiturgico cor="vermelho" rotulo="Pentecostes" />
+          <SeloLiturgico cor="rosa" rotulo="Gaudete" />
+        </div>
+      </Quadro>
+    </Secao>
+
+    <Secao id="terco" titulo="Divisor terço" origem="components/DivisorTerco">
+      <Quadro rotulo="Entre seções">
+        <DivisorTerco />
+      </Quadro>
+    </Secao>
+
+    <Secao id="horarios" titulo="Horários" origem="components/CardHorarios">
+      <Quadro rotulo="Largo · ≥ 640px (hoje = terça, fixo para comparar com o preview)">
+        <CardHorarios
+          titulo="Santa Missa"
+          linhas={horariosMissa}
+          selo={{ cor: 'verde', rotulo: 'Tempo Comum' }}
+          hoje={2}
+        />
+      </Quadro>
+      <Quadro
+        rotulo="Celular · 360px (dia de hoje de verdade, pelo fuso de São Paulo)"
+        largura={360}
+      >
+        <CardHorarios
+          titulo="Santa Missa"
+          linhas={horariosMissa}
+          selo={{ cor: 'verde', rotulo: 'Tempo Comum' }}
+        />
+      </Quadro>
+      <Quadro rotulo="Confissões · 360px" largura={360}>
+        <CardHorarios titulo="Confissões" linhas={horariosConfissao} />
+      </Quadro>
+    </Secao>
+
+    <Secao id="evento" titulo="Evento" origem="components/CardEvento">
+      <Quadro rotulo="Padrão, festa e franciscano">
+        <div class="grade-eventos">
+          <CardEvento
+            href="#"
+            data="2026-10-07"
+            variante="festa"
+            sobrelinha="Quarta-feira · Festa da padroeira"
+            titulo="Nossa Senhora"
+            destaque="do Rosário"
+            meta="Missa solene às 17h na Matriz"
+          />
+          <CardEvento
+            href="#"
+            data="2026-08-02"
+            variante="franciscano"
+            sobrelinha="Domingo · Igrejas jubilares"
+            titulo="O Perdão"
+            destaque="de Assis"
+            meta="Programação o dia todo"
+          />
+          <CardEvento
+            href="#"
+            data="2026-12-06"
+            sobrelinha="Sábado · 8h · Juventude"
+            titulo="Torneio de futsal"
+            meta="EEPAC · Rua Anúbio Lins Falcão"
+          />
+          <CardEvento
+            href="#"
+            data="2026-11-02"
+            sobrelinha="Domingo"
+            titulo="Finados"
+            meta="Missas às 7h e 17h"
+          />
+        </div>
+      </Quadro>
+    </Secao>
+
+    <Secao id="pastoral" titulo="Pastoral" origem="components/CardPastoral">
+      <Quadro rotulo="Mariano, social e paroquial">
+        <div class="ros-grade">
+          {pastorais.map((pastoral) => (
+            <CardPastoral {...pastoral} />
+          ))}
+        </div>
+      </Quadro>
+    </Secao>
+
+    <Secao
+      id="liturgia"
+      titulo="Liturgia do dia"
+      origem="components/LiturgiaDoDia + LiturgiaResumo"
+    >
+      <Quadro rotulo="Com o texto das leituras (só com autorização da CNBB) · ≥ 640px">
+        <LiturgiaDoDia
+          id="a"
+          data={liturgia.data}
+          semana={liturgia.semana}
+          celebracao={liturgia.celebracao}
+          cor={liturgia.cor}
+          leituras={liturgia.leiturasComTexto}
+          fonte={liturgia.fonte}
+        />
+      </Quadro>
+      <Quadro rotulo="Padrão do site: só referências e link oficial · 360px" largura={360}>
+        <LiturgiaDoDia
+          id="b"
+          data={liturgia.data}
+          semana={liturgia.semana}
+          celebracao={liturgia.celebracao}
+          cor={liturgia.cor}
+          leituras={liturgia.leiturasSoReferencia}
+          linkOficial={liturgia.linkOficial}
+          fonte={{ ...liturgia.fonte, prefixo: 'Leituras' }}
+        />
+      </Quadro>
+      <Quadro rotulo="Resumo para a página inicial">
+        <LiturgiaResumo href="#" referencia="Lc 19,1-10" titulo="Jesus na casa de Zaqueu" />
+      </Quadro>
+    </Secao>
+
+    <Secao id="santo" titulo="Santo do dia" origem="components/SantoDoDia">
+      <Quadro rotulo="Largo · ≥ 520px">
+        <SantoDoDia {...santo} />
+      </Quadro>
+      <Quadro rotulo="Celular · 360px" largura={360}>
+        <SantoDoDia {...santo} />
+      </Quadro>
+    </Secao>
+
+    <Secao id="post" titulo="Card de post" origem="components/CardPost">
+      <Quadro rotulo="Vídeo, pároco e juventude">
+        <div class="ros-blog__grade">
+          <CardPost {...posts.video} />
+          <CardPost {...posts.paroco} />
+          <CardPost {...posts.juventude} />
+        </div>
+      </Quadro>
+    </Secao>
+
+    <Secao id="video" titulo="Vídeo do YouTube" origem="components/VideoYouTube">
+      <Quadro rotulo="Miniatura; o clique carrega o player (youtube-nocookie.com)">
+        <div class="video-demo">
+          <VideoYouTube
+            id={VIDEO_EXEMPLO.id}
+            titulo="Vídeo de demonstração"
+            duracao={VIDEO_EXEMPLO.duracao}
+          />
+        </div>
+      </Quadro>
+    </Secao>
+
+    <Secao id="pix" titulo="Doação Pix" origem="components/DoacaoPix + CopiarChave">
+      <Quadro rotulo="Desktop" largura={840}>
+        <DoacaoPix id="pix-a" chave={pix.chave} titular={pix.titular} />
+      </Quadro>
+      <Quadro rotulo="Celular · 360px" largura={360}>
+        <DoacaoPix id="pix-b" chave={pix.chave} titular={pix.titular} />
+      </Quadro>
+    </Secao>
+
+    <Secao id="rodape" titulo="Rodapé" origem="components/Footer">
+      <Quadro rotulo="Desktop" semFundo>
+        <Footer
+          idBase="rodape-a"
+          nome={PAROQUIA.nome}
+          assinatura={PAROQUIA.assinatura}
+          endereco={enderecoEmLinhas(PAROQUIA)}
+          mapaHref={mapaHref}
+          navegacao={LINKS_PRINCIPAIS}
+          institucional={LINKS_INSTITUCIONAIS}
+          redes={[{ rotulo: 'Instagram · @paroquiadorosariojp', href: '#' }]}
+          contato={[{ rotulo: 'WhatsApp da secretaria', href: '#' }]}
+        />
+      </Quadro>
+      <Quadro rotulo="Celular · 360px" largura={360} semFundo>
+        <Footer
+          idBase="rodape-b"
+          nome={PAROQUIA.nome}
+          assinatura={PAROQUIA.assinatura}
+          endereco={enderecoEmLinhas(PAROQUIA)}
+          mapaHref={mapaHref}
+          navegacao={LINKS_PRINCIPAIS}
+          institucional={LINKS_INSTITUCIONAIS}
+          redes={[{ rotulo: 'Instagram · @paroquiadorosariojp', href: '#' }]}
+        />
+      </Quadro>
+    </Secao>
+
+    <Secao id="barra" titulo="Barra do celular" origem="components/BarraMobile">
+      <Quadro
+        rotulo="Aqui sem fixar na tela; nas páginas é fixa e só aparece abaixo de 1024px"
+        largura={360}
+      >
+        <BarraMobile mapaHref={mapaHref} whatsappHref="#" fixa={false} />
+      </Quadro>
+      <Quadro rotulo="Sem WhatsApp cadastrado" largura={360}>
+        <BarraMobile mapaHref={mapaHref} fixa={false} />
+      </Quadro>
+    </Secao>
+
+    {composicoes.map((c) => (
+      <Secao id={c.id} titulo={`${c.nome} (referência)`} origem={c.origem}>
+        <Quadro rotulo="Marcação do design system; vira componente na Fase 4" semFundo>
+          <Fragment set:html={(c.estilos ? `<style>${c.estilos}</style>` : '') + c.corpo} />
+        </Quadro>
+      </Secao>
     ))}
   </div>
 </BaseLayout>
@@ -100,41 +408,51 @@ const grupos = Map.groupBy(previas, (p) => p.grupo);
   .sg {
     padding-bottom: var(--espaco-16);
   }
-  .sg-topo {
+
+  .topo {
     padding-block: var(--espaco-12) var(--espaco-6);
   }
-  .sg-indice {
+
+  .indice ul {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--espaco-8);
-    margin-top: var(--espaco-6);
-  }
-  .sg-indice ul {
+    gap: var(--espaco-1) var(--espaco-6);
     list-style: none;
-    margin: 0;
+    margin: var(--espaco-6) 0 0;
     padding: 0;
   }
-  .sg-indice a {
+
+  .indice a {
     display: inline-flex;
     align-items: center;
     min-height: var(--toque-min);
   }
-  .sg-grupo {
-    margin: 0;
-    font-weight: 700;
-    color: var(--texto-suave);
+
+  .linha {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--espaco-4);
+    align-items: center;
   }
-  .sg-secao {
-    padding-block: var(--espaco-8) 0;
+
+  .pilha {
+    display: grid;
+    gap: var(--espaco-4);
   }
-  .sg-meta {
-    margin: var(--espaco-1) 0 var(--espaco-4);
-    color: var(--texto-suave);
-  }
-  .sg-previa {
-    overflow-x: auto;
-    background: var(--fundo);
-    border: 1px solid var(--linha);
+
+  .faixa-marrom {
+    background: var(--marrom);
+    padding: var(--espaco-4);
     border-radius: var(--raio-m);
+  }
+
+  .grade-eventos {
+    display: grid;
+    gap: var(--espaco-4);
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+
+  .video-demo {
+    max-width: 720px;
   }
 </style>

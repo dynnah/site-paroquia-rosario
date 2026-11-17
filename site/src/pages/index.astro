@@ -1,10 +1,10 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
+import PaginaLayout from '../layouts/PaginaLayout.astro';
 
 const emDesenvolvimento = import.meta.env.DEV;
 ---
 
-<BaseLayout title="Início">
+<PaginaLayout title="Início">
   <section class="container provisoria">
     <p class="ros-sobrelinha">Jaguaribe · João Pessoa</p>
     <h1 class="titulo-1">
@@ -19,7 +19,7 @@ const emDesenvolvimento = import.meta.env.DEV;
       </p>
     )}
   </section>
-</BaseLayout>
+</PaginaLayout>
 
 <style>
   .provisoria {
