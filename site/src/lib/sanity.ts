@@ -10,7 +10,7 @@
  * falha com mensagem clara, para nunca publicar um site vazio por engano.
  */
 import { createClient, type SanityClient } from '@sanity/client';
-import { partesData } from './formatacao.ts';
+import { dataISO } from './formatacao.ts';
 import type {
   Aviso,
   Configuracoes,
@@ -42,13 +42,7 @@ export function minutosDeLeitura(palavras: number | undefined): number {
   return Math.max(1, Math.ceil((palavras ?? 0) / PALAVRAS_POR_MINUTO));
 }
 
-const dois = (n: number) => String(n).padStart(2, '0');
-
-/** "2026-11-17", no fuso de São Paulo. */
-export function dataISO(agora: Date): string {
-  const { ano, mes, dia } = partesData(agora);
-  return `${ano}-${dois(mes)}-${dois(dia)}`;
-}
+export { dataISO };
 
 /** "11-17", no fuso de São Paulo: a chave dos santos do dia. */
 export function mesDia(agora: Date): string {

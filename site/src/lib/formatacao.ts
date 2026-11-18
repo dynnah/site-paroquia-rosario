@@ -180,3 +180,33 @@ export function horaLocal(entrada: string | Date): string {
   const total = minutosDoDia(entrada);
   return formatarHora(`${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`);
 }
+
+const doisDigitos = (n: number) => String(n).padStart(2, '0');
+
+/** "2026-11-17": o dia de calendário em São Paulo (padrão: agora). */
+export function dataISO(entrada: string | Date = new Date()): string {
+  const { ano, mes, dia } = partesData(entrada);
+  return `${ano}-${doisDigitos(mes)}-${doisDigitos(dia)}`;
+}
+
+/**
+ * Soma (ou subtrai) dias de calendário a um dia "AAAA-MM-DD". É aritmética de
+ * calendário, sem fuso: "2026-12-31" + 1 = "2027-01-01".
+ */
+export function somarDias(iso: string, dias: number): string {
+  if (!SO_DATA.test(iso)) throw new RangeError(`Dia inválido (esperado AAAA-MM-DD): ${iso}`);
+  const { ano, mes, dia } = partesData(iso);
+  const data = new Date(Date.UTC(ano, mes - 1, dia + dias));
+  return `${data.getUTCFullYear()}-${doisDigitos(data.getUTCMonth() + 1)}-${doisDigitos(data.getUTCDate())}`;
+}
+
+/**
+ * Um instante que cai no meio do dia "AAAA-MM-DD" em São Paulo (12h; 15h UTC).
+ * Serve para chamar as funções que recebem `Date` (santo do dia, horários de
+ * missa) para um dia específico sem risco de virar o dia por causa do fuso.
+ */
+export function instanteDoDia(iso: string): Date {
+  if (!SO_DATA.test(iso)) throw new RangeError(`Dia inválido (esperado AAAA-MM-DD): ${iso}`);
+  const { ano, mes, dia } = partesData(iso);
+  return new Date(Date.UTC(ano, mes - 1, dia, 15));
+}
