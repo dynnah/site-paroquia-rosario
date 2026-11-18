@@ -112,7 +112,7 @@ export function nomeDiaSemana(dia: number): string {
   return DIAS_SEMANA[dia] ?? '';
 }
 
-function capitalizar(texto: string): string {
+export function capitalizar(texto: string): string {
   return texto.charAt(0).toLocaleUpperCase('pt-BR') + texto.slice(1);
 }
 
@@ -148,4 +148,29 @@ export function formatarHora(valor: string): string {
   if (horas > 23 || (minutos !== undefined && Number(minutos) > 59)) return texto;
 
   return !minutos || minutos === '00' ? `${horas}h` : `${horas}h${minutos}`;
+}
+
+const formatadorHoraSP = new Intl.DateTimeFormat('en-GB', {
+  timeZone: FUSO,
+  hour: '2-digit',
+  minute: '2-digit',
+  hourCycle: 'h23',
+});
+
+/** Minutos desde a meia-noite, no fuso de São Paulo (padrão: agora). */
+export function minutosDoDia(entrada: string | Date = new Date()): number {
+  const data = typeof entrada === 'string' ? new Date(entrada) : entrada;
+  if (Number.isNaN(data.getTime())) {
+    throw new RangeError(`Data inválida: ${String(entrada)}`);
+  }
+  const partes = Object.fromEntries(
+    formatadorHoraSP.formatToParts(data).map((p) => [p.type, p.value]),
+  );
+  return (Number(partes.hour) % 24) * 60 + Number(partes.minute);
+}
+
+/** "17h" ou "8h40": a hora de um instante, vista em São Paulo. */
+export function horaLocal(entrada: string | Date): string {
+  const total = minutosDoDia(entrada);
+  return formatarHora(`${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`);
 }
