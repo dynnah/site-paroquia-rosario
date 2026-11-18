@@ -1,8 +1,8 @@
 ---
 /**
- * Reserva da liturgia: data de hoje e o caminho para ler as leituras na fonte
- * oficial. É o que a página mostra enquanto não há leituras (ou se a busca
- * falhar), e é o padrão enquanto o texto integral não for autorizado.
+ * Reserva da liturgia: a data e o caminho para ler as leituras na fonte
+ * oficial. É o que a página mostra quando a busca das leituras falha ou o dia
+ * não tem leituras.
  */
 import { dataLonga } from '../lib/formatacao';
 import { LITURGIA_OFICIAL } from '../lib/liturgia';
@@ -21,8 +21,8 @@ const { data } = Astro.props;
     Leituras do dia
   </h2>
   <p class="reserva__texto corpo">
-    As leituras e o Evangelho de hoje estão na Liturgia Diária da CNBB. Leia antes da missa, em casa
-    ou a caminho da igreja.
+    As leituras e o Evangelho deste dia estão na Liturgia Diária da CNBB. Leia antes da missa, em
+    casa ou a caminho da igreja.
   </p>
   <Botao href={LITURGIA_OFICIAL.href} icone="livro">
     Ler na {LITURGIA_OFICIAL.rotulo}

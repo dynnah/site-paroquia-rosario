@@ -20,12 +20,18 @@ interface Props {
   selo?: { cor: CorLiturgica; rotulo: string };
   /** Dia a destacar. Padrão: hoje em São Paulo. Um script leve reavalia no navegador. */
   hoje?: number;
+  /**
+   * `false` num card de outro dia ("Missa de amanhã"): não destaca nenhuma linha e o
+   * script do navegador não mexe nele (senão marcaria "hoje" numa linha de amanhã).
+   */
+  destacarHoje?: boolean;
 }
 
-const { titulo, linhas, selo, hoje = diaDaSemana() } = Astro.props;
+const { titulo, linhas, selo, hoje: hojeInformado, destacarHoje = true } = Astro.props;
+const hoje = destacarHoje ? (hojeInformado ?? diaDaSemana()) : -1;
 ---
 
-<div class="ros-horarios" data-horarios>
+<div class="ros-horarios" data-horarios={destacarHoje ? '' : undefined}>
   <div class="ros-horarios__topo">
     <h3>{titulo}</h3>
     {selo && <SeloLiturgico cor={selo.cor} rotulo={selo.rotulo} />}

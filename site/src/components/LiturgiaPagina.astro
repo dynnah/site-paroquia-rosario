@@ -1,0 +1,159 @@
+---
+/**
+ * Composição "Página Liturgia": leituras à esquerda, santo do dia e missa à direita;
+ * no celular, nessa ordem, em uma coluna. Serve às três páginas: /liturgia (hoje),
+ * /liturgia/ontem e /liturgia/amanha, que o rebuild diário renova.
+ *
+ * Sem leituras (API fora do ar, dia sem liturgia), mostra a data e o link oficial.
+ * Sem `LITURGIA_TEXTO_INTEGRAL`, mostra só as referências (ver `lib/liturgia.ts`).
+ */
+import PaginaLayout from '../layouts/PaginaLayout.astro';
+import { dataISO, instanteDoDia, somarDias } from '../lib/formatacao';
+import { linhasDeHoje } from '../lib/horarios';
+import {
+  leiturasDoCard,
+  linhaDaCelebracao,
+  liturgiaDoDia,
+  LITURGIA_OFICIAL,
+  textoIntegralLigado,
+  tituloDaLiturgia,
+} from '../lib/liturgia';
+import { conteudo } from '../lib/sanity';
+import CardHorarios from './CardHorarios.astro';
+import LiturgiaDoDia from './LiturgiaDoDia.astro';
+import LiturgiaIndisponivel from './LiturgiaIndisponivel.astro';
+import NavegacaoDatas from './NavegacaoDatas.astro';
+import SantoDoDia from './SantoDoDia.astro';
+
+type Periodo = 'ontem' | 'hoje' | 'amanha';
+
+interface Props {
+  periodo: Periodo;
+}
+
+const { periodo } = Astro.props;
+
+const DESLOCAMENTO = { ontem: -1, hoje: 0, amanha: 1 } as const;
+const TEXTOS = {
+  ontem: {
+    titulo: 'Liturgia de ontem',
+    descricao:
+      'Leituras e Evangelho de ontem, com o santo do dia, na Paróquia Nossa Senhora do Rosário, em Jaguaribe, João Pessoa.',
+    missa: undefined,
+  },
+  hoje: {
+    titulo: 'Liturgia',
+    descricao:
+      'Leituras do dia, santo do dia e missa de hoje na Paróquia Nossa Senhora do Rosário, em Jaguaribe, João Pessoa.',
+    missa: 'Missa de hoje',
+  },
+  amanha: {
+    titulo: 'Liturgia de amanhã',
+    descricao:
+      'Leituras e Evangelho de amanhã, para quem prepara a missa com antecedência, na Paróquia Nossa Senhora do Rosário, em Jaguaribe, João Pessoa.',
+    missa: 'Missa de amanhã',
+  },
+} as const;
+const texto = TEXTOS[periodo];
+
+// Todo cálculo de dia no fuso de São Paulo, e não no do servidor de build.
+const iso = somarDias(dataISO(), DESLOCAMENTO[periodo]);
+const instante = instanteDoDia(iso);
+
+const [liturgia, horarios, santos] = await Promise.all([
+  liturgiaDoDia(iso),
+  conteudo.horarios(),
+  conteudo.santosDoDia(instante),
+]);
+
+const textoIntegral = textoIntegralLigado();
+// Só a liturgia com leituras vira card; sem elas, a página mostra a reserva.
+const doDia = liturgia && liturgia.leituras.length > 0 ? liturgia : null;
+
+// Sem santo cadastrado no Studio, a celebração do dia já é o título do card de leituras
+// (memória, festa e solenidade não têm semana): repeti-la ao lado seria ruído.
+const santo = santos[0];
+const missa = texto.missa && horarios ? linhasDeHoje(horarios.missa.linhas, instante) : [];
+const temLateral = Boolean(santo) || missa.length > 0;
+
+const GRAU = { memoria: 'Memória', festa: 'Festa', solenidade: 'Solenidade' } as const;
+const FAMILIA = { franciscana: 'franciscana', mariana: 'mariana', nenhuma: undefined } as const;
+
+const NAVEGACAO = {
+  ontem: { proxima: { rotulo: 'Hoje', href: '/liturgia' } },
+  hoje: {
+    anterior: { rotulo: 'Ontem', href: '/liturgia/ontem' },
+    proxima: { rotulo: 'Amanhã', href: '/liturgia/amanha' },
+  },
+  amanha: { anterior: { rotulo: 'Hoje', href: '/liturgia' } },
+} as const;
+const navegacao: {
+  anterior?: { rotulo: string; href: string };
+  proxima?: { rotulo: string; href: string };
+} = NAVEGACAO[periodo];
+---
+
+<PaginaLayout title={texto.titulo} description={texto.descricao}>
+  <div class="ros-pagina">
+    <div class="ros-pagina__in">
+      <div class="ros-pagina__cab">
+        <h1 class="ros-pagina__titulo">{texto.titulo}</h1>
+      </div>
+
+      <div>
+        {doDia ? (
+          <>
+            <LiturgiaDoDia
+              id={periodo}
+              data={iso}
+              semana={tituloDaLiturgia(doDia)}
+              celebracao={linhaDaCelebracao(doDia)}
+              cor={doDia.cor}
+              leituras={leiturasDoCard(doDia.leituras)}
+              linkOficial={LITURGIA_OFICIAL.href}
+              fonte={
+                textoIntegral
+                  ? { rotulo: 'Liturgia Diária, CNBB', href: LITURGIA_OFICIAL.href }
+                  : undefined
+              }
+            />
+            {doDia.temLeiturasEspeciais && (
+              <p class="especiais pequeno">
+                Neste dia há leituras ou orações próprias que não cabem aqui. Veja todas na{' '}
+                <a href={LITURGIA_OFICIAL.href}>{LITURGIA_OFICIAL.rotulo}</a>.
+              </p>
+            )}
+          </>
+        ) : (
+          <LiturgiaIndisponivel data={iso} />
+        )}
+        <NavegacaoDatas rotulo="Outros dias da liturgia" {...navegacao} />
+      </div>
+
+      {temLateral && (
+        <aside class="ros-pagina__lateral" aria-label="Santo do dia e horário de missa">
+          {santo && (
+            <SantoDoDia
+              nome={santo.nome}
+              destaque={santo.destaque}
+              grau={GRAU[santo.grau]}
+              familia={FAMILIA[santo.familia]}
+              datas={santo.datasDeVida}
+              bio={santo.bio}
+            />
+          )}
+          {missa.length > 0 && texto.missa && (
+            <CardHorarios titulo={texto.missa} linhas={missa} destacarHoje={periodo === 'hoje'} />
+          )}
+        </aside>
+      )}
+    </div>
+  </div>
+</PaginaLayout>
+
+<style>
+  .especiais {
+    margin: var(--espaco-4) 0 0;
+    color: var(--texto-suave);
+  }
+</style>

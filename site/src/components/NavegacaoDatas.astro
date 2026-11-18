@@ -1,0 +1,55 @@
+---
+/**
+ * Navegação entre os dias da liturgia: "‹ Ontem" · "Amanhã ›". O design system só
+ * sugere a ideia (README da Página Liturgia), então usa o mesmo desenho da
+ * Paginacao do blog: botão fantasma à esquerda, secundário à direita.
+ * Num dia sem vizinho (ontem não tem "anterior"), o lado vazio mantém o outro no seu canto.
+ */
+import Botao from './Botao.astro';
+
+interface Destino {
+  rotulo: string;
+  href: string;
+}
+
+interface Props {
+  /** Nome da navegação para leitores de tela. */
+  rotulo: string;
+  anterior?: Destino;
+  proxima?: Destino;
+}
+
+const { rotulo, anterior, proxima } = Astro.props;
+---
+
+{(anterior || proxima) && (
+  <nav class="datas" aria-label={rotulo}>
+    {anterior ? (
+      <Botao variante="fantasma" href={anterior.href} rel="prev">
+        <span aria-hidden="true">‹</span>
+        {anterior.rotulo}
+      </Botao>
+    ) : (
+      <span />
+    )}
+    {proxima ? (
+      <Botao variante="secundario" href={proxima.href} rel="next">
+        {proxima.rotulo}
+        <span aria-hidden="true">›</span>
+      </Botao>
+    ) : (
+      <span />
+    )}
+  </nav>
+)}
+
+<style>
+  .datas {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--espaco-3) var(--espaco-6);
+    padding-top: var(--espaco-6);
+  }
+</style>
