@@ -1,0 +1,18 @@
+---
+/** Filtros do blog (Tudo · Palavra do Pároco · Juventude · Vídeos), no desenho das abas da liturgia. */
+import { FILTROS_BLOG, hrefBlog, type FiltroRota } from '../lib/blog';
+
+interface Props {
+  atual: FiltroRota;
+}
+
+const { atual } = Astro.props;
+---
+
+<nav class="ros-filtros" aria-label="Filtrar posts">
+  {FILTROS_BLOG.map((filtro) => (
+    <a href={hrefBlog(filtro.id)} aria-current={filtro.id === atual ? 'true' : undefined}>
+      {filtro.rotulo}
+    </a>
+  ))}
+</nav>

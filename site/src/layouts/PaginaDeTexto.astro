@@ -1,0 +1,56 @@
+---
+/**
+ * Página de texto editável no Sanity (tipo `pagina`): Nossa história, Contribua.
+ * Se o documento ainda não existe, mostra um aviso gentil em vez de quebrar o site.
+ */
+import EstadoVazio from '../components/EstadoVazio.astro';
+import TextoRico from '../components/TextoRico.astro';
+import { conteudo } from '../lib/sanity';
+import ArtigoLayout from './ArtigoLayout.astro';
+
+interface Props {
+  /** Slug do documento `pagina` no Sanity. */
+  slug: string;
+  /** Título e descrição usados se o documento ainda não existir. */
+  tituloReserva: string;
+  descricaoReserva: string;
+}
+
+const { slug, tituloReserva, descricaoReserva } = Astro.props;
+const pagina = await conteudo.pagina(slug);
+---
+
+<ArtigoLayout
+  title={pagina?.titulo ?? tituloReserva}
+  description={pagina?.resumo ?? descricaoReserva}
+  titulo={pagina?.titulo ?? tituloReserva}
+>
+  {pagina?.resumo && <p class="lead corpo-grande">{pagina.resumo}</p>}
+
+  {pagina ? (
+    <div class="ros-artigo__texto">
+      <TextoRico texto={pagina.corpo} />
+    </div>
+  ) : (
+    <div class="vazio">
+      <EstadoVazio
+        titulo="Esta página está sendo preparada."
+        texto="Volte em breve."
+        acao={{ rotulo: 'Voltar ao início', href: '/' }}
+      />
+    </div>
+  )}
+
+  <slot />
+</ArtigoLayout>
+
+<style>
+  .lead {
+    margin: var(--espaco-4) 0 0;
+    color: var(--texto-suave);
+  }
+
+  .vazio {
+    margin-top: var(--espaco-8);
+  }
+</style>

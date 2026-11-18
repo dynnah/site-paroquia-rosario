@@ -1,0 +1,46 @@
+---
+/**
+ * Página de leitura numa faixa central de 720px (`ros-artigo`): post do blog,
+ * evento, pastoral, sacramento, Nossa história, Contribua.
+ * Ordem do design system: voltar → sobrelinha → título → conteúdo.
+ */
+import PaginaLayout from './PaginaLayout.astro';
+
+interface Props {
+  /** <title> e descrição para buscadores. */
+  title: string;
+  description?: string;
+  /** Link "← Blog" no topo. */
+  voltar?: { rotulo: string; href: string };
+  /** Título visível (h1). */
+  titulo: string;
+  /** Parte do título em itálico. */
+  destaque?: string;
+  barraMobile?: boolean;
+}
+
+const { voltar, titulo, destaque, ...layout } = Astro.props;
+---
+
+<PaginaLayout {...layout}>
+  <article class="ros-artigo">
+    <div class="ros-artigo__in">
+      {voltar && (
+        <a class="ros-artigo__voltar" href={voltar.href}>
+          ← {voltar.rotulo}
+        </a>
+      )}
+      <slot name="sobrelinha" />
+      <h1 class="ros-artigo__titulo">
+        {titulo}
+        {destaque && (
+          <>
+            {' '}
+            <em class="ros-italico">{destaque}</em>
+          </>
+        )}
+      </h1>
+      <slot />
+    </div>
+  </article>
+</PaginaLayout>

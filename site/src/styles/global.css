@@ -93,6 +93,17 @@ a {
   z-index: 50;
 }
 
+/* Alvos de toque do cabeçalho com 44px (o design system deixa 40px no logo e 42px nos links do menu) */
+.ros-marca {
+  min-height: var(--toque-min);
+}
+
+.ros-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--toque-min);
+}
+
 /* Âncoras (#conteudo, #secao) não ficam escondidas atrás do cabeçalho fixo */
 html {
   scroll-padding-top: calc(var(--espaco-16) + var(--espaco-4));
@@ -126,4 +137,44 @@ body:has(dialog:modal) {
 
 .video-yt__player--grande {
   border-radius: var(--raio-g);
+}
+
+/* ---------- texto de leitura (TextoRico.astro): o que o design system não cobre ---------- */
+
+.ros-artigo__texto ul,
+.ros-artigo__texto ol {
+  margin: 0 0 var(--espaco-6);
+  padding-left: var(--espaco-6);
+}
+
+.ros-artigo__texto li {
+  margin-bottom: var(--espaco-2);
+}
+
+.ros-artigo__texto h3 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 28px;
+  margin: var(--espaco-6) 0 var(--espaco-2);
+}
+
+/* Bloco de leitura que vem logo depois de um subtítulo (sem o respiro de abertura do texto) */
+.ros-artigo__texto--compacto {
+  margin-top: 0;
+}
+
+/* Composições de página (Blog, Liturgia): o miolo trava na largura do container do site */
+.ros-blog__in,
+.ros-pagina__in {
+  max-width: var(--container-max);
+  margin-inline: auto;
+}
+
+.ros-artigo__subtitulo {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 32px;
+  margin: var(--espaco-8) 0 var(--espaco-3);
 }

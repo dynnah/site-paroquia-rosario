@@ -1,0 +1,37 @@
+---
+/**
+ * Reserva da liturgia: data de hoje e o caminho para ler as leituras na fonte
+ * oficial. É o que a página mostra enquanto não há leituras (ou se a busca
+ * falhar), e é o padrão enquanto o texto integral não for autorizado.
+ */
+import { dataLonga } from '../lib/formatacao';
+import { LITURGIA_OFICIAL } from '../lib/liturgia';
+import Botao from './Botao.astro';
+
+interface Props {
+  data?: string | Date;
+}
+
+const { data } = Astro.props;
+---
+
+<article class="ros-liturgia" aria-labelledby="lt-reserva">
+  <p class="ros-liturgia__data">{dataLonga(data)}</p>
+  <h2 class="ros-liturgia__titulo" id="lt-reserva">
+    Leituras do dia
+  </h2>
+  <p class="reserva__texto corpo">
+    As leituras e o Evangelho de hoje estão na Liturgia Diária da CNBB. Leia antes da missa, em casa
+    ou a caminho da igreja.
+  </p>
+  <Botao href={LITURGIA_OFICIAL.href} icone="livro">
+    Ler na {LITURGIA_OFICIAL.rotulo}
+  </Botao>
+</article>
+
+<style>
+  .reserva__texto {
+    margin: var(--espaco-4) 0;
+    max-width: var(--medida-texto);
+  }
+</style>

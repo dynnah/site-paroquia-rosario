@@ -1,0 +1,36 @@
+---
+/** Moldura das rotas de lista do blog: título da aba conforme o filtro e a página. */
+import ListagemBlog from '../components/ListagemBlog.astro';
+import type { FiltroRota } from '../lib/blog';
+import type { PaginaDePosts } from '../lib/sanity.tipos';
+import PaginaLayout from './PaginaLayout.astro';
+
+interface Props {
+  filtro: FiltroRota;
+  dados: PaginaDePosts;
+}
+
+const { filtro, dados } = Astro.props;
+
+const NOMES: Record<FiltroRota, string> = {
+  tudo: 'Blog',
+  paroco: 'Palavra do Pároco · Blog',
+  juventude: 'Juventude · Blog',
+  videos: 'Vídeos · Blog',
+};
+
+const DESCRICOES: Record<FiltroRota, string> = {
+  tudo: 'Colunas do pároco e da juventude da Paróquia Nossa Senhora do Rosário: reflexões, testemunhos e vídeos.',
+  paroco:
+    'Palavra do Pároco: reflexões e mensagens do pároco da Paróquia Nossa Senhora do Rosário.',
+  juventude: 'Juventude: textos e testemunhos dos jovens da Paróquia Nossa Senhora do Rosário.',
+  videos:
+    'Vídeos da Paróquia Nossa Senhora do Rosário: reflexões do Evangelho e momentos da comunidade.',
+};
+
+const titulo = dados.pagina > 1 ? `${NOMES[filtro]} · página ${dados.pagina}` : NOMES[filtro];
+---
+
+<PaginaLayout title={titulo} description={DESCRICOES[filtro]}>
+  <ListagemBlog filtro={filtro} dados={dados} />
+</PaginaLayout>

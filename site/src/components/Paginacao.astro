@@ -1,0 +1,66 @@
+---
+/**
+ * Paginação simples, no fim da lista: "Colunas mais recentes" · "Página 2 de 3" ·
+ * "Ver colunas anteriores". Não aparece quando há uma página só.
+ */
+import Botao from './Botao.astro';
+
+interface Props {
+  /** Nome da navegação para leitores de tela. */
+  rotulo: string;
+  pagina: number;
+  totalPaginas: number;
+  /** Endereço da página `n` (a primeira costuma não ter sufixo). */
+  href: (pagina: number) => string;
+  rotuloAnterior?: string;
+  rotuloProxima?: string;
+}
+
+const {
+  rotulo,
+  pagina,
+  totalPaginas,
+  href,
+  rotuloAnterior = 'Colunas mais recentes',
+  rotuloProxima = 'Ver colunas anteriores',
+} = Astro.props;
+---
+
+{totalPaginas > 1 && (
+  <nav class="paginacao" aria-label={rotulo}>
+    {pagina > 1 ? (
+      <Botao variante="fantasma" href={href(pagina - 1)} rel="prev">
+        ← {rotuloAnterior}
+      </Botao>
+    ) : (
+      <span />
+    )}
+    <p class="paginacao__posicao pequeno">
+      Página {pagina} de {totalPaginas}
+    </p>
+    {pagina < totalPaginas ? (
+      <Botao variante="secundario" href={href(pagina + 1)} rel="next">
+        {rotuloProxima} →
+      </Botao>
+    ) : (
+      <span />
+    )}
+  </nav>
+)}
+
+<style>
+  .paginacao {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--espaco-3) var(--espaco-6);
+    padding-top: var(--espaco-6);
+    border-top: 1px solid var(--linha);
+  }
+
+  .paginacao__posicao {
+    margin: 0;
+    color: var(--texto-suave);
+  }
+</style>

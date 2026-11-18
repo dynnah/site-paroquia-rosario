@@ -1,0 +1,20 @@
+---
+/** Um pedaço de texto com negrito, itálico e/ou link. Veja `lib/textoRico.ts`. */
+import type { Trecho } from '../lib/textoRico';
+
+type Props = Trecho;
+
+const { texto, negrito, italico, href } = Astro.props;
+
+// Sem marca, o "invólucro" é um Fragment e não gera nenhuma tag.
+// A marcação abaixo fica numa linha só, de propósito: quebrar linha entre as tags
+// injetaria espaços dentro do texto (uma vírgula colada em negrito viraria "palavra ,").
+// O `prettier-ignore` impede o formatador de quebrá-la.
+const Ligacao = href ? 'a' : Fragment;
+const Negrito = negrito ? 'strong' : Fragment;
+const Italico = italico ? 'em' : Fragment;
+const propsLigacao = href ? { href } : {};
+---
+
+{/* prettier-ignore */}
+<Ligacao {...propsLigacao}><Negrito><Italico>{texto}</Italico></Negrito></Ligacao>

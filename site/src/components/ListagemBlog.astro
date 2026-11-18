@@ -1,0 +1,73 @@
+---
+/**
+ * Composição "Página Blog" do design system: título, filtros, post em destaque
+ * (só na primeira página), grade e paginação. Usada por todas as rotas de lista
+ * do blog (tudo, colunas e vídeos).
+ */
+import { hrefBlog, propsCardPost, type FiltroRota } from '../lib/blog';
+import type { PaginaDePosts } from '../lib/sanity.tipos';
+import CardPost from './CardPost.astro';
+import EstadoVazio from './EstadoVazio.astro';
+import FiltrosBlog from './FiltrosBlog.astro';
+import Paginacao from './Paginacao.astro';
+
+interface Props {
+  filtro: FiltroRota;
+  dados: PaginaDePosts;
+}
+
+const { filtro, dados } = Astro.props;
+
+const [destaque, ...demais] = dados.posts;
+const comDestaque = dados.pagina === 1 && destaque !== undefined;
+const grade = comDestaque ? demais : dados.posts;
+
+const vazio =
+  filtro === 'videos'
+    ? 'Ainda não há vídeos publicados.'
+    : filtro === 'tudo'
+      ? 'Ainda não há posts publicados.'
+      : 'Ainda não há posts nesta coluna.';
+---
+
+<div class="ros-blog">
+  <div class="ros-blog__in">
+    <div>
+      <h1 class="ros-pagina__titulo">Blog</h1>
+      <p class="ros-blog__intro">
+        Colunas do pároco e da juventude: reflexões, testemunhos e vídeos da nossa comunidade.
+      </p>
+    </div>
+
+    <FiltrosBlog atual={filtro} />
+
+    {dados.posts.length === 0 && (
+      <EstadoVazio
+        titulo={vazio}
+        texto="Volte em breve, ou veja as outras colunas."
+        acao={filtro === 'tudo' ? undefined : { rotulo: 'Ver tudo', href: hrefBlog('tudo') }}
+      />
+    )}
+
+    {comDestaque && (
+      <div class="ros-blog__destaque">
+        <CardPost {...propsCardPost(destaque)} />
+      </div>
+    )}
+
+    {grade.length > 0 && (
+      <div class="ros-blog__grade">
+        {grade.map((post) => (
+          <CardPost {...propsCardPost(post)} />
+        ))}
+      </div>
+    )}
+
+    <Paginacao
+      rotulo="Páginas do blog"
+      pagina={dados.pagina}
+      totalPaginas={dados.totalPaginas}
+      href={(n) => hrefBlog(filtro, n)}
+    />
+  </div>
+</div>

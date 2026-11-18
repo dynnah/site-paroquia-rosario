@@ -1,0 +1,60 @@
+---
+/**
+ * Página interna comum (Horários, Agenda, Pastorais, Sacramentos, Contato):
+ * título, uma frase de apresentação e o conteúdo, dentro do container do site.
+ */
+import PaginaLayout from './PaginaLayout.astro';
+
+interface Props {
+  /** <title> e descrição para buscadores. */
+  title: string;
+  description?: string;
+  /** Título visível (h1). */
+  titulo: string;
+  /** Parte do título em itálico, como em "Nossa Senhora / do Rosário". */
+  destaque?: string;
+  /** Uma frase de apresentação. */
+  intro?: string;
+  barraMobile?: boolean;
+}
+
+const { titulo, destaque, intro, ...layout } = Astro.props;
+---
+
+<PaginaLayout {...layout}>
+  <div class="container pagina">
+    <header class="pagina__cab">
+      <h1 class="ros-pagina__titulo">
+        {titulo}
+        {destaque && (
+          <>
+            {' '}
+            <em class="ros-italico">{destaque}</em>
+          </>
+        )}
+      </h1>
+      {intro && <p class="pagina__intro corpo-grande">{intro}</p>}
+    </header>
+    <slot />
+  </div>
+</PaginaLayout>
+
+<style>
+  .pagina {
+    display: grid;
+    gap: var(--espaco-8);
+    padding-block: var(--espaco-8) var(--espaco-12);
+  }
+
+  .pagina__intro {
+    max-width: var(--medida-texto);
+    margin: var(--espaco-2) 0 0;
+    color: var(--texto-suave);
+  }
+
+  @media (min-width: 1024px) {
+    .pagina {
+      padding-block: var(--espaco-12) var(--espaco-16);
+    }
+  }
+</style>

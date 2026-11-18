@@ -1,0 +1,41 @@
+---
+/**
+ * Renderiza o texto formatado do Sanity (Portable Text) sem `set:html`.
+ * Não cria invólucro: quem usa coloca dentro de `.ros-artigo__texto` (ou de
+ * qualquer bloco de leitura). Os estilos de lista e subtítulo estão em global.css.
+ */
+import { montarTexto } from '../lib/textoRico';
+import type { TextoRico } from '../lib/sanity.tipos';
+import Trecho from './Trecho.astro';
+
+interface Props {
+  texto?: TextoRico | null;
+}
+
+const nos = montarTexto(Astro.props.texto);
+---
+
+{nos.map((no) => {
+  if ('itens' in no) {
+    const Lista = no.tipo;
+    return (
+      <Lista>
+        {no.itens.map((item) => (
+          <li>
+            {item.map((trecho) => (
+              <Trecho {...trecho} />
+            ))}
+          </li>
+        ))}
+      </Lista>
+    );
+  }
+  const Bloco = no.tipo;
+  return (
+    <Bloco>
+      {no.trechos.map((trecho) => (
+        <Trecho {...trecho} />
+      ))}
+    </Bloco>
+  );
+})}

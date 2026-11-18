@@ -1,0 +1,86 @@
+---
+/**
+ * Seção da página inicial: sobrelinha, título em serifa (com itálico opcional)
+ * e, à direita, um link "Ver tudo". Respiro entre seções: 48px no celular e
+ * 64px a partir do desktop, como pede o design system.
+ */
+import type { LinkSimples } from '../lib/tipos';
+import Botao from './Botao.astro';
+
+interface Props {
+  /** Distingue seções na mesma página (liga o título à região). */
+  id: string;
+  sobrelinha?: string;
+  titulo: string;
+  /** Parte do título em itálico. */
+  destaque?: string;
+  /** Link de "ver tudo" ao lado do título. */
+  acao?: LinkSimples;
+  /** Faixa com fundo afundado, para alternar com as seções de fundo normal. */
+  fundo?: 'padrao' | 'afundado';
+}
+
+const { id, sobrelinha, titulo, destaque, acao, fundo = 'padrao' } = Astro.props;
+const tituloId = `${id}-titulo`;
+---
+
+<section
+  class:list={['secao', { 'secao--afundada': fundo === 'afundado' }]}
+  aria-labelledby={tituloId}
+>
+  <div class="container">
+    <header class="secao__cab">
+      <div>
+        {sobrelinha && <p class="ros-sobrelinha">{sobrelinha}</p>}
+        <h2 class="titulo-2 secao__titulo" id={tituloId}>
+          {titulo}
+          {destaque && (
+            <>
+              {' '}
+              <em class="ros-italico">{destaque}</em>
+            </>
+          )}
+        </h2>
+      </div>
+      {acao && (
+        <Botao variante="fantasma" href={acao.href}>
+          {acao.rotulo}
+        </Botao>
+      )}
+    </header>
+    <slot />
+  </div>
+</section>
+
+<style>
+  .secao {
+    padding-block: var(--espaco-12);
+  }
+
+  .secao--afundada {
+    background: var(--fundo-afundado);
+  }
+
+  .secao__cab {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--espaco-3) var(--espaco-6);
+    margin-bottom: var(--espaco-6);
+  }
+
+  .secao__titulo {
+    margin: var(--espaco-1) 0 0;
+  }
+
+  .secao__titulo em {
+    color: var(--mariano);
+  }
+
+  @media (min-width: 1024px) {
+    .secao {
+      padding-block: var(--espaco-16);
+    }
+  }
+</style>

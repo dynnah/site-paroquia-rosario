@@ -122,6 +122,12 @@ export function dataLonga(entrada?: string | Date): string {
   return `${capitalizar(nomeDiaSemana(diaSemana))}, ${dia} de ${MESES[mes - 1]}`;
 }
 
+/** "17 de novembro de 2026" */
+export function dataCompleta(entrada?: string | Date): string {
+  const { dia, mes, ano } = partesData(entrada);
+  return `${dia} de ${MESES[mes - 1]} de ${ano}`;
+}
+
 /** "17 nov" */
 export function dataCurta(entrada?: string | Date): string {
   const { dia, mes } = partesData(entrada);
