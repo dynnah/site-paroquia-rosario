@@ -1,0 +1,58 @@
+---
+import Botao from '../components/Botao.astro';
+import PaginaLayout from '../layouts/PaginaLayout.astro';
+---
+
+<PaginaLayout
+  title="Página não encontrada"
+  description="Esta página não existe ou mudou de endereço. Volte ao início do site da Paróquia Nossa Senhora do Rosário."
+>
+  <section class="container nao-achou">
+    <p class="ros-sobrelinha">Página não encontrada</p>
+    <h1 class="titulo-1">
+      Não encontramos <span class="ros-italico">esta página</span>
+    </h1>
+    <p class="corpo-grande">
+      O endereço pode ter mudado ou ter sido digitado errado. Comece pelo início ou veja os horários
+      das missas.
+    </p>
+    <div class="acoes">
+      <Botao href="/">Voltar ao início</Botao>
+      <Botao variante="secundario" href="/horarios" icone="relogio">
+        Ver horários
+      </Botao>
+    </div>
+  </section>
+</PaginaLayout>
+
+<style>
+  .nao-achou {
+    display: grid;
+    gap: var(--espaco-4);
+    justify-items: start;
+    padding-block: var(--espaco-12);
+  }
+
+  .nao-achou h1,
+  .nao-achou p {
+    margin: 0;
+  }
+
+  .nao-achou p:not(.ros-sobrelinha) {
+    max-width: var(--medida-texto);
+    color: var(--texto-suave);
+  }
+
+  .acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--espaco-3);
+    margin-top: var(--espaco-2);
+  }
+
+  @media (min-width: 1024px) {
+    .nao-achou {
+      padding-block: var(--espaco-16);
+    }
+  }
+</style>

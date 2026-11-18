@@ -1,0 +1,77 @@
+---
+import Botao from '../components/Botao.astro';
+import CardHorarios from '../components/CardHorarios.astro';
+import EstadoVazio from '../components/EstadoVazio.astro';
+import PaginaInterna from '../layouts/PaginaInterna.astro';
+import { dadosDaParoquia, urlMapa, urlWhatsApp } from '../lib/paroquia';
+import { conteudo } from '../lib/sanity';
+
+const [horarios, config] = await Promise.all([conteudo.horarios(), conteudo.configuracoes()]);
+const paroquia = dadosDaParoquia(config);
+const whatsapp = urlWhatsApp(paroquia.whatsapp);
+
+// TODO(paroquia): confirmar com a secretaria os horários de missa, confissão, adoração e atendimento.
+const grupos = horarios
+  ? [
+      { titulo: 'Santa Missa', grupo: horarios.missa },
+      { titulo: 'Confissões', grupo: horarios.confissao },
+      { titulo: 'Adoração', grupo: horarios.adoracao },
+      { titulo: 'Secretaria', grupo: horarios.secretaria },
+    ].filter(({ grupo }) => grupo.linhas.length > 0)
+  : [];
+---
+
+<PaginaInterna
+  title="Horários"
+  description="Horários de missa, confissão, adoração e atendimento da secretaria da Paróquia Nossa Senhora do Rosário, em Jaguaribe, João Pessoa."
+  titulo="Horários"
+  intro="Missas, confissões, adoração e o atendimento da secretaria."
+  barraMobile
+>
+  {grupos.length === 0 ? (
+    <EstadoVazio
+      titulo="Os horários estão sendo atualizados."
+      texto="Fale com a secretaria para saber os horários desta semana."
+      acao={{ rotulo: 'Como chegar', href: urlMapa(paroquia) }}
+    />
+  ) : (
+    <div class="ros-grade">
+      {grupos.map(({ titulo, grupo }) => (
+        <div class="bloco">
+          <CardHorarios titulo={titulo} linhas={grupo.linhas} />
+          {grupo.observacao && <p class="bloco__obs pequeno">{grupo.observacao}</p>}
+        </div>
+      ))}
+    </div>
+  )}
+
+  <div class="acoes">
+    <Botao href={urlMapa(paroquia)} icone="local">
+      Como chegar
+    </Botao>
+    {whatsapp && (
+      <Botao variante="secundario" href={whatsapp} icone="mensagem">
+        Falar no WhatsApp
+      </Botao>
+    )}
+  </div>
+</PaginaInterna>
+
+<style>
+  .bloco {
+    display: grid;
+    gap: var(--espaco-2);
+    align-content: start;
+  }
+
+  .bloco__obs {
+    margin: 0;
+    color: var(--texto-suave);
+  }
+
+  .acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--espaco-3);
+  }
+</style>

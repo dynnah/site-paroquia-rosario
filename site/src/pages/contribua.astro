@@ -1,0 +1,30 @@
+---
+import DoacaoPix from '../components/DoacaoPix.astro';
+import PaginaDeTexto from '../layouts/PaginaDeTexto.astro';
+import { conteudo } from '../lib/sanity';
+
+const config = await conteudo.configuracoes();
+// TODO(paroquia): chave Pix oficial e nome do titular, no documento "Configurações" do Studio.
+const pix =
+  config?.pixChave && config.pixTitular
+    ? { chave: config.pixChave, titular: config.pixTitular }
+    : null;
+---
+
+<PaginaDeTexto
+  slug="contribua"
+  tituloReserva="Contribua"
+  descricaoReserva="Dízimo e doações por Pix para manter a igreja e os projetos da Paróquia Nossa Senhora do Rosário."
+>
+  {pix && (
+    <div class="pix">
+      <DoacaoPix chave={pix.chave} titular={pix.titular} />
+    </div>
+  )}
+</PaginaDeTexto>
+
+<style>
+  .pix {
+    margin-top: var(--espaco-8);
+  }
+</style>

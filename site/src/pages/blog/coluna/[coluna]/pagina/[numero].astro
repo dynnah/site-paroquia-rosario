@@ -1,0 +1,23 @@
+---
+import BlogLayout from '../../../../../layouts/BlogLayout.astro';
+import { conteudo } from '../../../../../lib/sanity';
+
+/** /blog/coluna/paroco/pagina/2… (a página 1 é /blog/coluna/paroco). */
+export async function getStaticPaths() {
+  const colunas = ['paroco', 'juventude'] as const;
+  const rotas = await Promise.all(
+    colunas.map(async (coluna) => {
+      const { totalPaginas } = await conteudo.posts(coluna, 1);
+      return Array.from({ length: totalPaginas - 1 }, (_, i) => ({
+        params: { coluna, numero: String(i + 2) },
+      }));
+    }),
+  );
+  return rotas.flat();
+}
+
+const coluna = Astro.params.coluna === 'juventude' ? 'juventude' : 'paroco';
+const dados = await conteudo.posts(coluna, Number(Astro.params.numero));
+---
+
+<BlogLayout filtro={coluna} dados={dados} />

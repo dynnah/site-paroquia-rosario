@@ -1,0 +1,71 @@
+---
+import Aviso from '../../components/Aviso.astro';
+import Botao from '../../components/Botao.astro';
+import TextoRico from '../../components/TextoRico.astro';
+import ArtigoLayout from '../../layouts/ArtigoLayout.astro';
+import { jaAconteceu, quandoAcontece } from '../../lib/eventos';
+import { conteudo } from '../../lib/sanity';
+
+// Inclui eventos que já passaram: o endereço continua valendo para quem guardou o link.
+export async function getStaticPaths() {
+  const slugs = await conteudo.slugs('evento');
+  return slugs.map((slug) => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params;
+const evento = await conteudo.evento(slug!);
+if (!evento) throw new Error(`Evento não encontrado: ${slug}`);
+
+const quando = quandoAcontece(evento);
+const passou = jaAconteceu(evento);
+---
+
+<ArtigoLayout
+  title={evento.titulo}
+  description={`${quando}${evento.local ? ` · ${evento.local}` : ''}`}
+  voltar={{ rotulo: 'Agenda', href: '/agenda' }}
+  titulo={evento.titulo}
+  destaque={evento.destaque}
+>
+  <p slot="sobrelinha" class="ros-sobrelinha">
+    {quando}
+  </p>
+
+  {evento.local && (
+    <p class="ros-artigo__autor">
+      <b>{evento.local}</b>
+    </p>
+  )}
+
+  {passou && (
+    <div class="aviso">
+      <Aviso
+        titulo="Este evento já aconteceu."
+        texto="Veja o que vem pela frente na agenda."
+        link={{ rotulo: 'Ver agenda', href: '/agenda' }}
+      />
+    </div>
+  )}
+
+  {evento.descricao && (
+    <div class="ros-artigo__texto">
+      <TextoRico texto={evento.descricao} />
+    </div>
+  )}
+
+  {!passou && evento.inscricaoUrl && (
+    <p class="acao">
+      <Botao href={evento.inscricaoUrl}>Quero participar</Botao>
+    </p>
+  )}
+</ArtigoLayout>
+
+<style>
+  .aviso {
+    margin-top: var(--espaco-6);
+  }
+
+  .acao {
+    margin: var(--espaco-8) 0 0;
+  }
+</style>

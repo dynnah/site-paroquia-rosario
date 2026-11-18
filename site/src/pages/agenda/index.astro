@@ -1,0 +1,31 @@
+---
+import CardEvento from '../../components/CardEvento.astro';
+import EstadoVazio from '../../components/EstadoVazio.astro';
+import PaginaInterna from '../../layouts/PaginaInterna.astro';
+import { propsCardEvento } from '../../lib/eventos';
+import { conteudo } from '../../lib/sanity';
+
+const eventos = await conteudo.eventosProximos(200);
+---
+
+<PaginaInterna
+  title="Agenda"
+  description="Festas, celebrações e encontros da Paróquia Nossa Senhora do Rosário, em Jaguaribe, João Pessoa."
+  titulo="Agenda"
+  intro="Festas, celebrações e encontros da nossa comunidade."
+  barraMobile
+>
+  {eventos.length === 0 ? (
+    <EstadoVazio
+      titulo="Ainda não há eventos marcados."
+      texto="Quando houver festa, celebração ou encontro, ele aparece aqui."
+      acao={{ rotulo: 'Ver horários', href: '/horarios' }}
+    />
+  ) : (
+    <div class="ros-grade">
+      {eventos.map((evento) => (
+        <CardEvento {...propsCardEvento(evento)} />
+      ))}
+    </div>
+  )}
+</PaginaInterna>

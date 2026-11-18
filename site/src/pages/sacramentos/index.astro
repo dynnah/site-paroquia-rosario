@@ -1,0 +1,30 @@
+---
+import CardPastoral from '../../components/CardPastoral.astro';
+import EstadoVazio from '../../components/EstadoVazio.astro';
+import PaginaInterna from '../../layouts/PaginaInterna.astro';
+import { propsCardSacramento } from '../../lib/sacramentos';
+import { conteudo } from '../../lib/sanity';
+
+const sacramentos = await conteudo.sacramentos();
+---
+
+<PaginaInterna
+  title="Sacramentos"
+  description="Batismo, Primeira Eucaristia, Crisma e Matrimônio na Paróquia Nossa Senhora do Rosário: requisitos, documentos e próximas turmas."
+  titulo="Sacramentos"
+  intro="O que é preciso para cada sacramento, os documentos e quando começam as próximas turmas."
+>
+  {sacramentos.length === 0 ? (
+    <EstadoVazio
+      titulo="Estamos reunindo as informações dos sacramentos."
+      texto="Enquanto isso, fale com a secretaria."
+      acao={{ rotulo: 'Fale conosco', href: '/contato' }}
+    />
+  ) : (
+    <div class="ros-grade">
+      {sacramentos.map((sacramento) => (
+        <CardPastoral {...propsCardSacramento(sacramento)} />
+      ))}
+    </div>
+  )}
+</PaginaInterna>

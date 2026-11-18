@@ -1,28 +1,171 @@
 ---
+/**
+ * Início: o horário primeiro. Avisos ativos, hero com a próxima missa, horários,
+ * próximos eventos, últimos posts, pastorais e doação.
+ * TODO(fase 5): resumo "Evangelho de hoje" (LiturgiaResumo) quando houver as leituras do dia.
+ */
+import Aviso from '../components/Aviso.astro';
+import CardEvento from '../components/CardEvento.astro';
+import CardHorarios from '../components/CardHorarios.astro';
+import CardPastoral from '../components/CardPastoral.astro';
+import CardPost from '../components/CardPost.astro';
+import DivisorTerco from '../components/DivisorTerco.astro';
+import DoacaoPix from '../components/DoacaoPix.astro';
+import Hero from '../components/Hero.astro';
+import SecaoPagina from '../components/SecaoPagina.astro';
 import PaginaLayout from '../layouts/PaginaLayout.astro';
+import { propsCardPost } from '../lib/blog';
+import { propsCardEvento } from '../lib/eventos';
+import { proximaMissa } from '../lib/horarios';
+import { dadosDaParoquia, urlMapa } from '../lib/paroquia';
+import { propsCardPastoral } from '../lib/pastorais';
+import { conteudo } from '../lib/sanity';
 
-const emDesenvolvimento = import.meta.env.DEV;
+const agora = new Date();
+const [config, horarios, avisos, eventos, blog, pastorais] = await Promise.all([
+  conteudo.configuracoes(),
+  conteudo.horarios(),
+  conteudo.avisosAtivos(),
+  conteudo.eventosProximos(3),
+  conteudo.posts('tudo', 1, 3),
+  conteudo.pastorais(),
+]);
+
+const paroquia = dadosDaParoquia(config);
+const missa = horarios?.missa.linhas ?? [];
+const confissao = horarios?.confissao.linhas ?? [];
+const adoracao = horarios?.adoracao.linhas ?? [];
+const proxima = proximaMissa(missa, agora);
+
+// TODO(paroquia): chave Pix oficial e nome do titular, no documento "Configurações" do Studio.
+const pix =
+  config?.pixChave && config.pixTitular
+    ? { chave: config.pixChave, titular: config.pixTitular }
+    : null;
 ---
 
-<PaginaLayout title="Início">
-  <section class="container provisoria">
-    <p class="ros-sobrelinha">Jaguaribe · João Pessoa</p>
-    <h1 class="titulo-1">
-      Nossa Senhora <span class="ros-italico">do Rosário</span>
-    </h1>
-    <p class="corpo-grande">Página inicial provisória. O site completo entra nas próximas fases.</p>
-    {emDesenvolvimento && (
-      <p>
-        <a class="ros-btn ros-btn--secundario" href="/styleguide">
-          Ver o styleguide
-        </a>
-      </p>
-    )}
-  </section>
+<PaginaLayout
+  title="Início"
+  description="Horários de missa, liturgia do dia, agenda e pastorais da Paróquia Nossa Senhora do Rosário, em Jaguaribe, João Pessoa."
+  barraMobile
+>
+  {avisos.length > 0 && (
+    <div class="container avisos">
+      {avisos.slice(0, 2).map((aviso) => (
+        <Aviso tipo={aviso.tipo} titulo={aviso.titulo} texto={aviso.texto} link={aviso.link} />
+      ))}
+    </div>
+  )}
+
+  <Hero
+    sobrelinha="Jaguaribe · João Pessoa"
+    titulo="Nossa Senhora"
+    tituloItalico="do Rosário"
+    texto="Igreja neoclássica erguida pelos frades franciscanos entre 1927 e 1929. Venha rezar conosco."
+    proximaMissa={proxima ?? undefined}
+    acaoPrimaria={{ rotulo: 'Ver horários', href: '/horarios', icone: 'relogio' }}
+    acaoSecundaria={{ rotulo: 'Como chegar', href: urlMapa(paroquia), icone: 'local' }}
+  />
+
+  {(missa.length > 0 || confissao.length > 0 || adoracao.length > 0) && (
+    <SecaoPagina
+      id="horarios"
+      sobrelinha="Horários"
+      titulo="Missas, confissões"
+      destaque="e adoração"
+      acao={{ rotulo: 'Ver todos os horários', href: '/horarios' }}
+    >
+      <div class="ros-grade">
+        {missa.length > 0 && <CardHorarios titulo="Santa Missa" linhas={missa} />}
+        {confissao.length > 0 && <CardHorarios titulo="Confissões" linhas={confissao} />}
+        {adoracao.length > 0 && <CardHorarios titulo="Adoração" linhas={adoracao} />}
+      </div>
+    </SecaoPagina>
+  )}
+
+  <div class="container divisor">
+    <DivisorTerco />
+  </div>
+
+  {eventos.length > 0 && (
+    <SecaoPagina
+      id="agenda"
+      sobrelinha="Agenda"
+      titulo="Próximos"
+      destaque="encontros"
+      acao={{ rotulo: 'Ver agenda', href: '/agenda' }}
+    >
+      <div class="ros-grade">
+        {eventos.map((evento) => (
+          <CardEvento {...propsCardEvento(evento)} />
+        ))}
+      </div>
+    </SecaoPagina>
+  )}
+
+  {blog.posts.length > 0 && (
+    <SecaoPagina
+      id="blog"
+      sobrelinha="Blog"
+      titulo="Palavra"
+      destaque="da comunidade"
+      acao={{ rotulo: 'Ver blog', href: '/blog' }}
+      fundo="afundado"
+    >
+      <div class="ros-grade">
+        {blog.posts.map((post) => (
+          <CardPost {...propsCardPost(post)} />
+        ))}
+      </div>
+    </SecaoPagina>
+  )}
+
+  {pastorais.length > 0 && (
+    <SecaoPagina
+      id="pastorais"
+      sobrelinha="Pastorais e movimentos"
+      titulo="Há um lugar"
+      destaque="para você"
+      acao={{ rotulo: 'Ver pastorais', href: '/pastorais' }}
+    >
+      <div class="ros-grade">
+        {pastorais.slice(0, 3).map((pastoral) => (
+          <CardPastoral {...propsCardPastoral(pastoral)} />
+        ))}
+      </div>
+    </SecaoPagina>
+  )}
+
+  {pix && (
+    <>
+      <div class="container divisor">
+        <DivisorTerco />
+      </div>
+      <section class="container doacao" aria-label="Dízimo e doações">
+        <DoacaoPix chave={pix.chave} titular={pix.titular} />
+      </section>
+    </>
+  )}
 </PaginaLayout>
 
 <style>
-  .provisoria {
-    padding-block: var(--espaco-12);
+  .avisos {
+    display: grid;
+    gap: var(--espaco-3);
+    padding-top: var(--espaco-4);
+  }
+
+  .divisor {
+    padding-block: var(--espaco-4);
+  }
+
+  .doacao {
+    padding-block: var(--espaco-8) var(--espaco-12);
+  }
+
+  @media (min-width: 1024px) {
+    .doacao {
+      padding-block: var(--espaco-8) var(--espaco-16);
+    }
   }
 </style>

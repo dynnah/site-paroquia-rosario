@@ -1,0 +1,16 @@
+---
+import BlogLayout from '../../../../layouts/BlogLayout.astro';
+import { conteudo } from '../../../../lib/sanity';
+
+/** /blog/videos/pagina/2… (a página 1 é /blog/videos). */
+export async function getStaticPaths() {
+  const { totalPaginas } = await conteudo.posts('videos', 1);
+  return Array.from({ length: totalPaginas - 1 }, (_, i) => ({
+    params: { numero: String(i + 2) },
+  }));
+}
+
+const dados = await conteudo.posts('videos', Number(Astro.params.numero));
+---
+
+<BlogLayout filtro="videos" dados={dados} />

@@ -1,0 +1,14 @@
+---
+import BlogLayout from '../../../../layouts/BlogLayout.astro';
+import { conteudo } from '../../../../lib/sanity';
+
+/** /blog/coluna/paroco e /blog/coluna/juventude. Colunas "outras" aparecem só em "Tudo". */
+export function getStaticPaths() {
+  return [{ params: { coluna: 'paroco' } }, { params: { coluna: 'juventude' } }];
+}
+
+const coluna = Astro.params.coluna === 'juventude' ? 'juventude' : 'paroco';
+const dados = await conteudo.posts(coluna, 1);
+---
+
+<BlogLayout filtro={coluna} dados={dados} />

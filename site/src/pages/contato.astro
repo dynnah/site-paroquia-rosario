@@ -1,0 +1,135 @@
+---
+import Botao from '../components/Botao.astro';
+import CardHorarios from '../components/CardHorarios.astro';
+import PaginaInterna from '../layouts/PaginaInterna.astro';
+import {
+  dadosDaParoquia,
+  enderecoEmLinhas,
+  urlInstagram,
+  urlMapa,
+  urlTelefone,
+  urlWhatsApp,
+} from '../lib/paroquia';
+import { conteudo } from '../lib/sanity';
+
+const [config, horarios] = await Promise.all([conteudo.configuracoes(), conteudo.horarios()]);
+const paroquia = dadosDaParoquia(config);
+const [rua, bairroCidade] = enderecoEmLinhas(paroquia);
+const secretaria = horarios?.secretaria.linhas ?? [];
+
+interface Contato {
+  rotulo: string;
+  valor: string;
+  href?: string;
+}
+
+// TODO(paroquia): WhatsApp, telefone, e-mail e canal do YouTube da secretaria.
+// Só aparece o que estiver preenchido no documento "Configurações" do Studio.
+const contatos: Contato[] = [];
+const whatsapp = urlWhatsApp(paroquia.whatsapp);
+if (whatsapp)
+  contatos.push({ rotulo: 'WhatsApp', valor: 'Conversar com a secretaria', href: whatsapp });
+if (paroquia.telefone)
+  contatos.push({
+    rotulo: 'Telefone',
+    valor: paroquia.telefone,
+    href: urlTelefone(paroquia.telefone),
+  });
+if (paroquia.email)
+  contatos.push({ rotulo: 'E-mail', valor: paroquia.email, href: `mailto:${paroquia.email}` });
+const instagram = urlInstagram(paroquia.instagram);
+if (instagram)
+  contatos.push({ rotulo: 'Instagram', valor: `@${paroquia.instagram}`, href: instagram });
+if (paroquia.youtube)
+  contatos.push({ rotulo: 'YouTube', valor: 'Canal da paróquia', href: paroquia.youtube });
+---
+
+<PaginaInterna
+  title="Contato"
+  description="Endereço, horário da secretaria e formas de falar com a Paróquia Nossa Senhora do Rosário, em Jaguaribe, João Pessoa."
+  titulo="Contato"
+  intro="Fale com a secretaria ou venha nos visitar."
+  barraMobile
+>
+  <div class="ros-grade">
+    <section class="bloco" aria-labelledby="onde-titulo">
+      <h2 class="titulo-2" id="onde-titulo">
+        Onde estamos
+      </h2>
+      <address class="endereco corpo-grande">
+        {rua}
+        <br />
+        {bairroCidade}
+      </address>
+      <Botao href={urlMapa(paroquia)} icone="local">
+        Como chegar
+      </Botao>
+    </section>
+
+    <section class="bloco" aria-labelledby="falar-titulo">
+      <h2 class="titulo-2" id="falar-titulo">
+        Fale conosco
+      </h2>
+      <ul class="contatos">
+        {contatos.map((contato) => (
+          <li>
+            <span class="pequeno">{contato.rotulo}</span>
+            {contato.href ? (
+              <a href={contato.href}>{contato.valor}</a>
+            ) : (
+              <span>{contato.valor}</span>
+            )}
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    {secretaria.length > 0 && <CardHorarios titulo="Secretaria" linhas={secretaria} />}
+  </div>
+</PaginaInterna>
+
+<style>
+  .bloco {
+    display: grid;
+    gap: var(--espaco-4);
+    align-content: start;
+    justify-items: start;
+    padding: var(--espaco-6);
+    background: var(--fundo-elevado);
+    border: 1px solid var(--linha);
+    border-radius: var(--raio-m);
+  }
+
+  .bloco h2 {
+    margin: 0;
+  }
+
+  .endereco {
+    margin: 0;
+    font-style: normal;
+  }
+
+  .contatos {
+    display: grid;
+    gap: var(--espaco-2);
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .contatos li {
+    display: grid;
+  }
+
+  .contatos .pequeno {
+    color: var(--texto-suave);
+  }
+
+  .contatos a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--toque-min);
+    font-weight: 600;
+  }
+</style>

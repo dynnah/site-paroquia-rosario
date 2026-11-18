@@ -1,0 +1,64 @@
+---
+import TextoRico from '../../components/TextoRico.astro';
+import VideoYouTube from '../../components/VideoYouTube.astro';
+import ArtigoLayout from '../../layouts/ArtigoLayout.astro';
+import { SLUGS_RESERVADOS_BLOG } from '../../lib/blog';
+import { dataCompleta } from '../../lib/formatacao';
+import { conteudo } from '../../lib/sanity';
+import { extrairIdYouTube } from '../../lib/youtube';
+
+export async function getStaticPaths() {
+  const slugs = await conteudo.slugs('post');
+  const reservados = slugs.filter((slug) => SLUGS_RESERVADOS_BLOG.includes(slug));
+  if (reservados.length > 0) {
+    console.warn(
+      `[blog] Posts ignorados: o slug usa um nome reservado das rotas do blog (${reservados.join(', ')}). Troque o slug no Studio.`,
+    );
+  }
+  return slugs
+    .filter((slug) => !SLUGS_RESERVADOS_BLOG.includes(slug))
+    .map((slug) => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params;
+const post = await conteudo.post(slug!);
+if (!post) throw new Error(`Post publicado não encontrado: ${slug}`);
+
+const idVideo = post.youtube ? extrairIdYouTube(post.youtube) : null;
+const temTexto = (post.corpo?.length ?? 0) > 0;
+const classeColuna =
+  post.coluna === 'outra' ? 'ros-coluna' : `ros-coluna ros-coluna--${post.coluna}`;
+---
+
+<ArtigoLayout
+  title={post.titulo}
+  description={post.resumo}
+  voltar={{ rotulo: 'Blog', href: '/blog' }}
+  titulo={post.titulo}
+>
+  <p slot="sobrelinha" class={classeColuna}>
+    {post.colunaNome}
+  </p>
+
+  <p class="ros-artigo__autor">
+    <b>{post.autor?.nome}</b> · {dataCompleta(post.data)}
+  </p>
+
+  {idVideo && (
+    <figure class="ros-artigo__midia">
+      <VideoYouTube id={idVideo} titulo={post.titulo} duracao={post.duracaoVideo} grande />
+      <figcaption>Vídeo no canal da paróquia no YouTube.</figcaption>
+    </figure>
+  )}
+
+  <div class="ros-artigo__texto">
+    {temTexto ? <TextoRico texto={post.corpo} /> : post.resumo && <p>{post.resumo}</p>}
+  </div>
+
+  {post.autor && (
+    <footer class="ros-artigo__rodape">
+      <b>{post.autor.nome}</b>
+      {post.autor.funcao}
+    </footer>
+  )}
+</ArtigoLayout>
