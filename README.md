@@ -190,13 +190,14 @@ Algumas regras importantes:
 | ---- | ------------------------------------------------------ | ------------- |
 | 1    | Estrutura: Astro, Vue, Sanity Studio e design system   | Concluída     |
 | 2    | Componentes do design system em Astro                  | Concluída     |
-| 3    | Modelo de conteúdo no Sanity                           | Em andamento  |
-| 4    | Páginas lendo do Sanity                                | A fazer       |
-| 5    | Liturgia e santo do dia automáticos                    | A fazer       |
+| 3    | Modelo de conteúdo no Sanity                           | Concluída     |
+| 4    | Páginas lendo do Sanity                                | Concluída     |
+| 5    | Liturgia e santo do dia automáticos                    | Concluída     |
 | 6    | Qualidade: SEO, acessibilidade e desempenho            | A fazer       |
-| 7    | Publicação e automações                                | A fazer       |
-| 8    | Conteúdo real e equipe                                 | A fazer       |
-| 9    | Lançamento                                             | A fazer       |
+| 7    | Reajustes de layout                                    | A fazer       |
+| 8    | Publicação e automações                                | A fazer       |
+| 9    | Conteúdo real e equipe                                 | A fazer       |
+| 10   | Lançamento                                             | A fazer       |
 
 Antes do lançamento ainda faltam informações da paróquia (horários 2026/2027, chave Pix e titular, contatos, lista de pastorais, requisitos dos sacramentos, texto da história e fotos). Enquanto isso, o código usa marcadores `TODO(paroquia)`.
 
