@@ -1,7 +1,7 @@
 /**
  * Conteúdo de exemplo para ver o site funcionando antes do conteúdo real.
  *
- * - Todo texto inventado leva o marcador "[EXEMPLO]" (a Fase 8 troca tudo).
+ * - Todo texto inventado leva o marcador "[EXEMPLO]" (a Fase 9 troca tudo).
  * - Nomes de pessoas são genéricos de propósito: nada de nomes fictícios que
  *   possam ser confundidos com gente da paróquia.
  * - Os IDs não têm ponto: no Sanity, `_id` com ponto vira documento privado.

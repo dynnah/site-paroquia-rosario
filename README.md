@@ -136,7 +136,7 @@ npx sanity cors add http://localhost:3333 --credentials                   # Stud
 npx sanity deploy                                                         # publica em <nome>.sanity.studio
 ```
 
-`--missing` pula o que já existe, então rodar o import de novo não sobrescreve nada. Depois de publicar o site com o domínio final, adicione-o também com `sanity cors add`. Tudo que o seed cria leva `[EXEMPLO]` no texto e deve ser trocado pelo conteúdo real (Fase 8).
+`--missing` pula o que já existe, então rodar o import de novo não sobrescreve nada. Depois de publicar o site com o domínio final, adicione-o também com `sanity cors add`. Tudo que o seed cria leva `[EXEMPLO]` no texto e deve ser trocado pelo conteúdo real (Fase 9).
 
 **Quem pode publicar:** o plano Free do Sanity só tem os papéis **Administrator** e **Viewer** (Editor e Contributor são do plano Growth). Como todo Administrator pode publicar, a revisão dos posts é feita pelo campo **Status de revisão** (_Rascunho_, _Em revisão_, _Aprovado_): quem escreve deixa em rascunho ou em revisão, e o site só publica posts **Aprovados**. No Studio, _Blog_ tem listas separadas por status para a pessoa que aprova.
 
