@@ -1,12 +1,14 @@
 ---
 import Botao from '../components/Botao.astro';
-import CardHorarios from '../components/CardHorarios.astro';
+import Icone from '../components/Icone.astro';
 import PaginaInterna from '../layouts/PaginaInterna.astro';
 import {
   dadosDaParoquia,
-  enderecoEmLinhas,
+  enderecoDoLocal,
+  locaisDaParoquia,
   urlInstagram,
   urlMapa,
+  urlMapaDoLocal,
   urlTelefone,
   urlWhatsApp,
 } from '../lib/paroquia';
@@ -15,8 +17,6 @@ import { jsonLdIgreja, urlAbsoluta } from '../lib/seo';
 
 const [config, horarios] = await Promise.all([conteudo.configuracoes(), conteudo.horarios()]);
 const paroquia = dadosDaParoquia(config);
-const [rua, bairroCidade] = enderecoEmLinhas(paroquia);
-const secretaria = horarios?.secretaria.linhas ?? [];
 
 const igreja = jsonLdIgreja(paroquia, {
   url: urlAbsoluta('/contato/', Astro.site),
@@ -25,129 +25,338 @@ const igreja = jsonLdIgreja(paroquia, {
   secretaria: horarios?.secretaria,
 });
 
-interface Contato {
+// "Onde estamos": a matriz e as capelas, cada uma com o seu "Como chegar".
+const locais = locaisDaParoquia(paroquia).map((local) => ({
+  nome: local.nome,
+  linhas: enderecoDoLocal(local),
+  // No mapa, a matriz se procura pelo nome da paróquia; a capela, pelo nome dela.
+  mapa: urlMapaDoLocal(local, local.nome === 'Matriz' ? paroquia.nome : local.nome),
+}));
+
+interface Acao {
   rotulo: string;
-  valor: string;
-  href?: string;
+  href: string;
+}
+
+/** Um canal de contato: título em destaque, o número ou dado em texto e uma linha por ação. */
+interface Grupo {
+  titulo: string;
+  detalhe?: string;
+  acoes: Acao[];
 }
 
 // TODO(paroquia): e-mail e canal do YouTube da secretaria.
 // Só aparece o que estiver preenchido no documento "Configurações" do Studio.
-const contatos: Contato[] = [];
+const grupos: Grupo[] = [];
 const whatsapp = urlWhatsApp(paroquia.whatsapp);
 const whatsappDoTelefone = urlWhatsApp(paroquia.telefone);
-// O telefone da secretaria atende no WhatsApp: tocar no número abre a conversa;
-// quem prefere ligar tem o link "Ligar" logo abaixo.
-if (paroquia.telefone) {
-  contatos.push({
-    rotulo: whatsapp === whatsappDoTelefone ? 'WhatsApp e telefone' : 'Telefone',
-    valor: paroquia.telefone,
-    href: whatsappDoTelefone,
-  });
-  contatos.push({
-    rotulo: 'Ligar',
-    valor: `Ligar para ${paroquia.telefone}`,
-    href: urlTelefone(paroquia.telefone),
+const telefone = urlTelefone(paroquia.telefone);
+const mesmoNumero = Boolean(whatsapp) && whatsapp === whatsappDoTelefone;
+
+if (paroquia.telefone && mesmoNumero) {
+  // O telefone da secretaria atende no WhatsApp: um canal só, com as duas formas de falar.
+  const acoes: Acao[] = [{ rotulo: 'Conversar no WhatsApp', href: whatsapp! }];
+  if (telefone) acoes.push({ rotulo: 'Ligar', href: telefone });
+  grupos.push({ titulo: 'WhatsApp e telefone', detalhe: paroquia.telefone, acoes });
+} else {
+  if (paroquia.telefone && telefone) {
+    grupos.push({
+      titulo: 'Telefone',
+      detalhe: paroquia.telefone,
+      acoes: [{ rotulo: 'Ligar', href: telefone }],
+    });
+  }
+  if (whatsapp) {
+    grupos.push({
+      titulo: 'WhatsApp',
+      acoes: [{ rotulo: 'Conversar no WhatsApp', href: whatsapp }],
+    });
+  }
+}
+if (paroquia.email) {
+  grupos.push({
+    titulo: 'E-mail',
+    acoes: [{ rotulo: paroquia.email, href: `mailto:${paroquia.email}` }],
   });
 }
-if (whatsapp && whatsapp !== whatsappDoTelefone)
-  contatos.push({ rotulo: 'WhatsApp', valor: 'Conversar com a secretaria', href: whatsapp });
-if (paroquia.email)
-  contatos.push({ rotulo: 'E-mail', valor: paroquia.email, href: `mailto:${paroquia.email}` });
 const instagram = urlInstagram(paroquia.instagram);
-if (instagram)
-  contatos.push({ rotulo: 'Instagram', valor: `@${paroquia.instagram}`, href: instagram });
-if (paroquia.youtube)
-  contatos.push({ rotulo: 'YouTube', valor: 'Canal da paróquia', href: paroquia.youtube });
+if (instagram) {
+  grupos.push({
+    titulo: 'Instagram',
+    acoes: [{ rotulo: `@${paroquia.instagram}`, href: instagram }],
+  });
+}
+if (paroquia.youtube) {
+  grupos.push({
+    titulo: 'YouTube',
+    acoes: [{ rotulo: 'Canal da paróquia', href: paroquia.youtube }],
+  });
+}
+
+/** Sai do site (WhatsApp, Instagram, YouTube, mapa): abre em outra aba. Ligar e e-mail abrem o aplicativo. */
+const abreFora = (href: string) => /^https?:/.test(href);
+
+/** Link que sai do site mostra a seta diagonal; ligar e e-mail, a seta reta. */
+const iconeDaAcao = (href: string) => (abreFora(href) ? 'externo' : 'seta');
 ---
 
 <PaginaInterna
   title="Contato"
-  description="Endereço, horário da secretaria e formas de falar com a Paróquia Nossa Senhora do Rosário, em Jaguaribe, João Pessoa."
+  description="Endereços da matriz e das capelas e formas de falar com a Paróquia Nossa Senhora do Rosário, em Jaguaribe, João Pessoa."
   titulo="Contato"
   jsonLd={igreja}
   intro="Fale com a secretaria ou venha nos visitar."
   barraMobile
 >
-  <div class="ros-grade">
-    <section class="bloco" aria-labelledby="onde-titulo">
+  <div class="contato">
+    <section class="cartao" aria-labelledby="onde-titulo">
       <h2 class="titulo-2" id="onde-titulo">
         Onde estamos
       </h2>
-      <address class="endereco corpo-grande">
-        {rua}
-        <br />
-        {bairroCidade}
-      </address>
-      <Botao href={urlMapa(paroquia)} icone="local">
-        Como chegar
-      </Botao>
+      <div class="locais">
+        {locais.map((local) => (
+          <article class="local">
+            <h3 class="destaque corpo-grande">{local.nome}</h3>
+            <address class="local__endereco">
+              {local.linhas.map((linha) => (
+                <span>{linha}</span>
+              ))}
+            </address>
+            <Botao
+              href={local.mapa}
+              variante="secundario"
+              icone="local"
+              target="_blank"
+              aria-label={`Como chegar: ${local.nome} (abre em outra aba)`}
+            >
+              Como chegar
+            </Botao>
+          </article>
+        ))}
+      </div>
     </section>
 
-    <section class="bloco" aria-labelledby="falar-titulo">
+    <section class="cartao" aria-labelledby="falar-titulo">
       <h2 class="titulo-2" id="falar-titulo">
         Fale conosco
       </h2>
-      <ul class="contatos">
-        {contatos.map((contato) => (
-          <li>
-            <span class="pequeno">{contato.rotulo}</span>
-            {contato.href ? (
-              <a href={contato.href}>{contato.valor}</a>
-            ) : (
-              <span>{contato.valor}</span>
-            )}
+      <ul class="grupos">
+        {grupos.map((grupo) => (
+          <li class="grupo">
+            <h3 class="destaque corpo-grande">{grupo.titulo}</h3>
+            {grupo.detalhe && <p class="grupo__detalhe">{grupo.detalhe}</p>}
+            <ul class="acoes">
+              {grupo.acoes.map((acao) => (
+                <li>
+                  <a
+                    class="acao"
+                    href={acao.href}
+                    target={abreFora(acao.href) ? '_blank' : undefined}
+                    rel={abreFora(acao.href) ? 'noopener noreferrer' : undefined}
+                  >
+                    <span>
+                      {acao.rotulo}
+                      {abreFora(acao.href) && <span class="sr-only"> (abre em outra aba)</span>}
+                    </span>
+                    <Icone nome={iconeDaAcao(acao.href)} />
+                  </a>
+                </li>
+              ))}
+            </ul>
           </li>
         ))}
       </ul>
     </section>
-
-    {secretaria.length > 0 && <CardHorarios titulo="Secretaria" linhas={secretaria} />}
   </div>
 </PaginaInterna>
 
 <style>
-  .bloco {
+  .contato {
     display: grid;
-    gap: var(--espaco-4);
+    gap: var(--espaco-6);
+  }
+
+  .cartao {
+    display: grid;
+    gap: var(--espaco-6);
     align-content: start;
-    justify-items: start;
     padding: var(--espaco-6);
     background: var(--fundo-elevado);
     border: 1px solid var(--linha);
     border-radius: var(--raio-m);
   }
 
-  .bloco h2 {
+  .cartao h2 {
     margin: 0;
   }
 
-  .endereco {
+  /* Título de cada parte (Matriz, WhatsApp e telefone…): em negrito, na cor do texto. */
+  .destaque {
+    margin: 0;
+    color: var(--texto);
+    font-weight: 700;
+  }
+
+  /* ── Onde estamos: uma parte por local, separadas por uma linha ── */
+  .locais {
+    display: grid;
+    gap: var(--espaco-6);
+  }
+
+  /* nome, endereço (que ocupa o espaço que sobra) e botão: os botões das duas partes ficam na mesma altura */
+  .local {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    gap: var(--espaco-3);
+    justify-items: start;
+  }
+
+  .local + .local {
+    padding-top: var(--espaco-6);
+    border-top: 1px solid var(--linha);
+  }
+
+  .local__endereco {
+    display: grid;
+    align-content: start;
     margin: 0;
     font-style: normal;
+    font-size: 18px;
+    line-height: 28px;
+    color: var(--texto);
   }
 
-  .contatos {
+  .local__endereco span:nth-child(n + 3) {
+    color: var(--texto-suave);
+    font-size: 15px;
+    line-height: 22px;
+  }
+
+  @media (min-width: 640px) {
+    .locais {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0;
+    }
+
+    .local {
+      padding-inline: var(--espaco-6);
+    }
+
+    .local:first-child {
+      padding-inline-start: 0;
+    }
+
+    .local:last-child {
+      padding-inline-end: 0;
+    }
+
+    .local + .local {
+      padding-top: 0;
+      border-top: 0;
+      border-inline-start: 1px solid var(--linha);
+    }
+  }
+
+  /* ── Fale conosco: um bloco por canal, com o título em negrito e uma linha por ação ── */
+  .grupos {
     display: grid;
-    gap: var(--espaco-2);
-    width: 100%;
+    gap: var(--espaco-6);
     margin: 0;
     padding: 0;
     list-style: none;
   }
 
-  .contatos li {
+  .grupo {
     display: grid;
+    gap: var(--espaco-2);
+    padding-top: var(--espaco-6);
+    border-top: 1px solid var(--linha);
   }
 
-  .contatos .pequeno {
+  .grupo:first-child {
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  /* Tablet e computador: os canais ficam em duas colunas, como as partes de "Onde estamos". */
+  @media (min-width: 640px) {
+    .grupos {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--espaco-6) 0;
+    }
+
+    .grupo {
+      align-content: start;
+      padding: 0 var(--espaco-6);
+      border-top: 0;
+    }
+
+    .grupo:nth-child(odd) {
+      padding-inline-start: 0;
+    }
+
+    .grupo:nth-child(even) {
+      padding-inline-end: 0;
+      border-inline-start: 1px solid var(--linha);
+    }
+  }
+
+  .grupo__detalhe {
+    margin: 0;
     color: var(--texto-suave);
+    font-variant-numeric: tabular-nums;
   }
 
-  .contatos a {
-    display: inline-flex;
+  .acoes {
+    display: grid;
+    gap: var(--espaco-2);
+    margin: var(--espaco-1) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Cada ação é uma linha inteira que se toca: sem sublinhado, com a seta à direita. */
+  .acao {
+    display: flex;
     align-items: center;
+    justify-content: space-between;
+    gap: var(--espaco-3);
     min-height: var(--toque-min);
+    padding: var(--espaco-2) var(--espaco-4);
+    background: var(--fundo);
+    border: 1px solid var(--linha);
+    border-radius: var(--raio-m);
+    color: var(--texto);
     font-weight: 600;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+  }
+
+  .acao :global(svg) {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    color: var(--mariano);
+  }
+
+  .acao:hover {
+    background: var(--mariano-suave);
+    border-color: var(--mariano);
+    color: var(--mariano);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .acao,
+    .acao :global(svg) {
+      transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .acao:hover :global(svg) {
+      transform: translateX(3px);
+    }
   }
 </style>

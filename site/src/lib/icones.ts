@@ -26,6 +26,8 @@ export const ICONES = {
     corpo: '<path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z"/>',
   },
   alerta: { corpo: '<path d="M12 3l9.5 17h-19z"/><path d="M12 10v4M12 17h.01"/>' },
+  seta: { corpo: '<path d="M5 12h14"/><path d="m13 6 6 6-6 6"/>' },
+  externo: { corpo: '<path d="M7 17 17 7"/><path d="M8 7h9v9"/>' },
   menu: { corpo: '<path d="M4 7h16M4 12h16M4 17h16"/>' },
   fechar: { corpo: '<path d="M18 6 6 18M6 6l12 12"/>' },
   livro: {
