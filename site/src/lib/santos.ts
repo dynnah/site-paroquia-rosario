@@ -95,7 +95,7 @@ export function decodificar(texto: string): string {
   });
 }
 
-const espacos = (texto: string) => texto.replace(/[ \t ]+/g, ' ').trim();
+const espacos = (texto: string) => texto.replace(/[ \t\u00a0]+/g, ' ').trim();
 
 /** Linhas de texto de um trecho de HTML (cada bloco ou `<br>` vira uma linha). */
 function linhasDoHtml(html: string): string[] {
