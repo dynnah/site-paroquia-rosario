@@ -1,4 +1,6 @@
 ---
+import { Image } from 'astro:assets';
+import logo from '../assets/logo-fachada-transparente.png';
 import type { NomeIcone } from '../lib/icones';
 import Botao from './Botao.astro';
 import Icone from './Icone.astro';
@@ -93,14 +95,17 @@ const linhasParaOScript = linhasMissa?.map(({ dias, horas, nota }) => ({ dias, h
       )}
     </div>
     <div class:list={['ros-arco', { 'ros-arco--foto': foto }]}>
-      <img
-        src={foto?.src ?? '/logo-fachada-transparente.png'}
-        alt={foto?.alt ?? 'Fachada da Igreja do Rosário'}
-        width={foto ? undefined : 447}
-        height={foto ? undefined : 447}
-        loading="lazy"
-        decoding="async"
-      />
+      {foto ? (
+        <img src={foto.src} alt={foto.alt} loading="lazy" decoding="async" />
+      ) : (
+        <Image
+          src={logo}
+          alt="Fachada da Igreja do Rosário"
+          widths={[240, 447]}
+          sizes="(min-width: 1024px) 320px, 240px"
+          loading="lazy"
+        />
+      )}
     </div>
   </div>
 </section>

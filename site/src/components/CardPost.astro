@@ -18,6 +18,8 @@ interface Props {
   minutosLeitura?: number;
   /** Presente = post de vídeo. `id` é o ID do YouTube (veja extrairIdYouTube). */
   video?: { id: string; duracao?: string };
+  /** Primeiro card da página, no alto da tela: a miniatura carrega já, com prioridade (é o LCP). */
+  prioritario?: boolean;
 }
 
 const {
@@ -30,6 +32,7 @@ const {
   data,
   minutosLeitura,
   video,
+  prioritario = false,
 } = Astro.props;
 
 const fecho = video ? 'vídeo' : minutosLeitura ? `${minutosLeitura} min de leitura` : undefined;
@@ -42,7 +45,8 @@ const meta = [autor, dataCurta(data), fecho].filter(Boolean).join(' · ');
       <img
         src={miniaturaYouTube(video.id)}
         alt=""
-        loading="lazy"
+        loading={prioritario ? 'eager' : 'lazy'}
+        fetchpriority={prioritario ? 'high' : undefined}
         decoding="async"
         referrerpolicy="no-referrer"
       />

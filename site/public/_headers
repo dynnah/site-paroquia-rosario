@@ -1,0 +1,12 @@
+# Cabeçalhos do Cloudflare Pages (https://developers.cloudflare.com/pages/configuration/headers/)
+
+# Arquivos gerados pelo build têm o conteúdo no nome (hash): podem ficar no cache para sempre.
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Ícones e imagem do Open Graph: um dia de cache.
+/*.png
+  Cache-Control: public, max-age=86400
+
+/*
+  X-Content-Type-Options: nosniff

@@ -25,6 +25,9 @@ const FORA_DO_SITEMAP = ['/liturgia/ontem/', '/liturgia/amanha/'];
 export default defineConfig({
   site: site || 'http://localhost:4321',
   output: 'static',
+  // O CSS vai dentro de cada página: quem chega do Instagram ou do WhatsApp quase sempre é a
+  // primeira visita, e uma requisição a menos adianta a primeira tela.
+  build: { inlineStylesheets: 'always' },
   integrations: [
     vue(),
     sitemap({

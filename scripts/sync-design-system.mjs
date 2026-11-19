@@ -1,6 +1,6 @@
 // Copia o design system (fonte da verdade, em /design-system) para o site.
 // Roda sozinho antes de `dev` e `build`. Não edite os arquivos gerados em
-// site/src/styles/ nem em site/public/: altere o design system e rode de novo.
+// site/src/styles/, site/src/assets/ nem em site/public/: altere o design system e rode de novo.
 
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
@@ -11,12 +11,14 @@ const raiz = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const designSystem = resolve(raiz, 'design-system');
 const estilos = resolve(raiz, 'site/src/styles');
 const publico = resolve(raiz, 'site/public');
+const imagens = resolve(raiz, 'site/src/assets');
 
 const aviso = (origem) =>
   `/* Cópia gerada de ${origem} por scripts/sync-design-system.mjs. Não editar aqui. */\n`;
 
 await mkdir(estilos, { recursive: true });
 await mkdir(publico, { recursive: true });
+await mkdir(imagens, { recursive: true });
 
 // 1) tokens.css: cópia fiel.
 const tokens = await readFile(resolve(designSystem, 'tokens.css'), 'utf8');
@@ -42,7 +44,8 @@ if (!fundo) throw new Error('Token --fundo não encontrado em design-system/toke
 const transparente = { r: 0, g: 0, b: 0, alpha: 0 };
 const bufferLogo = await readFile(logo);
 
-await writeFile(resolve(publico, 'logo-fachada-transparente.png'), bufferLogo);
+// O logo fica em src/assets: o `<Image>` do astro:assets gera as versões WebP nos tamanhos usados.
+await writeFile(resolve(imagens, 'logo-fachada-transparente.png'), bufferLogo);
 
 // favicon: logo transparente em 64px
 await sharp(bufferLogo)

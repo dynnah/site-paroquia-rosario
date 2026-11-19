@@ -40,6 +40,9 @@ const tokenEstatisticas = import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN?.trim();
 
 // As mesmas famílias e pesos de design-system/components/bundle.css (que não
 // carrega mais as fontes por @import, pois isso bloqueia a renderização).
+// Ao terminar de baixar, o preload vira uma folha de estilo (um atributo só, sem script à parte).
+const TROCA_PARA_FOLHA_DE_ESTILO = { onload: "this.onload=null;this.rel='stylesheet'" };
+
 const FONTES =
   'https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&display=swap';
 ---
@@ -77,7 +80,11 @@ const FONTES =
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href={FONTES} />
+    <!-- As fontes não bloqueiam a renderização: o texto aparece na fonte do sistema e troca (font-display: swap). -->
+    <link rel="preload" as="style" href={FONTES} {...TROCA_PARA_FOLHA_DE_ESTILO} />
+    <noscript>
+      <link rel="stylesheet" href={FONTES} />
+    </noscript>
 
     {dadosEstruturados.map((dados) => (
       <script type="application/ld+json" set:html={serializarJsonLd(dados)} />
