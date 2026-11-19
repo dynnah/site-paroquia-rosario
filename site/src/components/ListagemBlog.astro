@@ -49,6 +49,11 @@ const vazio =
       />
     )}
 
+    {dados.posts.length > 0 && (
+      // Os cards têm título h3 (design system): este h2, só para leitor de tela, mantém a ordem h1 → h2 → h3.
+      <h2 class="sr-only">Textos e vídeos</h2>
+    )}
+
     {comDestaque && (
       <div class="ros-blog__destaque">
         <CardPost {...propsCardPost(destaque)} />

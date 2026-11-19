@@ -20,7 +20,7 @@ const { id, titulo, duracao, grande = true } = Astro.props;
   <a
     class:list={['ros-video', { 'ros-video--grande': grande }, 'fachada']}
     href={urlYouTube(id)}
-    aria-label={`Assistir ao vídeo: ${titulo}`}
+    aria-label={`Assistir ao vídeo: ${titulo}${duracao ? `, duração ${duracao}` : ''}`}
   >
     <img
       src={miniaturaYouTube(id)}

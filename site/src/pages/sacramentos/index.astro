@@ -21,10 +21,14 @@ const sacramentos = await conteudo.sacramentos();
       acao={{ rotulo: 'Fale conosco', href: '/contato' }}
     />
   ) : (
-    <div class="ros-grade">
-      {sacramentos.map((sacramento) => (
-        <CardPastoral {...propsCardSacramento(sacramento)} />
-      ))}
-    </div>
+    <>
+      {/* Os cards têm título h3 (design system): este h2, só para leitor de tela, mantém a ordem h1 → h2 → h3. */}
+      <h2 class="sr-only">Sacramentos</h2>
+      <div class="ros-grade">
+        {sacramentos.map((sacramento) => (
+          <CardPastoral {...propsCardSacramento(sacramento)} />
+        ))}
+      </div>
+    </>
   )}
 </PaginaInterna>

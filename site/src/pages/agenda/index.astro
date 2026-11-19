@@ -22,10 +22,14 @@ const eventos = await conteudo.eventosProximos(200);
       acao={{ rotulo: 'Ver horários', href: '/horarios' }}
     />
   ) : (
-    <div class="ros-grade">
-      {eventos.map((evento) => (
-        <CardEvento {...propsCardEvento(evento)} />
-      ))}
-    </div>
+    <>
+      {/* Os cards têm título h3 (design system): este h2, só para leitor de tela, mantém a ordem h1 → h2 → h3. */}
+      <h2 class="sr-only">Próximos eventos</h2>
+      <div class="ros-grade">
+        {eventos.map((evento) => (
+          <CardEvento {...propsCardEvento(evento)} />
+        ))}
+      </div>
+    </>
   )}
 </PaginaInterna>
