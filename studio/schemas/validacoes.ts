@@ -8,11 +8,21 @@ type Resultado = true | string;
 /** Links aceitos nos campos de endereço. Caminhos relativos ("/horarios") também. */
 export const ESQUEMAS_LINK = ['http', 'https', 'mailto', 'tel'];
 
-const HORA = /^([01]\d|2[0-3]):[0-5]\d$/;
+const HORA_24 = '(?:[01]\\d|2[0-3]):[0-5]\\d';
+const HORA = new RegExp(`^(${HORA_24})(?:-(${HORA_24}))?$`);
 
-/** "07:00", em 24 horas. */
+/**
+ * "07:00", em 24 horas, ou um período "08:00-12:00" (a secretaria, por exemplo, atende
+ * "das 8h às 12h"). O fim do período tem de ser depois do começo.
+ */
 export function validarHora(valor: string | undefined): Resultado {
-  return !valor || HORA.test(valor) ? true : 'Use o formato 07:00 (24 horas), por exemplo 17:00.';
+  if (!valor) return true;
+  const partes = HORA.exec(valor);
+  if (!partes) {
+    return 'Use o formato 07:00 (24 horas), por exemplo 17:00. Para um período, 08:00-12:00.';
+  }
+  const [, inicio, fim] = partes;
+  return fim && fim <= (inicio as string) ? 'O fim do período tem de ser depois do começo.' : true;
 }
 
 const DIAS_NO_MES = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];

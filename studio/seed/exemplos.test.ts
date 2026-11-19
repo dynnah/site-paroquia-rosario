@@ -82,7 +82,7 @@ test('santos, posts de vídeo e horários passam nas validações dos campos', (
     assert.equal(validarDuracao(p.duracaoVideo as string | undefined), true, p._id);
   }
   const grupos = doTipo('horarios')[0];
-  for (const tipo of ['missa', 'confissao', 'adoracao', 'secretaria']) {
+  for (const tipo of ['missa', 'confissao', 'adoracao', 'rosario', 'secretaria']) {
     const { linhas } = grupos[tipo] as {
       linhas: { rotulo: string; dias: number[]; horas: string[]; nota?: string }[];
     };

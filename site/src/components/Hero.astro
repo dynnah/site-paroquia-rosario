@@ -18,13 +18,13 @@ interface Props {
   tituloItalico?: string;
   texto?: string;
   /** Calculada a partir da tabela de horários. Ex.: { quando: "hoje", hora: "17h" } ou { quando: "amanhã", hora: "7h" }. */
-  proximaMissa?: { quando: string; hora: string };
+  proximaMissa?: { quando: string; hora: string; local?: string };
   /**
-   * A tabela de missas (só `dias` e `horas`). Com ela, o navegador recalcula a
-   * "Próxima missa" na hora da visita, no fuso de São Paulo: a página é estática e
+   * A tabela de missas (só `dias`, `horas` e `nota`, que diz o local). Com ela, o navegador
+   * recalcula a "Próxima missa" na hora da visita, no fuso de São Paulo: a página é estática e
    * pode ter sido gerada horas antes (ou ficado em cache).
    */
-  linhasMissa?: Array<{ dias: number[]; horas: string[] }>;
+  linhasMissa?: Array<{ dias: number[]; horas: string[]; nota?: string }>;
   /** Uma ação primária (Ver horários) e no máximo uma secundária. */
   acaoPrimaria?: Acao;
   acaoSecundaria?: Acao;
@@ -44,7 +44,7 @@ const {
   foto,
 } = Astro.props;
 
-const linhasParaOScript = linhasMissa?.map(({ dias, horas }) => ({ dias, horas }));
+const linhasParaOScript = linhasMissa?.map(({ dias, horas, nota }) => ({ dias, horas, nota }));
 ---
 
 <section class="ros-hero">
@@ -68,7 +68,10 @@ const linhasParaOScript = linhasMissa?.map(({ dias, horas }) => ({ dias, horas }
         >
           <Icone nome="relogio" />
           <div>
-            <span>Próxima missa · {proximaMissa.quando}</span>
+            <span>
+              Próxima missa · {proximaMissa.quando}
+              {proximaMissa.local && ` · ${proximaMissa.local}`}
+            </span>
             <br />
             <strong>{proximaMissa.hora}</strong>
           </div>
@@ -111,7 +114,7 @@ const linhasParaOScript = linhasMissa?.map(({ dias, horas }) => ({ dias, horas }
     document.querySelectorAll<HTMLElement>('[data-proxima-missa]').forEach((bloco) => {
       let linhas: LinhaHorario[];
       try {
-        // Só `dias` e `horas` vêm na página, e são só esses dois campos que o cálculo usa.
+        // Só `dias`, `horas` e `nota` (o local) vêm na página: é o que o cálculo usa.
         linhas = JSON.parse(bloco.dataset.proximaMissa ?? '[]') as LinhaHorario[];
       } catch {
         return;
@@ -126,7 +129,7 @@ const linhasParaOScript = linhasMissa?.map(({ dias, horas }) => ({ dias, horas }
       bloco.style.display = proxima ? '' : 'none';
       if (!proxima) return;
 
-      rotulo.textContent = `Próxima missa · ${proxima.quando}`;
+      rotulo.textContent = `Próxima missa · ${proxima.quando}${proxima.local ? ` · ${proxima.local}` : ''}`;
       hora.textContent = proxima.hora;
     });
   }

@@ -10,22 +10,22 @@ const [horarios, config] = await Promise.all([conteudo.horarios(), conteudo.conf
 const paroquia = dadosDaParoquia(config);
 const whatsapp = urlWhatsApp(paroquia.whatsapp);
 
-// TODO(paroquia): confirmar com a secretaria os horários de missa, confissão, adoração e atendimento.
 const grupos = horarios
   ? [
-      { titulo: 'Santa Missa', grupo: horarios.missa },
-      { titulo: 'Confissões', grupo: horarios.confissao },
-      { titulo: 'Adoração', grupo: horarios.adoracao },
-      { titulo: 'Secretaria', grupo: horarios.secretaria },
+      { chave: 'missa', titulo: 'Santa Missa', grupo: horarios.missa },
+      { chave: 'confissao', titulo: 'Confissões', grupo: horarios.confissao },
+      { chave: 'adoracao', titulo: 'Adoração', grupo: horarios.adoracao },
+      { chave: 'rosario', titulo: 'Santo Rosário', grupo: horarios.rosario },
+      { chave: 'secretaria', titulo: 'Secretaria', grupo: horarios.secretaria },
     ].filter(({ grupo }) => grupo.linhas.length > 0)
   : [];
 ---
 
 <PaginaInterna
   title="Horários"
-  description="Horários de missa, confissão, adoração e atendimento da secretaria da Paróquia Nossa Senhora do Rosário, em Jaguaribe, João Pessoa."
+  description="Horários de missa, confissão, adoração, Santo Rosário e atendimento da secretaria da Paróquia Nossa Senhora do Rosário, em Jaguaribe, João Pessoa."
   titulo="Horários"
-  intro="Missas, confissões, adoração e o atendimento da secretaria."
+  intro="Missas, confissões, adoração, Santo Rosário e o atendimento da secretaria."
   barraMobile
 >
   {grupos.length === 0 ? (
@@ -35,11 +35,10 @@ const grupos = horarios
       acao={{ rotulo: 'Como chegar', href: urlMapa(paroquia) }}
     />
   ) : (
-    <div class="ros-grade">
-      {grupos.map(({ titulo, grupo }) => (
-        <div class="bloco">
+    <div class:list={['grade-horarios', { 'grade-horarios--painel': grupos.length === 5 }]}>
+      {grupos.map(({ chave, titulo, grupo }) => (
+        <div class="bloco" style={`--area: ${chave}`}>
           <CardHorarios titulo={titulo} linhas={grupo.linhas} />
-          {grupo.observacao && <p class="bloco__obs pequeno">{grupo.observacao}</p>}
         </div>
       ))}
     </div>
@@ -58,15 +57,16 @@ const grupos = horarios
 </PaginaInterna>
 
 <style>
+  /* O card cresce até a altura do bloco. Só faz efeito na grade de computador, onde os blocos de
+     uma linha têm a mesma altura. */
   .bloco {
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: var(--espaco-2);
-    align-content: start;
   }
 
-  .bloco__obs {
-    margin: 0;
-    color: var(--texto-suave);
+  .bloco > :global(.ros-horarios) {
+    flex: 1;
   }
 
   .acoes {

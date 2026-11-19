@@ -85,31 +85,32 @@ export function gerarDocumentos(agora: Date = new Date()): DocumentoSeed[] {
       _type: 'horarios',
       missa: {
         linhas: [
-          linha('Domingo', [0], ['07:00', '17:00']),
+          linha('Domingo', [0], ['07:00', '17:00'], 'Matriz'),
+          linha('Domingo', [0], ['09:00'], 'Capela Sagrada Família'),
+          linha('Domingo', [0], ['10:00'], 'Capela São Cristóvão'),
           linha('Segunda', [1], [], 'Sem missa'),
-          linha('Terça', [2], ['17:00']),
-          linha('Quarta a sexta', [3, 4, 5], ['17:00']),
-          linha('Sábado', [6], ['17:00'], 'Missa da comunidade'),
+          linha('Terça a sábado', [2, 3, 4, 5, 6], ['17:00'], 'Matriz'),
         ],
-        observacao: `${MARCA} Horários de exemplo. Confirmar com a secretaria.`,
       },
       confissao: {
         linhas: [
-          linha('Terça a sexta', [2, 3, 4, 5], ['16:00']),
-          linha('Sábado', [6], ['15:00', '16:30']),
+          linha('Terça e quinta', [2, 4], ['15:00'], 'A partir deste horário, com agendamento'),
         ],
-        observacao: `${MARCA} Horários de exemplo.`,
       },
       adoracao: {
-        linhas: [linha('Quinta', [4], ['18:00'], 'Adoração ao Santíssimo')],
-        observacao: `${MARCA} Horário de exemplo.`,
+        linhas: [
+          linha('Quinta', [4], ['16:30'], 'Matriz'),
+          linha('Quinta', [4], ['19:30'], 'Capela São Francisco e Santa Clara'),
+        ],
+      },
+      rosario: {
+        linhas: [linha('Sábado', [6], ['15:00'], 'Matriz')],
       },
       secretaria: {
         linhas: [
-          linha('Segunda a sexta', [1, 2, 3, 4, 5], ['08:00', '16:00']),
-          linha('Sábado e domingo', [6, 0], [], 'Fechada'),
+          linha('Terça a sexta', [2, 3, 4, 5], ['08:00-12:00', '14:00-17:00']),
+          linha('Sábado', [6], ['08:00-12:00']),
         ],
-        observacao: `${MARCA} Horário de exemplo.`,
       },
     },
 

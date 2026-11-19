@@ -54,6 +54,7 @@ export interface Horarios {
   missa: GrupoHorarios;
   confissao: GrupoHorarios;
   adoracao: GrupoHorarios;
+  rosario: GrupoHorarios;
   secretaria: GrupoHorarios;
 }
 

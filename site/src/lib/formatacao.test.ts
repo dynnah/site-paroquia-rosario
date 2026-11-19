@@ -59,6 +59,18 @@ test('formatarHora usa 7h, 17h e 8h40', () => {
   assert.equal(formatarHora(' 07:00 '), '7h');
 });
 
+test('formatarHora escreve um período como "8h às 12h"', () => {
+  assert.equal(formatarHora('08:00-12:00'), '8h às 12h');
+  assert.equal(formatarHora('14:00-17:30'), '14h às 17h30');
+  assert.equal(formatarHora(' 08:00-12:00 '), '8h às 12h');
+});
+
+test('formatarHora deixa passar período mal formado', () => {
+  assert.equal(formatarHora('08:00-'), '08:00-');
+  assert.equal(formatarHora('08:00-25:00'), '08:00-25:00');
+  assert.equal(formatarHora('8h-meio-dia'), '8h-meio-dia');
+});
+
 test('formatarHora devolve o que não reconhece', () => {
   assert.equal(formatarHora('25:00'), '25:00');
   assert.equal(formatarHora('10:75'), '10:75');

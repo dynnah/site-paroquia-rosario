@@ -300,6 +300,66 @@ body:has(dialog:modal) {
   scrollbar-color: var(--texto-suave) transparent;
 }
 
+/* ---------- horários: destaque de "hoje" (CardHorarios.astro, em todo o site) ----------
+   Fundo no tom do rodapé (--fundo-afundado); o horário segue em azul, dentro do contorno azul do
+   design system. A marca "hoje" fica em cinza discreto para o azul ser só do horário. O seletor
+   com dois níveis vale tanto na lista do celular quanto nas caixas do card largo (container ≥ 640px). */
+.ros-horarios .ros-horarios__dia--hoje {
+  background: var(--fundo-afundado);
+  border-color: var(--fundo-afundado);
+}
+
+.ros-horarios .ros-hoje {
+  color: var(--texto-suave);
+}
+
+/* ---------- grade dos cards de horários (horarios.astro e a seção da página inicial) ----------
+   Os cards têm alturas muito diferentes (a missa tem cinco linhas, o Santo Rosário tem uma), e uma
+   grade em linhas deixava buracos embaixo dos mais baixos. Em colunas, cada card sobe até o de cima
+   e as colunas ficam do mesmo tamanho. Celular (abaixo de 640px): uma coluna, um card embaixo do
+   outro. A ordem de leitura é a da página: desce uma coluna, depois a seguinte. */
+
+.grade-horarios > * {
+  break-inside: avoid;
+  margin-bottom: var(--espaco-6);
+}
+
+.grade-horarios > :last-child {
+  margin-bottom: 0;
+}
+
+@media (min-width: 640px) {
+  .grade-horarios {
+    column-count: 2;
+    column-gap: var(--espaco-6);
+  }
+
+  /* o último de cada coluna não precisa de respiro embaixo; o do fim do grupo já não tem */
+  .grade-horarios > * {
+    margin-bottom: var(--espaco-6);
+  }
+}
+
+/* Página de horários, no computador (com os cinco cards): a Santa Missa à esquerda; no alto, ao lado
+   dela, Confissões e Santo Rosário; embaixo deles, Secretaria e Adoração. Cada bloco informa o seu
+   lugar em `--area`. Os cards de uma linha têm a mesma altura (a grade estica). */
+@media (min-width: 1024px) {
+  .grade-horarios--painel {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-areas:
+      'missa confissao rosario'
+      'missa secretaria adoracao';
+    gap: var(--espaco-6);
+    column-count: auto;
+  }
+
+  .grade-horarios--painel > * {
+    grid-area: var(--area);
+    margin-bottom: 0;
+  }
+}
+
 /* ---------- vídeo do YouTube: player que substitui a miniatura (VideoYouTube.astro) ---------- */
 
 .video-yt__player {

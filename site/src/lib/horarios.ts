@@ -27,6 +27,8 @@ export interface ProximaMissa {
   quando: string;
   /** "17h", "8h40" */
   hora: string;
+  /** A observação da linha ("Matriz", "Capela São Cristóvão"): onde é a missa, se a tabela disser. */
+  local?: string;
 }
 
 function rotuloQuando(passo: number, dia: number): string {
@@ -35,14 +37,23 @@ function rotuloQuando(passo: number, dia: number): string {
   return nomeDiaSemana(dia);
 }
 
-/** Horários (em minutos, ordenados) de um dia da semana, somando todas as linhas que o incluem. */
-function horasDoDia(linhas: LinhaHorario[], dia: number): number[] {
+interface HoraDoDia {
+  minutos: number;
+  local?: string;
+}
+
+/**
+ * Horários (em minutos, ordenados) de um dia da semana, somando todas as linhas que o incluem,
+ * cada um com a observação da sua linha (o local da missa, por exemplo).
+ */
+function horasDoDia(linhas: LinhaHorario[], dia: number): HoraDoDia[] {
   return linhas
     .filter((linha) => linha.dias.includes(dia))
-    .flatMap((linha) => linha.horas)
-    .map(horaEmMinutos)
-    .filter((minutos): minutos is number => minutos !== null)
-    .sort((a, b) => a - b);
+    .flatMap((linha) =>
+      linha.horas.map((hora) => ({ minutos: horaEmMinutos(hora), local: linha.nota })),
+    )
+    .filter((hora): hora is { minutos: number; local: string | undefined } => hora.minutos !== null)
+    .sort((a, b) => a.minutos - b.minutos);
 }
 
 /**
@@ -59,9 +70,13 @@ export function proximaMissa(
   for (let passo = 0; passo <= 7; passo++) {
     const dia = (hoje + passo) % 7;
     const horas = horasDoDia(linhas, dia);
-    const escolhida = passo === 0 ? horas.find((minutos) => minutos > minutosAgora) : horas[0];
+    const escolhida = passo === 0 ? horas.find((hora) => hora.minutos > minutosAgora) : horas[0];
     if (escolhida !== undefined) {
-      return { quando: rotuloQuando(passo, dia), hora: minutosEmHora(escolhida) };
+      return {
+        quando: rotuloQuando(passo, dia),
+        hora: minutosEmHora(escolhida.minutos),
+        ...(escolhida.local ? { local: escolhida.local } : {}),
+      };
     }
   }
   return null;

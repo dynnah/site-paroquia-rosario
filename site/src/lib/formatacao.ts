@@ -140,20 +140,31 @@ export function diaEMes(entrada?: string | Date): { dia: string; mes: string } {
   return { dia: String(dia).padStart(2, '0'), mes: MESES_CURTOS[mes - 1] ?? '' };
 }
 
-/**
- * Horário no formato da paróquia: "07:00" → "7h", "08:40" → "8h40", "17h" → "17h".
- * O que não for reconhecido volta como veio.
- */
-export function formatarHora(valor: string): string {
-  const texto = valor.trim();
-  const partes = /^(\d{1,2})[:h](\d{2})?$/.exec(texto);
-  if (!partes) return texto;
+/** "07:00" → "7h", "08:40" → "8h40"; formato desconhecido → null. */
+function horaSimples(texto: string): string | null {
+  const partes = /^(\d{1,2})[:h](\d{2})?$/.exec(texto.trim());
+  if (!partes) return null;
 
   const horas = Number(partes[1]);
   const minutos = partes[2];
-  if (horas > 23 || (minutos !== undefined && Number(minutos) > 59)) return texto;
+  if (horas > 23 || (minutos !== undefined && Number(minutos) > 59)) return null;
 
   return !minutos || minutos === '00' ? `${horas}h` : `${horas}h${minutos}`;
+}
+
+/**
+ * Horário no formato da paróquia: "07:00" → "7h", "08:40" → "8h40", "17h" → "17h".
+ * Um período vira "8h às 12h" ("08:00-12:00"). O que não for reconhecido volta como veio.
+ */
+export function formatarHora(valor: string): string {
+  const texto = valor.trim();
+  const periodo = /^([^-]+)-([^-]+)$/.exec(texto);
+  if (periodo) {
+    const inicio = horaSimples(periodo[1] ?? '');
+    const fim = horaSimples(periodo[2] ?? '');
+    return inicio && fim ? `${inicio} às ${fim}` : texto;
+  }
+  return horaSimples(texto) ?? texto;
 }
 
 const formatadorHoraSP = new Intl.DateTimeFormat('en-GB', {

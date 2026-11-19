@@ -39,7 +39,7 @@ export const linhaHorario = defineType({
       type: 'array',
       of: [{ type: 'string' }],
       description:
-        'Um por linha, no formato 07:00 ou 17:00. Se não houver horário nesse dia, deixe vazio e escreva "Sem missa" na observação: o dia nunca some da tabela.',
+        'Um por linha, no formato 07:00 ou 17:00. Para um período, 08:00-12:00 (aparece "8h às 12h"). Se não houver horário nesse dia, deixe vazio e escreva "Sem missa" na observação: o dia nunca some da tabela.',
       validation: (regra) =>
         regra.custom((horas) => {
           for (const hora of (horas as string[] | undefined) ?? []) {

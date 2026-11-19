@@ -20,6 +20,16 @@ test('validarHora aceita 24h com zero à esquerda', () => {
   assert.notEqual(validarHora('7:00'), true);
 });
 
+test('validarHora aceita um período, com o fim depois do começo', () => {
+  assert.equal(validarHora('08:00-12:00'), true);
+  assert.equal(validarHora('14:00-17:30'), true);
+  assert.notEqual(validarHora('12:00-08:00'), true);
+  assert.notEqual(validarHora('08:00-08:00'), true);
+  assert.notEqual(validarHora('08:00-'), true);
+  assert.notEqual(validarHora('8:00-12:00'), true);
+  assert.notEqual(validarHora('08:00-25:00'), true);
+});
+
 test('validarMesDia confere o calendário e aceita 29 de fevereiro', () => {
   assert.equal(validarMesDia('11-17'), true);
   assert.equal(validarMesDia('02-29'), true);

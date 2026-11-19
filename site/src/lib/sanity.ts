@@ -101,7 +101,7 @@ export const CONSULTAS = {
   }`,
 
   horarios: `*[_type == "horarios" && _id == "horarios"][0]{
-    ${grupo('missa')}, ${grupo('confissao')}, ${grupo('adoracao')}, ${grupo('secretaria')}
+    ${grupo('missa')}, ${grupo('confissao')}, ${grupo('adoracao')}, ${grupo('rosario')}, ${grupo('secretaria')}
   }`,
 
   avisosAtivos: `*[_type == "aviso" && dateTime(inicio) <= dateTime($agora)

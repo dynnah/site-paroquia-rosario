@@ -16,6 +16,7 @@ export const horarios = defineType({
     }),
     defineField({ name: 'confissao', title: 'Confissões', type: 'grupoHorarios' }),
     defineField({ name: 'adoracao', title: 'Adoração', type: 'grupoHorarios' }),
+    defineField({ name: 'rosario', title: 'Santo Rosário', type: 'grupoHorarios' }),
     defineField({ name: 'secretaria', title: 'Secretaria', type: 'grupoHorarios' }),
   ],
   preview: { prepare: () => ({ title: 'Horários' }) },

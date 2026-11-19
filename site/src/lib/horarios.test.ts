@@ -98,3 +98,51 @@ test('linhasDeHoje filtra pelo dia da semana em São Paulo', () => {
     ['Terça'],
   );
 });
+
+// A tabela real: no domingo há missas em duas capelas, e a observação da linha diz onde é cada uma.
+const missaComLocal: LinhaHorario[] = [
+  { rotulo: 'Domingo', dias: [0], horas: ['07:00', '17:00'], nota: 'Matriz' },
+  { rotulo: 'Domingo', dias: [0], horas: ['09:00'], nota: 'Capela Sagrada Família' },
+  { rotulo: 'Domingo', dias: [0], horas: ['10:00'], nota: 'Capela São Cristóvão' },
+  { rotulo: 'Segunda', dias: [1], horas: [], nota: 'Sem missa' },
+  { rotulo: 'Terça a sábado', dias: [2, 3, 4, 5, 6], horas: ['17:00'], nota: 'Matriz' },
+];
+
+test('a próxima missa diz onde é, e no domingo passa pelas capelas', () => {
+  // domingo, 22 de novembro de 2026
+  assert.deepEqual(proximaMissa(missaComLocal, em('2026-11-22T09:30:00Z')), {
+    quando: 'hoje',
+    hora: '7h',
+    local: 'Matriz',
+  }); // 6h30
+  assert.deepEqual(proximaMissa(missaComLocal, em('2026-11-22T11:00:00Z')), {
+    quando: 'hoje',
+    hora: '9h',
+    local: 'Capela Sagrada Família',
+  }); // 8h
+  assert.deepEqual(proximaMissa(missaComLocal, em('2026-11-22T12:30:00Z')), {
+    quando: 'hoje',
+    hora: '10h',
+    local: 'Capela São Cristóvão',
+  }); // 9h30
+  assert.deepEqual(proximaMissa(missaComLocal, em('2026-11-22T13:30:00Z')), {
+    quando: 'hoje',
+    hora: '17h',
+    local: 'Matriz',
+  }); // 10h30
+});
+
+test('depois da missa das 17h de domingo, pula a segunda sem missa e vai para terça', () => {
+  const proxima = proximaMissa(missaComLocal, em('2026-11-22T21:00:00Z')); // domingo, 18h
+  assert.equal(proxima?.hora, '17h');
+  assert.equal(proxima?.local, 'Matriz');
+  assert.match(proxima?.quando ?? '', /terça/);
+});
+
+test('linhasDeHoje devolve as três linhas do domingo', () => {
+  const domingo = linhasDeHoje(missaComLocal, em('2026-11-22T15:00:00Z'));
+  assert.deepEqual(
+    domingo.map((l) => l.nota),
+    ['Matriz', 'Capela Sagrada Família', 'Capela São Cristóvão'],
+  );
+});
