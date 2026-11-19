@@ -14,7 +14,6 @@ import {
   enderecoEmLinhas,
   urlInstagram,
   urlMapa,
-  urlTelefone,
   urlWhatsApp,
 } from '../lib/paroquia';
 import { conteudo } from '../lib/sanity';
@@ -35,7 +34,8 @@ const paroquia = dadosDaParoquia(await conteudo.configuracoes());
 const mapaHref = urlMapa(paroquia);
 const whatsappHref = urlWhatsApp(paroquia.whatsapp);
 const instagramHref = urlInstagram(paroquia.instagram);
-const telefoneHref = urlTelefone(paroquia.telefone);
+// O telefone da secretaria atende no WhatsApp: tocar no número abre a conversa.
+const telefoneHref = urlWhatsApp(paroquia.telefone);
 
 const redes: LinkSimples[] = [];
 if (instagramHref)
@@ -43,9 +43,11 @@ if (instagramHref)
 if (paroquia.youtube) redes.push({ rotulo: 'YouTube', href: paroquia.youtube });
 
 const contato: LinkSimples[] = [];
-if (whatsappHref) contato.push({ rotulo: 'WhatsApp da secretaria', href: whatsappHref });
 if (paroquia.telefone && telefoneHref)
-  contato.push({ rotulo: paroquia.telefone, href: telefoneHref });
+  contato.push({ rotulo: `WhatsApp · ${paroquia.telefone}`, href: telefoneHref });
+// Só aparece à parte se for outro número que o telefone acima.
+if (whatsappHref && whatsappHref !== telefoneHref)
+  contato.push({ rotulo: 'WhatsApp da secretaria', href: whatsappHref });
 if (paroquia.email) contato.push({ rotulo: paroquia.email, href: `mailto:${paroquia.email}` });
 ---
 

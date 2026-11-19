@@ -28,10 +28,11 @@ export const PAROQUIA: DadosParoquia = {
   assinatura: 'Igreja do Rosário',
   endereco: { rua: 'Rua Frei Martinho, s/n', bairro: 'Jaguaribe', cidade: 'João Pessoa', uf: 'PB' },
   instagram: 'paroquiadorosariojp',
-  // TODO(paroquia): canal do YouTube, WhatsApp da secretaria, telefone, e-mail e link do Maps.
+  // TODO(paroquia): canal do YouTube, e-mail e link do Maps.
   youtube: undefined,
-  whatsapp: undefined,
-  telefone: undefined,
+  // O mesmo número atende por ligação e por WhatsApp (informado pela paróquia).
+  whatsapp: '558332411433',
+  telefone: '(83) 3241-1433',
   email: undefined,
   mapaUrl: undefined,
 };
@@ -50,9 +51,15 @@ export function urlMapa(p: DadosParoquia): string {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(consulta)}`;
 }
 
+/**
+ * Link do WhatsApp. Aceita o número como a paróquia o escreve: "5583999999999" ou
+ * "(83) 3241-1433" (10 ou 11 dígitos, com DDD): nesse caso entra o 55 do Brasil.
+ */
 export function urlWhatsApp(numero: string | undefined): string | undefined {
   const digitos = numero?.replace(/\D/g, '');
-  return digitos ? `https://wa.me/${digitos}` : undefined;
+  if (!digitos) return undefined;
+  const comPais = digitos.length === 10 || digitos.length === 11 ? `55${digitos}` : digitos;
+  return `https://wa.me/${comPais}`;
 }
 
 export function urlInstagram(usuario: string | undefined): string | undefined {

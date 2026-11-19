@@ -73,6 +73,9 @@ export function gerarDocumentos(agora: Date = new Date()): DocumentoSeed[] {
         cidade: 'João Pessoa',
         uf: 'PB',
       },
+      // Telefone e horários abaixo são os reais, informados pela paróquia em 19/11/2026.
+      telefone: '(83) 3241-1433',
+      whatsapp: '558332411433',
       instagram: 'paroquiadorosariojp',
       pixChave: `${MARCA} chave-pix@exemplo.com`,
       pixTitular: `${MARCA} Titular da conta`,

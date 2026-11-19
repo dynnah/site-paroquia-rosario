@@ -23,18 +23,27 @@ interface Contato {
   href?: string;
 }
 
-// TODO(paroquia): WhatsApp, telefone, e-mail e canal do YouTube da secretaria.
+// TODO(paroquia): e-mail e canal do YouTube da secretaria.
 // Só aparece o que estiver preenchido no documento "Configurações" do Studio.
 const contatos: Contato[] = [];
 const whatsapp = urlWhatsApp(paroquia.whatsapp);
-if (whatsapp)
-  contatos.push({ rotulo: 'WhatsApp', valor: 'Conversar com a secretaria', href: whatsapp });
-if (paroquia.telefone)
+const whatsappDoTelefone = urlWhatsApp(paroquia.telefone);
+// O telefone da secretaria atende no WhatsApp: tocar no número abre a conversa;
+// quem prefere ligar tem o link "Ligar" logo abaixo.
+if (paroquia.telefone) {
   contatos.push({
-    rotulo: 'Telefone',
+    rotulo: whatsapp === whatsappDoTelefone ? 'WhatsApp e telefone' : 'Telefone',
     valor: paroquia.telefone,
+    href: whatsappDoTelefone,
+  });
+  contatos.push({
+    rotulo: 'Ligar',
+    valor: `Ligar para ${paroquia.telefone}`,
     href: urlTelefone(paroquia.telefone),
   });
+}
+if (whatsapp && whatsapp !== whatsappDoTelefone)
+  contatos.push({ rotulo: 'WhatsApp', valor: 'Conversar com a secretaria', href: whatsapp });
 if (paroquia.email)
   contatos.push({ rotulo: 'E-mail', valor: paroquia.email, href: `mailto:${paroquia.email}` });
 const instagram = urlInstagram(paroquia.instagram);

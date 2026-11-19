@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { PAROQUIA, dadosDaParoquia, urlTelefone } from './paroquia.ts';
+import { PAROQUIA, dadosDaParoquia, urlTelefone, urlWhatsApp } from './paroquia.ts';
 import { propsCardPastoral } from './pastorais.ts';
 import type { Pastoral } from './sanity.tipos.ts';
 
@@ -23,6 +23,15 @@ test('campos preenchidos no painel vencem; os vazios caem na reserva', () => {
   assert.equal(dados.endereco.bairro, 'Jaguaribe');
   assert.equal(dados.assinatura, PAROQUIA.assinatura);
   assert.equal(dados.email, undefined);
+});
+
+test('urlWhatsApp aceita o número com ou sem o 55 e com a pontuação do telefone', () => {
+  assert.equal(urlWhatsApp('558332411433'), 'https://wa.me/558332411433');
+  assert.equal(urlWhatsApp('5583999990000'), 'https://wa.me/5583999990000');
+  assert.equal(urlWhatsApp('(83) 3241-1433'), 'https://wa.me/558332411433');
+  assert.equal(urlWhatsApp('(83) 99999-0000'), 'https://wa.me/5583999990000');
+  assert.equal(urlWhatsApp(undefined), undefined);
+  assert.equal(urlWhatsApp('  '), undefined);
 });
 
 test('urlTelefone mantém só dígitos e o +', () => {
