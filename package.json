@@ -18,16 +18,21 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "sync:design": "node scripts/sync-design-system.mjs"
+    "sync:design": "node scripts/sync-design-system.mjs",
+    "auditar": "node scripts/auditar.mjs",
+    "og": "node scripts/gerar-og.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "axe-core": "^4.14.1",
     "eslint": "^10.15.0",
     "eslint-plugin-astro": "^1.7.0",
     "eslint-plugin-vue": "^10.12.1",
     "globals": "^17.14.0",
+    "lighthouse": "^13.6.0",
     "prettier": "^3.10.1",
     "prettier-plugin-astro": "^1.1.2",
+    "puppeteer-core": "^25.18.1",
     "sharp": "^0.35.5",
     "typescript": "~6.0.3",
     "typescript-eslint": "^8.73.0",
