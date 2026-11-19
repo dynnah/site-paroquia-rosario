@@ -4,7 +4,9 @@ import Botao from '../../components/Botao.astro';
 import TextoRico from '../../components/TextoRico.astro';
 import ArtigoLayout from '../../layouts/ArtigoLayout.astro';
 import { jaAconteceu, quandoAcontece } from '../../lib/eventos';
+import { dadosDaParoquia } from '../../lib/paroquia';
 import { conteudo } from '../../lib/sanity';
+import { jsonLdEvento, urlAbsoluta } from '../../lib/seo';
 
 // Inclui eventos que já passaram: o endereço continua valendo para quem guardou o link.
 export async function getStaticPaths() {
@@ -16,6 +18,13 @@ const { slug } = Astro.params;
 const evento = await conteudo.evento(slug!);
 if (!evento) throw new Error(`Evento não encontrado: ${slug}`);
 
+const paroquia = dadosDaParoquia(await conteudo.configuracoes());
+const jsonLd = jsonLdEvento(evento, paroquia, {
+  url: urlAbsoluta(Astro.url.pathname, Astro.site),
+  imagem: urlAbsoluta('/og-padrao.png', Astro.site),
+  site: urlAbsoluta('/', Astro.site),
+});
+
 const quando = quandoAcontece(evento);
 const passou = jaAconteceu(evento);
 ---
@@ -23,6 +32,7 @@ const passou = jaAconteceu(evento);
 <ArtigoLayout
   title={evento.titulo}
   description={`${quando}${evento.local ? ` · ${evento.local}` : ''}`}
+  jsonLd={jsonLd}
   voltar={{ rotulo: 'Agenda', href: '/agenda' }}
   titulo={evento.titulo}
   destaque={evento.destaque}

@@ -22,6 +22,7 @@ import { evangelhoDoDia, liturgiaDoDia } from '../lib/liturgia';
 import { dadosDaParoquia, urlMapa } from '../lib/paroquia';
 import { propsCardPastoral } from '../lib/pastorais';
 import { conteudo } from '../lib/sanity';
+import { jsonLdIgreja, urlAbsoluta } from '../lib/seo';
 
 const agora = new Date();
 const [config, horarios, avisos, eventos, blog, pastorais, liturgia] = await Promise.all([
@@ -42,6 +43,13 @@ const confissao = horarios?.confissao.linhas ?? [];
 const adoracao = horarios?.adoracao.linhas ?? [];
 const proxima = proximaMissa(missa, agora);
 
+const igreja = jsonLdIgreja(paroquia, {
+  url: urlAbsoluta('/', Astro.site),
+  imagem: urlAbsoluta('/og-padrao.png', Astro.site),
+  mapa: urlMapa(paroquia),
+  secretaria: horarios?.secretaria,
+});
+
 // TODO(paroquia): chave Pix oficial e nome do titular, no documento "Configurações" do Studio.
 const pix =
   config?.pixChave && config.pixTitular
@@ -50,7 +58,9 @@ const pix =
 ---
 
 <PaginaLayout
-  title="Início"
+  title="Paróquia Nossa Senhora do Rosário · Jaguaribe, João Pessoa"
+  semSufixo
+  jsonLd={igreja}
   description="Horários de missa, liturgia do dia, agenda e pastorais da Paróquia Nossa Senhora do Rosário, em Jaguaribe, João Pessoa."
   barraMobile
 >

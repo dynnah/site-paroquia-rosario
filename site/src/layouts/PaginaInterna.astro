@@ -3,9 +3,10 @@
  * Página interna comum (Horários, Agenda, Pastorais, Sacramentos, Contato):
  * título, uma frase de apresentação e o conteúdo, dentro do container do site.
  */
+import type { PropsSeo } from '../lib/seo';
 import PaginaLayout from './PaginaLayout.astro';
 
-interface Props {
+interface Props extends PropsSeo {
   /** <title> e descrição para buscadores. */
   title: string;
   description?: string;

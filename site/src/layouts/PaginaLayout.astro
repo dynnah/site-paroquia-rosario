@@ -17,10 +17,11 @@ import {
   urlWhatsApp,
 } from '../lib/paroquia';
 import { conteudo } from '../lib/sanity';
+import type { PropsSeo } from '../lib/seo';
 import type { LinkSimples } from '../lib/tipos';
 import BaseLayout from './BaseLayout.astro';
 
-interface Props {
+interface Props extends PropsSeo {
   title: string;
   description?: string;
   /** Barra fixa no celular: Horários · Como chegar · WhatsApp. */

@@ -4,9 +4,10 @@
  * evento, pastoral, sacramento, Nossa história, Contribua.
  * Ordem do design system: voltar → sobrelinha → título → conteúdo.
  */
+import type { PropsSeo } from '../lib/seo';
 import PaginaLayout from './PaginaLayout.astro';
 
-interface Props {
+interface Props extends PropsSeo {
   /** <title> e descrição para buscadores. */
   title: string;
   description?: string;

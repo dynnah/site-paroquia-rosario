@@ -11,11 +11,19 @@ import {
   urlWhatsApp,
 } from '../lib/paroquia';
 import { conteudo } from '../lib/sanity';
+import { jsonLdIgreja, urlAbsoluta } from '../lib/seo';
 
 const [config, horarios] = await Promise.all([conteudo.configuracoes(), conteudo.horarios()]);
 const paroquia = dadosDaParoquia(config);
 const [rua, bairroCidade] = enderecoEmLinhas(paroquia);
 const secretaria = horarios?.secretaria.linhas ?? [];
+
+const igreja = jsonLdIgreja(paroquia, {
+  url: urlAbsoluta('/contato/', Astro.site),
+  imagem: urlAbsoluta('/og-padrao.png', Astro.site),
+  mapa: urlMapa(paroquia),
+  secretaria: horarios?.secretaria,
+});
 
 interface Contato {
   rotulo: string;
@@ -57,6 +65,7 @@ if (paroquia.youtube)
   title="Contato"
   description="Endereço, horário da secretaria e formas de falar com a Paróquia Nossa Senhora do Rosário, em Jaguaribe, João Pessoa."
   titulo="Contato"
+  jsonLd={igreja}
   intro="Fale com a secretaria ou venha nos visitar."
   barraMobile
 >
