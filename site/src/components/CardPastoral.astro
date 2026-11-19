@@ -5,25 +5,36 @@ import Botao from './Botao.astro';
 interface Props {
   /** Define a cor do filete: paroquial (padrão), mariano, franciscano ou social. */
   familia?: FamiliaPastoral;
-  /** Sobrelinha: "Movimento", "Ação social", "Formação". */
-  categoria: string;
+  /**
+   * Cor do filete na página Nossa Comunidade (vale mais que `familia`): `pastoral` é o marrom
+   * escuro; `movimento` (movimentos, grupos, ministérios e projetos) é um marrom mais claro.
+   */
+  tom?: 'pastoral' | 'movimento';
+  /** Sobrelinha: "Movimento", "Ação social", "Formação". Sem ela, o card não mostra sobrelinha. */
+  categoria?: string;
   nome: string;
-  /** Uma frase do que a pastoral faz. */
-  descricao: string;
+  /** Uma frase do que a pastoral faz (opcional). */
+  descricao?: string;
   /** Quando se reúne, como entrar, contato. */
   info?: { rotulo: string; valor: string }[];
   acao: LinkSimples;
 }
 
-const { familia = 'paroquial', categoria, nome, descricao, info = [], acao } = Astro.props;
+const { familia = 'paroquial', tom, categoria, nome, descricao, info = [], acao } = Astro.props;
 ---
 
-<article class:list={['ros-pastoral', { [`ros-pastoral--${familia}`]: familia !== 'paroquial' }]}>
+<article
+  class:list={[
+    'ros-pastoral',
+    { [`ros-pastoral--${familia}`]: familia !== 'paroquial' },
+    { [`ros-pastoral--${tom}`]: tom },
+  ]}
+>
   <div class="ros-pastoral__faixa"></div>
   <div class="ros-pastoral__corpo">
-    <p class="ros-sobrelinha">{categoria}</p>
+    {categoria && <p class="ros-sobrelinha">{categoria}</p>}
     <h3>{nome}</h3>
-    <p>{descricao}</p>
+    {descricao && <p>{descricao}</p>}
     {info.length > 0 && (
       <ul class="ros-pastoral__info">
         {info.map((item) => (

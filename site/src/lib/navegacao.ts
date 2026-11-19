@@ -5,9 +5,8 @@ export const LINKS_PRINCIPAIS: LinkSimples[] = [
   { rotulo: 'Início', href: '/' },
   { rotulo: 'Liturgia', href: '/liturgia' },
   { rotulo: 'Agenda', href: '/agenda' },
-  { rotulo: 'Pastorais', href: '/pastorais' },
+  { rotulo: 'Nossa Comunidade', href: '/nossa-comunidade' },
   { rotulo: 'Blog', href: '/blog' },
-  { rotulo: 'Sacramentos', href: '/sacramentos' },
   { rotulo: 'Contato', href: '/contato' },
 ];
 

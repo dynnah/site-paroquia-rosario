@@ -1,0 +1,71 @@
+---
+import CardPastoral from '../../components/CardPastoral.astro';
+import EstadoVazio from '../../components/EstadoVazio.astro';
+import PaginaInterna from '../../layouts/PaginaInterna.astro';
+import { propsCardPastoral, secoesDaComunidade } from '../../lib/pastorais';
+import { conteudo } from '../../lib/sanity';
+
+const lista = await conteudo.pastorais();
+const { pastorais, gruposEMovimentos, ministerios, projetos } = secoesDaComunidade(lista);
+const secoes = [
+  { id: 'pastorais', titulo: 'Pastorais', itens: pastorais },
+  { id: 'grupos', titulo: 'Grupos e movimentos', itens: gruposEMovimentos },
+  { id: 'ministerios', titulo: 'Ministérios', itens: ministerios },
+  { id: 'projetos', titulo: 'Projetos', itens: projetos },
+].filter((secao) => secao.itens.length > 0);
+---
+
+<PaginaInterna
+  title="Nossa Comunidade"
+  description="Pastorais, grupos, movimentos, ministérios e projetos da Paróquia Nossa Senhora do Rosário e como participar de cada um."
+  titulo="Nossa"
+  destaque="Comunidade"
+  intro="Há um lugar para cada um servir e crescer na fé. Conheça as pastorais, os grupos, os ministérios e os projetos da paróquia."
+>
+  {secoes.length === 0 ? (
+    <EstadoVazio
+      titulo="Estamos reunindo as informações da nossa comunidade."
+      texto="Enquanto isso, fale com a secretaria para saber como participar."
+      acao={{ rotulo: 'Fale conosco', href: '/contato' }}
+    />
+  ) : (
+    secoes.map((secao) => (
+      <section class="secao" aria-labelledby={`${secao.id}-titulo`}>
+        <h2 class="titulo-2" id={`${secao.id}-titulo`}>
+          {secao.titulo}
+        </h2>
+        <div class="ros-grade">
+          {secao.itens.map((pastoral) => (
+            <CardPastoral {...propsCardPastoral(pastoral)} />
+          ))}
+        </div>
+      </section>
+    ))
+  )}
+
+  <p class="sacramentos">
+    Para se preparar para o batismo, a primeira eucaristia, a crisma ou o matrimônio, procure a
+    secretaria. <a href="/horarios">Ver horários da secretaria</a>
+  </p>
+</PaginaInterna>
+
+<style>
+  .secao {
+    display: grid;
+    gap: var(--espaco-6);
+  }
+
+  .secao h2 {
+    margin: 0;
+  }
+
+  .sacramentos {
+    margin: 0;
+    color: var(--texto-suave);
+  }
+
+  /* o link não se parte em duas linhas */
+  .sacramentos a {
+    white-space: nowrap;
+  }
+</style>

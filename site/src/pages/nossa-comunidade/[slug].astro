@@ -2,6 +2,7 @@
 import Botao from '../../components/Botao.astro';
 import TextoRico from '../../components/TextoRico.astro';
 import ArtigoLayout from '../../layouts/ArtigoLayout.astro';
+import { sobrelinhaDaPastoral } from '../../lib/pastorais';
 import { conteudo } from '../../lib/sanity';
 
 export async function getStaticPaths() {
@@ -18,19 +19,22 @@ const dados = [
   { rotulo: 'Responsável', valor: pastoral.responsavel },
   { rotulo: 'Contato', valor: pastoral.contato },
 ].filter((dado): dado is { rotulo: string; valor: string } => Boolean(dado.valor));
+const sobrelinha = sobrelinhaDaPastoral(pastoral);
 ---
 
 <ArtigoLayout
   title={pastoral.nome}
-  description={pastoral.descricao}
-  voltar={{ rotulo: 'Pastorais', href: '/pastorais' }}
+  description={pastoral.descricao ?? `${pastoral.nome}, da Paróquia Nossa Senhora do Rosário.`}
+  voltar={{ rotulo: 'Nossa Comunidade', href: '/nossa-comunidade' }}
   titulo={pastoral.nome}
 >
-  <p slot="sobrelinha" class="ros-sobrelinha">
-    {pastoral.categoria}
-  </p>
+  {sobrelinha && (
+    <p slot="sobrelinha" class="ros-sobrelinha">
+      {sobrelinha}
+    </p>
+  )}
 
-  <p class="lead corpo-grande">{pastoral.descricao}</p>
+  {pastoral.descricao && <p class="lead corpo-grande">{pastoral.descricao}</p>}
 
   {dados.length > 0 && (
     <dl class="dados">
