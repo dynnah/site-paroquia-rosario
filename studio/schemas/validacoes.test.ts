@@ -3,6 +3,7 @@ import { test } from 'node:test';
 import {
   extrairIdYouTube,
   slugificar,
+  validarCep,
   validarDuracao,
   validarHora,
   validarInstagram,
@@ -78,4 +79,14 @@ test('slugificar tira acentos e pontuação', () => {
   assert.equal(slugificar('  Nossa história!  '), 'nossa-historia');
   assert.equal(slugificar('Missa às 17h'), 'missa-as-17h');
   assert.equal(slugificar('a'.repeat(120)).length, 80);
+});
+
+test('validarCep aceita 58015-310 e 58015310, e deixa vazio passar', () => {
+  assert.equal(validarCep('58015-310'), true);
+  assert.equal(validarCep('58015310'), true);
+  assert.equal(validarCep(undefined), true);
+  assert.equal(validarCep(''), true);
+  assert.notEqual(validarCep('58015-31'), true);
+  assert.notEqual(validarCep('5801-5310'), true);
+  assert.notEqual(validarCep('abcde-fgh'), true);
 });

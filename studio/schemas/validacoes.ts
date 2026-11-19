@@ -88,6 +88,11 @@ export function validarDuracao(valor: string | undefined): Resultado {
 }
 
 /** Só dígitos, com 55 e DDD: 5583999999999. */
+/** "58015-310" (o traço é opcional). */
+export function validarCep(valor: string | undefined): Resultado {
+  return !valor || /^\d{5}-?\d{3}$/.test(valor.trim()) ? true : 'Use o formato 58015-310.';
+}
+
 export function validarWhatsApp(valor: string | undefined): Resultado {
   return !valor || /^55\d{10,11}$/.test(valor)
     ? true

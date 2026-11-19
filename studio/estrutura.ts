@@ -67,7 +67,9 @@ export const estrutura: StructureResolver = (S) =>
           S.list()
             .title('Comunidade')
             .items([
-              S.documentTypeListItem('pastoral').title('Pastorais e movimentos'),
+              S.documentTypeListItem('pastoral').title(
+                'Nossa Comunidade (pastorais, grupos, ministérios e projetos)',
+              ),
               S.documentTypeListItem('sacramento').title('Sacramentos'),
               S.documentTypeListItem('pagina').title('Páginas de texto'),
             ]),

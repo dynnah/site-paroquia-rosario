@@ -4,7 +4,7 @@ import { campoSlug } from '../campos';
 
 export const pastoral = defineType({
   name: 'pastoral',
-  title: 'Pastoral ou movimento',
+  title: 'Pastoral, movimento ou grupo',
   type: 'document',
   icon: UsersIcon,
   fields: [
@@ -16,36 +16,39 @@ export const pastoral = defineType({
     }),
     campoSlug('nome'),
     defineField({
-      name: 'familia',
-      title: 'Família',
+      name: 'tipo',
+      title: 'O que é',
       type: 'string',
-      description: 'Define a cor do filete no topo do card.',
+      description:
+        'Define a seção em Nossa Comunidade e a cor do filete no topo do card: pastorais no marrom escuro; os demais num marrom mais claro. Movimento e Grupo aparecem juntos, em "Grupos e movimentos".',
       options: {
         list: [
-          { title: 'Paroquial', value: 'paroquial' },
-          { title: 'Mariana', value: 'mariano' },
-          { title: 'Franciscana', value: 'franciscano' },
-          { title: 'Ação social', value: 'social' },
+          { title: 'Pastoral', value: 'pastoral' },
+          { title: 'Movimento', value: 'movimento' },
+          { title: 'Grupo', value: 'grupo' },
+          { title: 'Ministério', value: 'ministerio' },
+          { title: 'Projeto', value: 'projeto' },
         ],
         layout: 'radio',
       },
-      initialValue: 'paroquial',
+      initialValue: 'pastoral',
       validation: (regra) => regra.required(),
     }),
     defineField({
       name: 'categoria',
-      title: 'Categoria',
+      title: 'Categoria (opcional)',
       type: 'string',
-      description: 'Texto pequeno acima do nome. Ex.: "Movimento", "Ação social", "Formação".',
-      validation: (regra) => regra.required().max(30),
+      description:
+        'Texto pequeno acima do nome. Ex.: "Ministério de música", "Ação social". Se ficar vazio, aparece o tipo.',
+      validation: (regra) => regra.max(30),
     }),
     defineField({
       name: 'descricao',
-      title: 'O que faz',
+      title: 'O que faz (opcional)',
       type: 'text',
       rows: 3,
-      description: 'Uma ou duas frases.',
-      validation: (regra) => regra.required().max(200),
+      description: 'Duas ou três frases. Pode ficar vazio até o grupo mandar o texto.',
+      validation: (regra) => regra.max(250),
     }),
     defineField({
       name: 'encontros',
@@ -77,7 +80,7 @@ export const pastoral = defineType({
     }),
     defineField({
       name: 'sobre',
-      title: 'Sobre a pastoral (página própria)',
+      title: 'Sobre (página própria)',
       type: 'textoRico',
     }),
   ],

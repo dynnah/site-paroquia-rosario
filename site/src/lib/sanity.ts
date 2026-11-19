@@ -77,11 +77,12 @@ const POSTS_VISIVEIS = `_type == "post" && statusRevisao == "aprovado" && dateTi
   && ($coluna == "" || coluna == $coluna) && (!$soVideos || defined(youtube))`;
 
 const EVENTO = `{
-  _id, "slug": slug.current, titulo, destaque, inicio, fim, local, categoria, inscricaoUrl
+  _id, "slug": slug.current, titulo, destaque, inicio, fim, "semHorario": coalesce(semHorario, false),
+  local, categoria, inscricaoUrl
 }`;
 
 const PASTORAL = `{
-  _id, "slug": slug.current, nome, familia, categoria, descricao, encontros, contato, responsavel,
+  _id, "slug": slug.current, nome, "tipo": coalesce(tipo, "pastoral"), categoria, descricao, encontros, contato, responsavel,
   link${LINK}
 }`;
 
@@ -97,7 +98,7 @@ const SANTO = `{ _id, dia, nome, destaque, grau, familia, datasDeVida, bio }`;
 
 export const CONSULTAS = {
   configuracoes: `*[_type == "configuracoes" && _id == "configuracoes"][0]{
-    nome, assinatura, endereco, mapaUrl, telefone, whatsapp, email, instagram, youtube, pixChave, pixTitular
+    nome, assinatura, endereco, capelas, mapaUrl, telefone, whatsapp, email, instagram, youtube, pixChave, pixTitular, pixConta
   }`,
 
   horarios: `*[_type == "horarios" && _id == "horarios"][0]{
@@ -112,13 +113,14 @@ export const CONSULTAS = {
     | order(inicio asc)[0...$limite]${EVENTO}`,
 
   evento: `*[_type == "evento" && slug.current == $slug][0]{
-    _id, "slug": slug.current, titulo, destaque, inicio, fim, local, categoria, inscricaoUrl, descricao
+    _id, "slug": slug.current, titulo, destaque, inicio, fim, "semHorario": coalesce(semHorario, false),
+    local, categoria, inscricaoUrl, descricao
   }`,
 
   pastorais: `*[_type == "pastoral"] | order(nome asc)${PASTORAL}`,
 
   pastoral: `*[_type == "pastoral" && slug.current == $slug][0]{
-    _id, "slug": slug.current, nome, familia, categoria, descricao, encontros, contato, responsavel,
+    _id, "slug": slug.current, nome, "tipo": coalesce(tipo, "pastoral"), categoria, descricao, encontros, contato, responsavel,
     link${LINK}, sobre
   }`,
 
@@ -242,7 +244,11 @@ export function criarConteudo(buscar: Buscar, agora: () => Date = () => new Date
 
     evento: (slug: string) => buscar<EventoDetalhe | null>(CONSULTAS.evento, { slug }, null),
 
-    pastorais: () => buscar<Pastoral[]>(CONSULTAS.pastorais, {}, []),
+    /** Em ordem alfabética do português: o GROQ separa maiúsculas de minúsculas e acentos. */
+    pastorais: async () =>
+      [...(await buscar<Pastoral[]>(CONSULTAS.pastorais, {}, []))].sort((a, b) =>
+        a.nome.localeCompare(b.nome, 'pt-BR'),
+      ),
 
     pastoral: (slug: string) => buscar<PastoralDetalhe | null>(CONSULTAS.pastoral, { slug }, null),
 

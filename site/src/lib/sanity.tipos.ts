@@ -23,7 +23,17 @@ export interface Link {
 export interface Configuracoes {
   nome: string;
   assinatura?: string;
-  endereco?: { rua?: string; bairro?: string; cidade?: string; uf?: string };
+  endereco?: { rua?: string; bairro?: string; cidade?: string; uf?: string; cep?: string };
+  /** Capelas, além da matriz. Vazio: vale a reserva do código. */
+  capelas?: Array<{
+    nome?: string;
+    rua?: string;
+    bairro?: string;
+    cidade?: string;
+    uf?: string;
+    cep?: string;
+    mapaUrl?: string;
+  }>;
   mapaUrl?: string;
   telefone?: string;
   /** Somente dígitos, com 55 e DDD. */
@@ -34,6 +44,7 @@ export interface Configuracoes {
   youtube?: string;
   pixChave?: string;
   pixTitular?: string;
+  pixConta?: string;
 }
 
 export interface LinhaHorario {
@@ -66,7 +77,7 @@ export interface Aviso {
   link?: Link;
 }
 
-export type CategoriaEvento = 'padrao' | 'festa' | 'franciscano';
+export type CategoriaEvento = 'padrao' | 'festa' | 'mariano' | 'franciscano';
 
 export interface Evento {
   _id: string;
@@ -76,6 +87,8 @@ export interface Evento {
   /** Instante ISO (UTC). */
   inicio: string;
   fim?: string;
+  /** Sem hora definida (vários dias ou horário ainda não confirmado): o site mostra só a data ou o período. */
+  semHorario?: boolean;
   local?: string;
   categoria: CategoriaEvento;
   inscricaoUrl?: string;
@@ -85,15 +98,17 @@ export interface EventoDetalhe extends Evento {
   descricao?: TextoRico;
 }
 
-export type FamiliaPastoralSanity = 'paroquial' | 'mariano' | 'franciscano' | 'social';
+/** O que é: define a seção da página Nossa Comunidade (movimento e grupo dividem uma) e o tom do filete. */
+export type TipoPastoral = 'pastoral' | 'movimento' | 'grupo' | 'ministerio' | 'projeto';
 
 export interface Pastoral {
   _id: string;
   slug: string;
   nome: string;
-  familia: FamiliaPastoralSanity;
-  categoria: string;
-  descricao: string;
+  tipo: TipoPastoral;
+  /** Texto pequeno acima do nome; sem ele, vale o rótulo do tipo. */
+  categoria?: string;
+  descricao?: string;
   encontros?: string;
   contato?: string;
   responsavel?: string;

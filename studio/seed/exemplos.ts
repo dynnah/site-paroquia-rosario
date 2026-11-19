@@ -51,7 +51,6 @@ function linha(rotulo: string, dias: number[], horas: string[], nota?: string) {
 
 const referencia = (id: string) => ({ _type: 'reference', _ref: id });
 
-const FORMULARIO = { rotulo: 'Quero participar', href: 'https://www.google.com/forms/about/' };
 const VIDEO_ABERTO = 'https://www.youtube.com/watch?v=aqz-KE-bpKQ'; // Big Buck Bunny, vídeo aberto de demonstração
 
 export function gerarDocumentos(agora: Date = new Date()): DocumentoSeed[] {
@@ -72,7 +71,19 @@ export function gerarDocumentos(agora: Date = new Date()): DocumentoSeed[] {
         bairro: 'Jaguaribe',
         cidade: 'João Pessoa',
         uf: 'PB',
+        cep: '58014-430',
       },
+      capelas: [
+        {
+          _key: chave(),
+          nome: 'Capela São Cristóvão',
+          rua: 'R. São Cristóvão, 211',
+          bairro: 'Jaguaribe',
+          cidade: 'João Pessoa',
+          uf: 'PB',
+          cep: '58015-310',
+        },
+      ],
       // Telefone e horários abaixo são os reais, informados pela paróquia em 19/11/2026.
       telefone: '(83) 3241-1433',
       whatsapp: '558332411433',
@@ -186,53 +197,6 @@ export function gerarDocumentos(agora: Date = new Date()): DocumentoSeed[] {
       inicio: hora(-10, 19),
       local: 'Salão paroquial',
       categoria: 'padrao',
-    },
-
-    // ── Pastorais ─────────────────────────────────────────────────────────────────
-    {
-      _id: 'exemplo-pastoral-jovem',
-      _type: 'pastoral',
-      nome: `${MARCA} Pastoral Jovem`,
-      slug: { _type: 'slug', current: 'exemplo-pastoral-jovem' },
-      familia: 'mariano',
-      categoria: 'Movimento',
-      descricao: 'Encontros e retiros para jovens ao longo do ano.',
-      encontros: 'sábados, 19h',
-      contato: 'secretaria paroquial',
-      link: FORMULARIO,
-      sobre: [bloco('Texto de exemplo sobre a pastoral.')],
-    },
-    {
-      _id: 'exemplo-pastoral-social',
-      _type: 'pastoral',
-      nome: `${MARCA} Pastoral Social`,
-      slug: { _type: 'slug', current: 'exemplo-pastoral-social' },
-      familia: 'social',
-      categoria: 'Ação social',
-      descricao: 'Acompanha famílias do bairro com ações ao longo do ano.',
-      encontros: 'primeiro sábado do mês',
-      link: { rotulo: 'Como ajudar', href: 'https://www.google.com/forms/about/' },
-    },
-    {
-      _id: 'exemplo-pastoral-catequese',
-      _type: 'pastoral',
-      nome: `${MARCA} Catequese`,
-      slug: { _type: 'slug', current: 'exemplo-catequese' },
-      familia: 'paroquial',
-      categoria: 'Formação',
-      descricao: 'Preparação para a Primeira Eucaristia e a Crisma.',
-      encontros: 'sábados, 15h',
-      link: { rotulo: 'Venha ser catequista', href: 'https://www.google.com/forms/about/' },
-    },
-    {
-      _id: 'exemplo-pastoral-franciscana',
-      _type: 'pastoral',
-      nome: `${MARCA} Fraternidade franciscana`,
-      slug: { _type: 'slug', current: 'exemplo-fraternidade-franciscana' },
-      familia: 'franciscano',
-      categoria: 'Movimento',
-      descricao: 'Encontros de espiritualidade na tradição de São Francisco.',
-      encontros: 'último domingo do mês',
     },
 
     // ── Sacramentos ───────────────────────────────────────────────────────────────

@@ -20,12 +20,12 @@ export const evento = defineType({
       title: 'Parte do título em itálico',
       type: 'string',
       description:
-        'Opcional. Ex.: no título "Festa de Nossa Senhora do Rosário", destaque "do Rosário".',
+        'Opcional. O final do título que fica em itálico. Ex.: no título "Festa de Nossa Senhora do Rosário", destaque "do Rosário".',
       validation: (regra) =>
         regra.max(40).custom((destaque, contexto) => {
           const titulo = (contexto.document as { titulo?: string } | undefined)?.titulo ?? '';
-          return destaque && !titulo.includes(destaque)
-            ? 'O destaque precisa ser um trecho do título.'
+          return destaque && !titulo.endsWith(destaque)
+            ? 'O destaque precisa ser o final do título.'
             : true;
         }),
     }),
@@ -48,6 +48,14 @@ export const evento = defineType({
         }),
     }),
     defineField({
+      name: 'semHorario',
+      title: 'Sem horário definido',
+      type: 'boolean',
+      description:
+        'Marque para festas de vários dias ou quando o horário ainda não foi confirmado: o site mostra só a data (ou o período, até o dia do término). Os horários podem ir na descrição.',
+      initialValue: false,
+    }),
+    defineField({
       name: 'local',
       title: 'Local',
       type: 'string',
@@ -58,11 +66,13 @@ export const evento = defineType({
       name: 'categoria',
       title: 'Categoria',
       type: 'string',
-      description: 'Festa: solenidades e padroeira. Franciscano: datas dos frades.',
+      description:
+        'Define a cor da data. Padrão: pastel neutro. Festa: dourado (festas e solenidades). Nossa Senhora: azul, só para a festa da padroeira, o dia dela e datas marianas. Franciscano: terracota (datas dos frades).',
       options: {
         list: [
           { title: 'Padrão', value: 'padrao' },
           { title: 'Festa', value: 'festa' },
+          { title: 'Nossa Senhora', value: 'mariano' },
           { title: 'Franciscano', value: 'franciscano' },
         ],
         layout: 'radio',
@@ -96,14 +106,14 @@ export const evento = defineType({
     },
   ],
   preview: {
-    select: { title: 'titulo', inicio: 'inicio', local: 'local' },
-    prepare: ({ title, inicio, local }) => ({
+    select: { title: 'titulo', inicio: 'inicio', local: 'local', semHorario: 'semHorario' },
+    prepare: ({ title, inicio, local, semHorario }) => ({
       title,
       subtitle: [
         inicio
           ? new Date(inicio).toLocaleString('pt-BR', {
               dateStyle: 'short',
-              timeStyle: 'short',
+              ...(semHorario ? {} : { timeStyle: 'short' as const }),
               timeZone: 'America/Sao_Paulo',
             })
           : 'sem data',

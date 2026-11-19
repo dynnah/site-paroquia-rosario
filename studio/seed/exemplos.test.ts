@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
+  validarCep,
   slugificar,
   validarDuracao,
   validarHora,
@@ -19,7 +20,6 @@ const TIPOS = [
   'horarios',
   'aviso',
   'evento',
-  'pastoral',
   'sacramento',
   'autor',
   'post',
@@ -70,7 +70,6 @@ test('referências de post apontam para autores que existem', () => {
 test('limites de tamanho dos schemas são respeitados', () => {
   for (const p of doTipo('post')) assert.ok(String(p.resumo).length <= 220, p._id);
   for (const a of doTipo('aviso')) assert.ok(String(a.texto).length <= 160, a._id);
-  for (const p of doTipo('pastoral')) assert.ok(String(p.descricao).length <= 200, p._id);
   for (const s of doTipo('sacramento')) assert.ok(String(s.resumo).length <= 200, s._id);
   for (const s of doTipo('santo')) assert.ok(String(s.bio).length <= 320, s._id);
 });
@@ -111,4 +110,23 @@ test('instante respeita o fuso de São Paulo (UTC−3)', () => {
   assert.equal(instante(AGORA, 1, 7, 30), '2026-11-18T10:30:00.000Z');
   // 00h30 em São Paulo ainda é "ontem" em UTC: o dia local manda.
   assert.equal(dataEmDias(new Date('2026-11-18T03:30:00Z'), 0), '2026-11-18');
+});
+
+test('os CEPs das configurações (matriz e capelas) são válidos', () => {
+  const { endereco } = doTipo('configuracoes')[0] as unknown as { endereco: { cep?: string } };
+  assert.equal(validarCep(endereco.cep), true);
+  assert.ok(endereco.cep);
+});
+
+test('as capelas das configurações têm nome, rua e CEP válido', () => {
+  const { capelas } = doTipo('configuracoes')[0] as unknown as {
+    capelas: { _key: string; nome: string; rua: string; uf: string; cep?: string }[];
+  };
+  assert.ok(capelas.length > 0);
+  for (const c of capelas) {
+    assert.ok(c._key && c.nome && c.rua);
+    assert.equal(c.uf, 'PB');
+    assert.equal(validarCep(c.cep), true, c.nome);
+  }
+  assert.equal(new Set(capelas.map((c) => c._key)).size, capelas.length, 'chaves repetidas');
 });

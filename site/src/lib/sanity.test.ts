@@ -7,6 +7,7 @@ import assert from 'node:assert/strict';
 import { mock, test } from 'node:test';
 import { evaluate, parse } from 'groq-js';
 // Teste lê o seed do outro workspace de propósito: é a fonte única dos exemplos.
+import { gerarComunidade } from '../../../studio/seed/comunidade.ts';
 import { gerarDocumentos } from '../../../studio/seed/exemplos.ts';
 import {
   buscarNoSanity,
@@ -19,7 +20,7 @@ import {
 
 // Terça, 17 de novembro de 2026, 10h em São Paulo.
 const AGORA = new Date('2026-11-17T13:00:00Z');
-const documentos = gerarDocumentos(AGORA);
+const documentos = [...gerarDocumentos(AGORA), ...gerarComunidade()];
 
 function fonteEmMemoria(): Buscar {
   return async <T>(consulta: string, params: Record<string, unknown>) => {
@@ -86,18 +87,42 @@ test('evento por slug traz a descrição; slug desconhecido dá null', async () 
   assert.equal(await conteudo.evento('nao-existe'), null);
 });
 
-test('pastorais vêm em ordem alfabética, com família e botão', async () => {
+test('pastorais vêm em ordem alfabética do português, sem separar maiúsculas nem acentos', async () => {
+  const fonte = [
+    { slug: 'a', nome: 'Pastoral Familiar' },
+    { slug: 'b', nome: 'Pastoral da Crisma' },
+    { slug: 'c', nome: 'Élohim' },
+    { slug: 'd', nome: 'Abba' },
+  ];
+  const ordenadas = await criarConteudo((async () => fonte) as never).pastorais();
+  assert.deepEqual(
+    ordenadas.map((p) => p.nome),
+    ['Abba', 'Élohim', 'Pastoral da Crisma', 'Pastoral Familiar'],
+  );
+});
+
+test('pastorais vêm em ordem alfabética, com tipo e botão', async () => {
   const lista = await conteudo.pastorais();
-  assert.equal(lista.length, 4);
+  assert.equal(lista.length, 13);
   assert.deepEqual(
     lista.map((p) => p.nome),
-    [...lista.map((p) => p.nome)].sort((a, b) => a.localeCompare(b)),
+    [...lista.map((p) => p.nome)].sort((a, b) => a.localeCompare(b, 'pt-BR')),
   );
-  const jovem = lista.find((p) => p.slug === 'exemplo-pastoral-jovem');
-  assert.equal(jovem?.familia, 'mariano');
-  assert.equal(jovem?.link?.rotulo, 'Quero participar');
-  const detalhe = await conteudo.pastoral('exemplo-pastoral-jovem');
-  assert.ok((detalhe?.sobre?.length ?? 0) > 0);
+  const ejc = lista.find((p) => p.slug === 'ejc-rosario');
+  assert.equal(ejc?.tipo, 'movimento');
+  assert.deepEqual([...new Set(lista.map((p) => p.tipo))].sort(), [
+    'grupo',
+    'ministerio',
+    'movimento',
+    'pastoral',
+    'projeto',
+  ]);
+  assert.equal(ejc?.categoria, 'Encontro de Jovens com Cristo');
+  assert.equal(ejc?.link?.rotulo, 'Seguir no Instagram');
+  assert.equal(ejc?.link?.href, 'https://www.instagram.com/ejcrosariojp/');
+  const detalhe = await conteudo.pastoral('ejc-rosario');
+  assert.equal(detalhe?.nome, 'EJC Rosário');
+  assert.ok(!detalhe?.sobre, 'sem texto próprio, a página mostra só o contato');
 });
 
 test('sacramentos seguem a posição e escondem turmas que já passaram', async () => {
@@ -203,7 +228,7 @@ test('pagina por slug', async () => {
 test('slugs para getStaticPaths: posts só os publicáveis, o resto todos', async () => {
   assert.equal((await conteudo.slugs('post')).length, 4);
   assert.equal((await conteudo.slugs('evento')).length, 4);
-  assert.equal((await conteudo.slugs('pastoral')).length, 4);
+  assert.equal((await conteudo.slugs('pastoral')).length, 13);
   assert.equal((await conteudo.slugs('sacramento')).length, 4);
   assert.deepEqual((await conteudo.slugs('pagina')).sort(), ['contribua', 'nossa-historia']);
 });
