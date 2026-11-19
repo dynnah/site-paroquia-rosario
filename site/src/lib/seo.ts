@@ -5,6 +5,7 @@
  * Os dados estruturados descrevem só o que a paróquia já publica no site (endereço,
  * telefone, Instagram, horário da secretaria, eventos da agenda); nada é inventado.
  */
+import { dataISO } from './formatacao.ts';
 import type { DadosParoquia } from './paroquia.ts';
 import { urlInstagram } from './paroquia.ts';
 import type { Evento, GrupoHorarios } from './sanity.tipos.ts';
@@ -128,6 +129,7 @@ function enderecoPostal(paroquia: DadosParoquia) {
     streetAddress: `${rua}, ${bairro}`,
     addressLocality: cidade,
     addressRegion: uf,
+    ...(paroquia.endereco.cep ? { postalCode: paroquia.endereco.cep } : {}),
     addressCountry: 'BR',
   };
 }
@@ -181,7 +183,7 @@ export interface OpcoesEvento {
  * evento é na própria igreja.
  */
 export function jsonLdEvento(
-  evento: Pick<Evento, 'titulo' | 'inicio' | 'fim' | 'local'>,
+  evento: Pick<Evento, 'titulo' | 'inicio' | 'fim' | 'local' | 'semHorario'>,
   paroquia: DadosParoquia,
   opcoes: OpcoesEvento,
 ) {
@@ -189,8 +191,9 @@ export function jsonLdEvento(
     '@context': 'https://schema.org',
     '@type': 'Event',
     name: evento.titulo,
-    startDate: evento.inicio,
-    ...(evento.fim ? { endDate: evento.fim } : {}),
+    // Sem horário definido, o Google recebe só a data (sem inventar uma hora).
+    startDate: evento.semHorario ? dataISO(evento.inicio) : evento.inicio,
+    ...(evento.fim ? { endDate: evento.semHorario ? dataISO(evento.fim) : evento.fim } : {}),
     eventStatus: 'https://schema.org/EventScheduled',
     eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
     location: {

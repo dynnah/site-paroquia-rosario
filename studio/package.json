@@ -10,7 +10,10 @@
     "check": "tsc --noEmit",
     "test": "node --test \"schemas/**/*.test.ts\" \"seed/**/*.test.ts\"",
     "schema:validate": "sanity schema validate",
-    "seed:gerar": "node scripts/gerar-seed.ts"
+    "seed:gerar": "node scripts/gerar-seed.ts",
+    "seed:comunidade": "node scripts/gerar-comunidade.ts",
+    "seed:blog": "node scripts/gerar-blog.ts",
+    "seed:agenda": "node scripts/gerar-agenda.ts"
   },
   "dependencies": {
     "@sanity/icons": "^5.4.0",

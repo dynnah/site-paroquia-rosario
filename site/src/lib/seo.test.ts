@@ -131,6 +131,7 @@ test('jsonLdIgreja descreve a paróquia com o que o site já publica', () => {
     streetAddress: 'Rua Frei Martinho, s/n, Jaguaribe',
     addressLocality: 'João Pessoa',
     addressRegion: 'PB',
+    postalCode: '58014-430',
     addressCountry: 'BR',
   });
   assert.deepEqual(ld.sameAs, ['https://www.instagram.com/paroquiadorosariojp/']);
@@ -182,4 +183,19 @@ test('jsonLdEvento sem local e sem fim: o evento é na igreja e não inventa a h
   assert.equal(ld.location.name, 'Paróquia Nossa Senhora do Rosário');
   assert.ok(!('endDate' in ld));
   assert.ok(!('image' in ld));
+});
+
+test('jsonLdEvento sem horário: só a data, sem inventar uma hora', () => {
+  const ld = jsonLdEvento(
+    {
+      titulo: 'Trezena de Santo Antônio',
+      inicio: '2027-06-01T03:00:00.000Z',
+      fim: '2027-06-14T02:59:00.000Z',
+      semHorario: true,
+    },
+    PAROQUIA,
+    { url: 'https://exemplo.org/agenda/trezena/' },
+  );
+  assert.equal(ld.startDate, '2027-06-01');
+  assert.equal(ld.endDate, '2027-06-13');
 });

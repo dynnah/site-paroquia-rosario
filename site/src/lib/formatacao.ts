@@ -128,6 +128,21 @@ export function dataCompleta(entrada?: string | Date): string {
   return `${dia} de ${MESES[mes - 1]} de ${ano}`;
 }
 
+/** "6 de outubro" */
+export function diaDeMes(entrada?: string | Date): string {
+  const { dia, mes } = partesData(entrada);
+  return `${dia} de ${MESES[mes - 1]}`;
+}
+
+/** "2 de agosto", "1 a 13 de junho" (mesmo mês) ou "28 de setembro a 6 de outubro". */
+export function periodo(inicio: string | Date, fim: string | Date): string {
+  const a = partesData(inicio);
+  const b = partesData(fim);
+  if (a.ano === b.ano && a.mes === b.mes && a.dia === b.dia) return diaDeMes(inicio);
+  if (a.ano === b.ano && a.mes === b.mes) return `${a.dia} a ${b.dia} de ${MESES[b.mes - 1]}`;
+  return `${diaDeMes(inicio)} a ${diaDeMes(fim)}`;
+}
+
 /** "17 nov" */
 export function dataCurta(entrada?: string | Date): string {
   const { dia, mes } = partesData(entrada);
