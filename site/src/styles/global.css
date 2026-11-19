@@ -114,6 +114,74 @@ body:has(dialog:modal) {
   overflow: hidden;
 }
 
+/* ---------- liturgia: leituras em sequência (LiturgiaDoDia.astro) ----------
+   O design system esconde todas as leituras menos a da aba marcada. Aqui elas aparecem uma
+   depois da outra, como no missal, e as abas viraram atalhos (links). */
+
+.ros-liturgia .ros-leitura {
+  display: block;
+}
+
+/* Sem linha entre as leituras: ela se confundiria com as bordas das abas e do crédito. Quem separa
+   é o respiro maior e a referência em azul que abre cada leitura. */
+.ros-liturgia .ros-leitura + .ros-leitura {
+  padding-top: var(--espaco-8);
+}
+
+/* A linha que separa as abas do texto é desenhada por baixo das abas (linha de 1px, sem borda),
+   e a aba marcada a cobre com o sublinhado azul: os dois ficam exatamente na mesma linha. */
+.ros-liturgia__barra {
+  border-bottom: 0;
+  box-shadow: inset 0 -1px 0 var(--linha);
+}
+
+.ros-liturgia__abas .ros-aba {
+  margin-bottom: 0;
+  text-decoration: none;
+}
+
+.ros-liturgia__abas .ros-aba[aria-current] {
+  color: var(--texto);
+  border-bottom-color: var(--mariano);
+}
+
+.ros-liturgia__abas .ros-aba:focus-visible {
+  outline: 2px solid var(--foco);
+  outline-offset: 2px;
+}
+
+/* Anúncio antes da leitura, refrão do salmo e resposta do povo depois (em negrito, como no missal) */
+.ros-leitura__abertura {
+  font-style: italic;
+  color: var(--texto-suave);
+}
+
+.ros-leitura__abertura strong {
+  font-style: normal;
+  color: var(--texto);
+}
+
+.ros-leitura__refrao {
+  color: var(--texto);
+}
+
+.ros-leitura__fecho {
+  margin-top: var(--espaco-6);
+}
+
+/* Crédito da CNBB: fica no pé do card (no computador, parado, abaixo do texto que rola) */
+.ros-liturgia .ros-liturgia__fonte {
+  margin-top: var(--espaco-4);
+  padding-top: var(--espaco-3);
+  border-top: 1px solid var(--linha);
+}
+
+/* Área das leituras: no computador rola por dentro do card (ver "página Liturgia", abaixo) */
+.ros-liturgia__leituras:focus-visible {
+  outline: 2px solid var(--foco);
+  outline-offset: 2px;
+}
+
 /* ---------- liturgia: botão "Aa" (TamanhoTexto.vue guarda a escolha em data-tamanho) ---------- */
 
 .ros-liturgia[data-tamanho='2'] .ros-leitura__texto {
@@ -124,6 +192,112 @@ body:has(dialog:modal) {
 .ros-liturgia[data-tamanho='3'] .ros-leitura__texto {
   font-size: 26px;
   line-height: 42px;
+}
+
+/* Card largo (tablet e computador): a letra padrão é a menor (16px, o piso do projeto) para
+   caber mais texto. No celular fica a do design system (19px). "Aa" continua aumentando. */
+@container (min-width: 640px) {
+  .ros-liturgia .ros-leitura__texto {
+    font-size: 16px;
+    line-height: 27px;
+  }
+
+  .ros-liturgia[data-tamanho='2'] .ros-leitura__texto {
+    font-size: 20px;
+    line-height: 33px;
+  }
+
+  .ros-liturgia[data-tamanho='3'] .ros-leitura__texto {
+    font-size: 24px;
+    line-height: 38px;
+  }
+}
+
+/* ---------- página Liturgia (LiturgiaPagina.astro) ----------
+   Celular: título, leituras, datas, santo e missa, nessa ordem (quem vem do WhatsApp quer o
+   Evangelho primeiro). `display: contents` solta o título e as datas na grade da página só
+   para poder ordená-los. */
+
+.ros-pagina--liturgia .ros-pagina__cab {
+  display: contents;
+}
+
+.ros-pagina--liturgia .ros-pagina__leitura {
+  order: 1;
+}
+
+.ros-pagina--liturgia .ros-pagina__datas {
+  order: 2;
+}
+
+.ros-pagina--liturgia .ros-pagina__lateral {
+  order: 3;
+}
+
+/* A navegação já tem o espaço da grade; o respiro de cima dela é só para quando ficava embaixo do card */
+.ros-pagina--liturgia .ros-pagina__datas > nav {
+  padding-top: 0;
+}
+
+/* Computador: as datas sobem para a linha do título, e o card de leituras ocupa a altura da coluna
+   ao lado (santo + missa). O texto rola dentro do card, com abas e título parados. */
+@container (min-width: 1000px) {
+  /* Coluna das leituras mais larga que a do design system (1.6fr), para caber mais texto por linha */
+  .ros-pagina--liturgia .ros-pagina__in {
+    grid-template-columns: minmax(0, 2.1fr) minmax(320px, 1fr);
+  }
+
+  .ros-pagina--liturgia .ros-pagina__cab {
+    display: flex;
+    grid-column: 1;
+    grid-row: 1;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--espaco-6);
+  }
+
+  .ros-pagina--liturgia .ros-pagina__datas > nav {
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+  }
+
+  .ros-pagina--liturgia .ros-pagina__leitura {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .ros-pagina--liturgia .ros-pagina__lateral {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  /* `contain: size` tira o texto da conta: a altura da linha vem da coluna ao lado (ou do mínimo). */
+  .ros-pagina--liturgia .ros-pagina__leitura--com-lateral {
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaco-4);
+    contain: size;
+    min-height: calc(var(--espaco-12) * 10);
+  }
+
+  .ros-pagina--liturgia .ros-pagina__leitura--com-lateral .ros-liturgia {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+  }
+}
+
+/* Fora da consulta de propósito: o card (.ros-liturgia) é um container, e a consulta de dentro dele
+   mediria a largura do card, não a da página. No celular e no tablet o card não tem altura fixa,
+   então estas regras não rolam nada. */
+.ros-pagina--liturgia .ros-pagina__leitura--com-lateral .ros-liturgia__leituras {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: var(--espaco-2);
+  scrollbar-width: thin;
+  scrollbar-color: var(--texto-suave) transparent;
 }
 
 /* ---------- vídeo do YouTube: player que substitui a miniatura (VideoYouTube.astro) ---------- */

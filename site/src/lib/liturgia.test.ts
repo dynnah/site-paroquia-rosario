@@ -6,6 +6,7 @@ import {
   evangelhoDoDia,
   interpretarCelebracao,
   leiturasDoCard,
+  limparAbertura,
   limparReferencia,
   linhaDaCelebracao,
   montarLeituras,
@@ -20,10 +21,22 @@ const SEGREDO = 'TEXTO-DA-LEITURA';
 const REFRAO = 'REFRAO-DO-SALMO';
 
 const leituraComum = {
-  primeiraLeitura: [{ referencia: 'Ap 4,1-11', titulo: 'Leitura…', texto: `1${SEGREDO} um` }],
+  primeiraLeitura: [
+    {
+      referencia: 'Ap 4,1-11',
+      titulo: 'Leitura do livro do Apocalipse de São João',
+      texto: `1${SEGREDO} um`,
+    },
+  ],
   salmo: [{ referencia: 'Sl 150', refrao: REFRAO, texto: `– ${SEGREDO} dois` }],
   segundaLeitura: [],
-  evangelho: [{ referencia: 'Lc 19,11-28', titulo: 'Proclamação…', texto: `11${SEGREDO} três` }],
+  evangelho: [
+    {
+      referencia: 'Lc 19,11-28',
+      titulo: 'Proclamação do Evangelho de Jesus Cristo\u00a0✠ segundo Lucas',
+      texto: `11${SEGREDO} três`,
+    },
+  ],
   extras: [],
 };
 
@@ -421,24 +434,97 @@ test('buscarLiturgia respeita a flag do texto integral', async () => {
 
 // ── ligação com os componentes ──────────────────────────────────────────────────
 
-test('leiturasDoCard sem texto integral: só rótulo e referência, nada de texto', () => {
+test('leiturasDoCard sem texto integral: só rótulo e referência, nada de texto nem fórmulas', () => {
   const l = converterLiturgia(resposta(), '2026-11-18', false);
   const card = leiturasDoCard(l!.leituras);
   assert.deepEqual(card, [
-    { id: 'l1', rotulo: '1ª Leitura', referencia: 'Ap 4,1-11', texto: undefined },
-    { id: 'sl', rotulo: 'Salmo', referencia: 'Sl 150', texto: undefined },
-    { id: 'ev', rotulo: 'Evangelho', referencia: 'Lc 19,11-28', texto: undefined },
+    { id: 'l1', rotulo: '1ª Leitura', referencia: 'Ap 4,1-11' },
+    { id: 'sl', rotulo: 'Salmo', referencia: 'Sl 150' },
+    { id: 'ev', rotulo: 'Evangelho', referencia: 'Lc 19,11-28' },
   ]);
   assert.ok(!JSON.stringify(card).includes(SEGREDO));
 });
 
-test('leiturasDoCard com texto integral: o refrão abre o texto do salmo', () => {
+test('leiturasDoCard com texto integral: refrão à parte, anúncio antes e resposta do povo depois', () => {
   const l = converterLiturgia(resposta(), '2026-11-18', true);
-  const salmo = leiturasDoCard(l!.leituras).find((x) => x.id === 'sl');
-  // O texto do salmo na API começa com "– " (resposta do povo); o adaptador não mexe nisso.
-  assert.deepEqual(salmo?.texto, [`R. ${REFRAO}`, `– ${SEGREDO} dois`]);
-  const primeira = leiturasDoCard(l!.leituras).find((x) => x.id === 'l1');
+  const card = leiturasDoCard(l!.leituras);
+
+  const primeira = card.find((x) => x.id === 'l1');
   assert.deepEqual(primeira?.texto, [`${SEGREDO} um`]);
+  assert.deepEqual(primeira?.abertura, { dito: 'Leitura do livro do Apocalipse de São João.' });
+  assert.deepEqual(primeira?.fecho, { dito: 'Palavra do Senhor.', resposta: 'Graças a Deus.' });
+
+  // O texto do salmo na API começa com "– " (resposta do povo); o adaptador não mexe nisso.
+  const salmo = card.find((x) => x.id === 'sl');
+  assert.equal(salmo?.refrao, REFRAO);
+  assert.deepEqual(salmo?.texto, [`– ${SEGREDO} dois`]);
+  assert.equal(salmo?.abertura, undefined);
+  assert.equal(salmo?.fecho, undefined, 'o salmo não tem "Palavra do Senhor"');
+
+  const evangelho = card.find((x) => x.id === 'ev');
+  assert.deepEqual(evangelho?.abertura, {
+    dito: 'Proclamação do Evangelho de Jesus Cristo segundo Lucas.',
+    resposta: 'Glória a vós, Senhor.',
+  });
+  assert.deepEqual(evangelho?.fecho, {
+    dito: 'Palavra da Salvação.',
+    resposta: 'Glória a vós, Senhor.',
+  });
+});
+
+test('a segunda leitura também fecha com "Palavra do Senhor"', () => {
+  const l = converterLiturgia(
+    resposta({
+      leituras: {
+        ...leituraComum,
+        segundaLeitura: [
+          { referencia: 'Hb 1,1-6', titulo: 'Leitura da carta aos Hebreus', texto: 'x' },
+        ],
+      },
+    }),
+    '2026-11-18',
+    true,
+  );
+  const segunda = leiturasDoCard(l!.leituras).find((x) => x.id === 'l2');
+  assert.equal(segunda?.abertura?.dito, 'Leitura da carta aos Hebreus.');
+  assert.equal(segunda?.fecho?.resposta, 'Graças a Deus.');
+});
+
+test('com duas formas (longa e breve) o anúncio vem da primeira e o fecho aparece uma vez', () => {
+  const { leituras } = montarLeituras(
+    {
+      evangelho: [
+        {
+          referencia: 'Lc 2,22-40',
+          titulo: 'Proclamação do Evangelho segundo Lucas',
+          texto: 'longo',
+        },
+        { referencia: 'Lc 2,22.39-40', titulo: 'Forma breve', texto: 'breve' },
+      ],
+    },
+    true,
+  );
+  const [ev] = leiturasDoCard(leituras);
+  assert.equal(ev.abertura?.dito, 'Proclamação do Evangelho segundo Lucas.');
+  assert.equal(JSON.stringify(ev).split('Palavra da Salvação').length - 1, 1);
+});
+
+test('sem o texto, o anúncio da leitura também não vai para a página', () => {
+  const { leituras } = montarLeituras(leituraComum, false);
+  assert.ok(leituras.every((l) => l.abertura === undefined));
+});
+
+test('limparAbertura: tira a cruz, os espaços estranhos e o defeito da API', () => {
+  assert.equal(
+    limparAbertura('Proclamação do Evangelho de Jesus Cristo\u00a0✠ segundo João'),
+    'Proclamação do Evangelho de Jesus Cristo segundo João.',
+  );
+  assert.equal(
+    limparAbertura('Livro do Livro do Profeta Isaías'),
+    'Leitura do livro do Profeta Isaías.',
+  );
+  assert.equal(limparAbertura('  Leitura da Carta aos Hebreus. '), 'Leitura da Carta aos Hebreus.');
+  assert.equal(limparAbertura('   '), '');
 });
 
 test('evangelhoDoDia acha o Evangelho e tolera a falta dele', () => {
@@ -454,10 +540,12 @@ test('evangelhoDoDia acha o Evangelho e tolera a falta dele', () => {
 
 // ── flag ────────────────────────────────────────────────────────────────────────
 
-test('textoIntegralLigado: só "true" liga; qualquer outra coisa é desligado', () => {
-  assert.equal(textoIntegralLigado('true'), true);
-  assert.equal(textoIntegralLigado(' TRUE '), true);
-  for (const valor of ['false', '', '1', 'sim', 'yes', undefined]) {
-    assert.equal(textoIntegralLigado(valor), false, `valor ${String(valor)}`);
+test('textoIntegralLigado: o texto está no ar, a menos que LITURGIA_OCULTAR_TEXTO seja "true"', () => {
+  // sem a variável (o caso normal, inclusive no Cloudflare), o texto aparece
+  for (const valor of [undefined, '', 'false', '0', 'não', 'sim']) {
+    assert.equal(textoIntegralLigado(valor), true, `valor ${String(valor)}`);
   }
+  // a válvula de segurança
+  assert.equal(textoIntegralLigado('true'), false);
+  assert.equal(textoIntegralLigado(' TRUE '), false);
 });

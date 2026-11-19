@@ -286,7 +286,7 @@ const mapaHref = urlMapa(PAROQUIA);
       titulo="Liturgia do dia"
       origem="components/LiturgiaDoDia + LiturgiaResumo"
     >
-      <Quadro rotulo="Com o texto das leituras (só com autorização da CNBB) · ≥ 640px">
+      <Quadro rotulo="Padrão do site: leituras em sequência, com o texto inteiro · ≥ 640px">
         <LiturgiaDoDia
           id="a"
           data={liturgia.data}
@@ -294,10 +294,9 @@ const mapaHref = urlMapa(PAROQUIA);
           celebracao={liturgia.celebracao}
           cor={liturgia.cor}
           leituras={liturgia.leiturasComTexto}
-          fonte={liturgia.fonte}
         />
       </Quadro>
-      <Quadro rotulo="Padrão do site: só referências e link oficial · 360px" largura={360}>
+      <Quadro rotulo="Com LITURGIA_OCULTAR_TEXTO=true: só as referências · 360px" largura={360}>
         <LiturgiaDoDia
           id="b"
           data={liturgia.data}
@@ -305,8 +304,6 @@ const mapaHref = urlMapa(PAROQUIA);
           celebracao={liturgia.celebracao}
           cor={liturgia.cor}
           leituras={liturgia.leiturasSoReferencia}
-          linkOficial={liturgia.linkOficial}
-          fonte={{ ...liturgia.fonte, prefixo: 'Leituras' }}
         />
       </Quadro>
       <Quadro rotulo="Resumo para a página inicial">

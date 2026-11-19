@@ -4,8 +4,9 @@
  * no celular, nessa ordem, em uma coluna. Serve às três páginas: /liturgia (hoje),
  * /liturgia/ontem e /liturgia/amanha, que o rebuild diário renova.
  *
- * Sem leituras (API fora do ar, dia sem liturgia), mostra a data e o link oficial.
- * Sem `LITURGIA_TEXTO_INTEGRAL`, mostra só as referências (ver `lib/liturgia.ts`).
+ * As leituras aparecem por inteiro, dentro do card, sem mandar o fiel para outro site.
+ * Só com `LITURGIA_OCULTAR_TEXTO=true` ficam as referências (ver `lib/liturgia.ts`).
+ * Sem leituras (API fora do ar, dia sem liturgia), mostra a reserva (`LiturgiaIndisponivel`).
  */
 import PaginaLayout from '../layouts/PaginaLayout.astro';
 import { dataISO, instanteDoDia, somarDias } from '../lib/formatacao';
@@ -14,8 +15,6 @@ import {
   leiturasDoCard,
   linhaDaCelebracao,
   liturgiaDoDia,
-  LITURGIA_OFICIAL,
-  textoIntegralLigado,
   tituloDaLiturgia,
 } from '../lib/liturgia';
 import { conteudo } from '../lib/sanity';
@@ -67,7 +66,6 @@ const [liturgia, horarios, santos] = await Promise.all([
   conteudo.santosDoDia(instante),
 ]);
 
-const textoIntegral = textoIntegralLigado();
 // Só a liturgia com leituras vira card; sem elas, a página mostra a reserva.
 const doDia = liturgia && liturgia.leituras.length > 0 ? liturgia : null;
 
@@ -96,13 +94,16 @@ const navegacao: {
 ---
 
 <PaginaLayout title={texto.titulo} description={texto.descricao}>
-  <div class="ros-pagina">
+  <div class="ros-pagina ros-pagina--liturgia">
     <div class="ros-pagina__in">
       <div class="ros-pagina__cab">
         <h1 class="ros-pagina__titulo">{texto.titulo}</h1>
+        <div class="ros-pagina__datas">
+          <NavegacaoDatas rotulo="Outros dias da liturgia" {...navegacao} />
+        </div>
       </div>
 
-      <div>
+      <div class:list={['ros-pagina__leitura', { 'ros-pagina__leitura--com-lateral': temLateral }]}>
         {doDia ? (
           <>
             <LiturgiaDoDia
@@ -112,24 +113,17 @@ const navegacao: {
               celebracao={linhaDaCelebracao(doDia)}
               cor={doDia.cor}
               leituras={leiturasDoCard(doDia.leituras)}
-              linkOficial={LITURGIA_OFICIAL.href}
-              fonte={
-                textoIntegral
-                  ? { rotulo: 'Liturgia Diária, CNBB', href: LITURGIA_OFICIAL.href }
-                  : undefined
-              }
             />
             {doDia.temLeiturasEspeciais && (
               <p class="especiais pequeno">
-                Neste dia há leituras ou orações próprias que não cabem aqui. Veja todas na{' '}
-                <a href={LITURGIA_OFICIAL.href}>{LITURGIA_OFICIAL.rotulo}</a>.
+                Neste dia a liturgia tem mais leituras e orações próprias do que cabem aqui.
+                Pergunte na secretaria ou acompanhe pelo missal.
               </p>
             )}
           </>
         ) : (
           <LiturgiaIndisponivel data={iso} />
         )}
-        <NavegacaoDatas rotulo="Outros dias da liturgia" {...navegacao} />
       </div>
 
       {temLateral && (

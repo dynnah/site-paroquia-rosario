@@ -1,23 +1,19 @@
 ---
+/**
+ * Card da liturgia do dia: as leituras em sequência, como no missal. Cada uma abre com o
+ * anúncio ("Leitura do livro…") e fecha com "Palavra do Senhor" e a resposta do povo. As
+ * abas no topo são atalhos para cada leitura, não trocam o que está na tela.
+ *
+ * Fica dentro do site: nenhum link do card leva a outro endereço. O crédito da CNBB é fixo
+ * e aparece sempre que há texto. Estilos em `styles/global.css` (seção "liturgia").
+ */
 import { dataLonga } from '../lib/formatacao';
+import type { LeituraDoCard } from '../lib/liturgia';
 import type { CorLiturgica } from '../lib/tipos';
-import Botao from './Botao.astro';
 import TamanhoTexto from './TamanhoTexto.vue';
 
-type IdLeitura = 'l1' | 'sl' | 'l2' | 'ev';
-
-interface Leitura {
-  /** 1ª leitura, salmo, 2ª leitura (só domingos e solenidades) e evangelho. O CSS depende destes ids. */
-  id: IdLeitura;
-  rotulo: string;
-  referencia: string;
-  /** Parágrafos. Sem texto, o card mostra só a referência e o link da liturgia oficial. */
-  texto?: string[];
-  aclamacao?: string;
-}
-
 interface Props {
-  /** Distingue cards repetidos na mesma página (ids dos campos e do título). */
+  /** Distingue cards repetidos na mesma página (ids das seções e do título). */
   id: string;
   data: string | Date;
   /** "33ª Semana do Tempo Comum" */
@@ -25,18 +21,15 @@ interface Props {
   /** "Santa Isabel da Hungria · Memória" */
   celebracao: string;
   cor: CorLiturgica;
-  leituras: Leitura[];
-  /** Aba aberta. Padrão: o Evangelho. */
-  aberta?: IdLeitura;
-  fonte?: { rotulo: string; href: string; prefixo?: string };
-  /** Link da liturgia oficial, para as leituras sem texto integral. */
-  linkOficial?: string;
+  /** 1ª leitura, salmo, 2ª leitura (só domingos e solenidades) e evangelho. */
+  leituras: LeituraDoCard[];
 }
 
-const { id, data, semana, celebracao, cor, leituras, aberta, fonte, linkOficial } = Astro.props;
+const { id, data, semana, celebracao, cor, leituras } = Astro.props;
 
-const abertaId = aberta ?? (leituras.some((l) => l.id === 'ev') ? 'ev' : leituras[0]?.id);
 const tituloId = `lt-${id}`;
+const ancora = (leitura: LeituraDoCard) => `${leitura.id}-${id}`;
+const temTexto = leituras.some((leitura) => leitura.texto);
 ---
 
 <article class="ros-liturgia" aria-labelledby={tituloId}>
@@ -54,58 +47,147 @@ const tituloId = `lt-${id}`;
   </p>
 
   <div class="ros-liturgia__barra">
-    <div class="ros-liturgia__abas" role="radiogroup" aria-label="Leituras do dia">
-      {leituras.map((leitura) => (
-        <>
-          <input
-            type="radio"
-            name={`leit-${id}`}
-            id={`${leitura.id}-${id}`}
-            value={leitura.id}
-            checked={leitura.id === abertaId}
-          />
-          <label class="ros-aba" for={`${leitura.id}-${id}`}>
-            {leitura.rotulo}
-          </label>
-        </>
+    <nav class="ros-liturgia__abas" aria-label="Ir para a leitura">
+      {leituras.map((leitura, indice) => (
+        <a
+          class="ros-aba"
+          href={`#${ancora(leitura)}`}
+          aria-current={indice === 0 ? 'location' : undefined}
+        >
+          {leitura.rotulo}
+        </a>
       ))}
-    </div>
+    </nav>
     <TamanhoTexto client:visible />
   </div>
 
-  {leituras.map((leitura) => (
-    <section class="ros-leitura" data-leitura={leitura.id}>
-      <p class="ros-leitura__ref">{leitura.referencia}</p>
-      {leitura.texto ? (
-        <div class="ros-leitura__texto">
-          {leitura.texto.map((paragrafo) => (
-            <p>{paragrafo}</p>
-          ))}
-        </div>
-      ) : (
-        linkOficial && (
-          <p class="acao-leitura">
-            <Botao variante="secundario" href={linkOficial}>
-              Ler na Liturgia Diária
-            </Botao>
-          </p>
-        )
-      )}
-      {leitura.aclamacao && leitura.texto && (
-        <p class="ros-leitura__aclamacao">{leitura.aclamacao}</p>
-      )}
-    </section>
-  ))}
+  <div class="ros-liturgia__leituras">
+    {leituras.map((leitura) => (
+      <section
+        class="ros-leitura"
+        id={ancora(leitura)}
+        data-leitura={leitura.id}
+        aria-labelledby={`${ancora(leitura)}-rotulo`}
+      >
+        <h3 class="sr-only" id={`${ancora(leitura)}-rotulo`}>
+          {leitura.rotulo}
+        </h3>
+        <p class="ros-leitura__ref">{leitura.referencia}</p>
+        {leitura.texto && (
+          <div class="ros-leitura__texto">
+            {leitura.abertura && (
+              <p class="ros-leitura__abertura">
+                {leitura.abertura.dito}
+                {leitura.abertura.resposta && (
+                  <>
+                    <br />
+                    <strong>— {leitura.abertura.resposta}</strong>
+                  </>
+                )}
+              </p>
+            )}
+            {leitura.refrao && (
+              <p class="ros-leitura__refrao">
+                <strong>R. {leitura.refrao}</strong>
+              </p>
+            )}
+            {leitura.texto.map((paragrafo) => (
+              <p>{paragrafo}</p>
+            ))}
+            {leitura.fecho && (
+              <p class="ros-leitura__fecho">
+                — {leitura.fecho.dito}
+                <br />
+                <strong>— {leitura.fecho.resposta}</strong>
+              </p>
+            )}
+          </div>
+        )}
+      </section>
+    ))}
+  </div>
 
-  {fonte && (
+  {temTexto && (
     <p class="ros-liturgia__fonte">
-      {fonte.prefixo ?? 'Texto'}: <a href={fonte.href}>{fonte.rotulo}</a>
+      Conferência Nacional dos Bispos do Brasil
+      <br />© Todos os direitos reservados.
     </p>
   )}
 </article>
 
-<style>
-  .acao-leitura {
-    margin: var(--espaco-4) 0 0;
-  }
-</style>
+<script>
+  // Atalhos das abas e destaque da leitura que está na tela. Sem JavaScript, as abas são
+  // âncoras comuns e continuam levando à leitura.
+  const semMovimento = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  document.querySelectorAll<HTMLElement>('.ros-liturgia').forEach((card) => {
+    const area = card.querySelector<HTMLElement>('.ros-liturgia__leituras');
+    const abas = [...card.querySelectorAll<HTMLAnchorElement>('.ros-liturgia__abas a')];
+    const secoes = [...card.querySelectorAll<HTMLElement>('.ros-leitura')];
+    if (!area || abas.length === 0 || secoes.length === 0) return;
+
+    // No computador o texto rola dentro do card; no celular, é a página que rola.
+    const rolaPorDentro = () => area.scrollHeight > area.clientHeight + 1;
+
+    const marcar = (alvo: HTMLElement | undefined) => {
+      for (const aba of abas) {
+        if (alvo && aba.hash === `#${alvo.id}`) aba.setAttribute('aria-current', 'location');
+        else aba.removeAttribute('aria-current');
+      }
+    };
+
+    // Área que rola precisa ser alcançável pelo teclado.
+    const ajustarArea = () => {
+      if (rolaPorDentro()) {
+        area.tabIndex = 0;
+        area.setAttribute('role', 'region');
+        area.setAttribute('aria-label', 'Texto das leituras');
+      } else {
+        area.removeAttribute('tabindex');
+        area.removeAttribute('role');
+        area.removeAttribute('aria-label');
+      }
+    };
+
+    area.addEventListener(
+      'scroll',
+      () => {
+        if (!rolaPorDentro()) return;
+        const topo = area.getBoundingClientRect().top;
+        let atual = secoes[0];
+        for (const secao of secoes) {
+          if (secao.getBoundingClientRect().top - topo <= 40) atual = secao;
+        }
+        // No fim da rolagem a última leitura vale, mesmo curta demais para chegar ao topo.
+        if (area.scrollTop + area.clientHeight >= area.scrollHeight - 2) {
+          atual = secoes[secoes.length - 1];
+        }
+        marcar(atual);
+      },
+      { passive: true },
+    );
+
+    for (const aba of abas) {
+      aba.addEventListener('click', (evento) => {
+        const alvo = secoes.find((secao) => `#${secao.id}` === aba.hash);
+        if (!alvo) return;
+        evento.preventDefault();
+        marcar(alvo);
+        const behavior = semMovimento() ? 'auto' : 'smooth';
+        if (rolaPorDentro()) {
+          const deslocamento = alvo.getBoundingClientRect().top - area.getBoundingClientRect().top;
+          area.scrollTo({ top: area.scrollTop + deslocamento, behavior });
+        } else {
+          alvo.scrollIntoView({ behavior, block: 'start' });
+        }
+      });
+    }
+
+    // Veio de um endereço com âncora (ex.: "Evangelho de hoje", na página inicial).
+    marcar(secoes.find((secao) => `#${secao.id}` === location.hash) ?? secoes[0]);
+
+    ajustarArea();
+    addEventListener('resize', ajustarArea);
+    addEventListener('load', ajustarArea);
+  });
+</script>

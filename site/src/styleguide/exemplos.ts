@@ -62,31 +62,35 @@ export const liturgia = {
   semana: '33ª Semana do Tempo Comum',
   celebracao: 'Santa Isabel da Hungria · Memória',
   cor: 'branco' as const,
-  fonte: { rotulo: 'Liturgia Diária, CNBB', href: '#' },
-  linkOficial: '#',
   leiturasComTexto: [
     {
       id: 'l1' as const,
       rotulo: '1ª Leitura',
       referencia: 'Apocalipse 3,1-6.14-22',
+      abertura: { dito: 'Leitura do livro do Apocalipse de São João.' },
       texto: ['[Texto integral da primeira leitura.]'],
-      aclamacao: 'Palavra do Senhor.',
+      fecho: { dito: 'Palavra do Senhor.', resposta: 'Graças a Deus.' },
     },
     {
       id: 'sl' as const,
       rotulo: 'Salmo',
       referencia: 'Salmo 14(15)',
-      texto: ['[Refrão]', '[Estrofes do salmo.]'],
+      refrao: '[Refrão do salmo.]',
+      texto: ['– [Estrofes do salmo.]'],
     },
     {
       id: 'ev' as const,
       rotulo: 'Evangelho',
       referencia: 'Lucas 19,1-10',
-      texto: ['[Texto integral do Evangelho, vindo da fonte oficial da liturgia.]'],
-      aclamacao: 'Palavra da Salvação.',
+      abertura: {
+        dito: 'Proclamação do Evangelho de Jesus Cristo segundo Lucas.',
+        resposta: 'Glória a vós, Senhor.',
+      },
+      texto: ['[Texto integral do Evangelho.]'],
+      fecho: { dito: 'Palavra da Salvação.', resposta: 'Glória a vós, Senhor.' },
     },
   ],
-  /** Modo padrão do site: só a referência e o link da liturgia oficial. */
+  /** Com `LITURGIA_OCULTAR_TEXTO=true`: só a referência, sem texto e sem link para outro site. */
   leiturasSoReferencia: [
     { id: 'l1' as const, rotulo: '1ª Leitura', referencia: 'Apocalipse 3,1-6.14-22' },
     { id: 'sl' as const, rotulo: 'Salmo', referencia: 'Salmo 14(15)' },

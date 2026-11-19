@@ -4,19 +4,22 @@
  * Fonte: API aberta `liturgia-diaria` (v2). A escolha e os riscos estão em
  * `docs/liturgia.md`. O site só lê a API no build (nunca no navegador do fiel).
  *
- * Direitos autorais: o texto das leituras (tradução CNBB) não pode ser publicado
- * sem autorização. Com `LITURGIA_TEXTO_INTEGRAL` falsa (o padrão) o adaptador
- * descarta o texto e o refrão da resposta antes de montar qualquer coisa: o
- * resto do site nem chega a vê-los. Ficam só o nome da celebração, a cor e as
- * referências bíblicas (que são fatos do calendário litúrgico).
+ * Texto das leituras: por decisão da paróquia (19/11/2026) o site publica a passagem
+ * inteira, na própria página, sem mandar o fiel para outro endereço. O texto é a
+ * tradução da CNBB, que tem direitos sobre ela, e a API não declara licença: a
+ * paróquia assumiu esse risco e a autorização da CNBB segue como pendência (ver
+ * `docs/liturgia.md`). Para tirar o texto do ar sem mexer no código, defina
+ * `LITURGIA_OCULTAR_TEXTO=true`: o adaptador descarta o texto e o refrão da resposta
+ * antes de montar qualquer coisa, e ficam só o nome da celebração, a cor e as
+ * referências bíblicas.
  *
- * Se a API falhar, `buscarLiturgia` devolve `null` e a página mostra a data e o
- * link da liturgia oficial. O build nunca quebra por causa dela.
+ * Se a API falhar, `buscarLiturgia` devolve `null` e a página mostra a reserva
+ * (`LiturgiaIndisponivel`). O build nunca quebra por causa dela.
  */
 import { dataISO } from './formatacao.ts';
 import type { CorLiturgica } from './tipos.ts';
 
-/** Fonte oficial: o texto integral das leituras (tradução CNBB) não é publicado aqui sem autorização. */
+/** A liturgia oficial da CNBB. Só a reserva (`LiturgiaIndisponivel`), quando a API falha, aponta para ela. */
 export const LITURGIA_OFICIAL = {
   rotulo: 'Liturgia Diária',
   href: 'https://www.cnbb.org.br/liturgia-diaria/',
@@ -38,10 +41,12 @@ export interface LeituraDoDia {
   rotulo: string;
   /** "Lc 19,11-28". Com opções (forma longa e breve), "Lc 2,22-40 ou Lc 2,22.39-40". */
   referencia: string;
-  /** Parágrafos. Só existe com `LITURGIA_TEXTO_INTEGRAL=true`. */
+  /** Parágrafos. Não existe com `LITURGIA_OCULTAR_TEXTO=true`. */
   texto?: string[];
-  /** Refrão do salmo. Só existe com `LITURGIA_TEXTO_INTEGRAL=true`. */
+  /** Refrão do salmo. Não existe com `LITURGIA_OCULTAR_TEXTO=true`. */
   refrao?: string;
+  /** Frase que anuncia a leitura: "Leitura do livro do Apocalipse de São João." (salmo não tem). */
+  abertura?: string;
 }
 
 export interface LiturgiaDoDia {
@@ -169,6 +174,22 @@ export function limparReferencia(referencia: string): string {
     .trim();
 }
 
+/**
+ * A frase que anuncia a leitura, como a API a escreve, pronta para a tela:
+ * "Proclamação do Evangelho de Jesus Cristo ✠ segundo João" → "…Cristo segundo João."
+ * Tira o sinal da cruz (sai mal em leitor de tela), os espaços estranhos e um defeito
+ * conhecido da API ("Livro do Livro do Profeta Isaías", no Natal).
+ */
+export function limparAbertura(titulo: string): string {
+  const limpo = titulo
+    .replace(/[✠✝†]/gu, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/^Livro do Livro d/i, 'Leitura do livro d')
+    .replace(/[.;:,\s]+$/, '');
+  return limpo ? `${limpo}.` : '';
+}
+
 // Número de versículo colado na palavra: "1vi", "41quando". Não mexe em ordinais ("5ª").
 const NUMERO_DE_VERSICULO = /(?<![\p{L}\p{N}])\d{1,3}(?=[\p{L}“"‘'(])(?![ªº°])/gu;
 
@@ -191,17 +212,23 @@ const ehObjeto = (valor: unknown): valor is Record<string, unknown> =>
 const textoNaoVazio = (valor: unknown): string | undefined =>
   typeof valor === 'string' && valor.trim() ? valor : undefined;
 
-function opcoesDoSlot(
-  bruto: unknown,
-): Array<{ referencia: string; texto?: string; refrao?: string }> {
+interface OpcaoBruta {
+  referencia: string;
+  titulo?: string;
+  texto?: string;
+  refrao?: string;
+}
+
+function opcoesDoSlot(bruto: unknown): OpcaoBruta[] {
   if (!Array.isArray(bruto)) return [];
-  const opcoes: Array<{ referencia: string; texto?: string; refrao?: string }> = [];
+  const opcoes: OpcaoBruta[] = [];
   for (const item of bruto) {
     if (!ehObjeto(item)) continue;
     const referencia = textoNaoVazio(item.referencia);
     if (!referencia) continue;
     opcoes.push({
       referencia: limparReferencia(referencia),
+      titulo: textoNaoVazio(item.titulo),
       texto: textoNaoVazio(item.texto),
       refrao: textoNaoVazio(item.refrao),
     });
@@ -243,6 +270,8 @@ export function montarLeituras(
       if (paragrafosDoSlot.length > 0) leitura.texto = paragrafosDoSlot;
       const refrao = opcoes[0]?.refrao;
       if (slot.id === 'sl' && refrao) leitura.refrao = refrao;
+      const abertura = leitura.texto && opcoes[0]?.titulo ? limparAbertura(opcoes[0].titulo) : '';
+      if (abertura && slot.id !== 'sl') leitura.abertura = abertura;
     }
 
     leituras.push(leitura);
@@ -354,15 +383,19 @@ export async function buscarLiturgia(
 
 // ── Uso no site (lê o ambiente e guarda o resultado por data) ────────────────────
 
-type AmbienteLiturgia = { PROD?: boolean; LITURGIA_TEXTO_INTEGRAL?: string };
+type AmbienteLiturgia = { PROD?: boolean; LITURGIA_OCULTAR_TEXTO?: string };
 // Em `astro dev`/`build` o Vite preenche `import.meta.env`; nos testes (Node puro) ele não existe.
 const env = (import.meta.env ?? {}) as AmbienteLiturgia;
 
-/** A flag `LITURGIA_TEXTO_INTEGRAL`: só o valor "true" liga o texto integral. */
+/**
+ * O texto integral das leituras está no ar, a menos que `LITURGIA_OCULTAR_TEXTO` valha
+ * "true" (a válvula de segurança, caso a CNBB peça para retirar). Sem a variável,
+ * ou com qualquer outro valor, o texto aparece.
+ */
 export function textoIntegralLigado(
-  valor: string | undefined = env.LITURGIA_TEXTO_INTEGRAL,
+  ocultar: string | undefined = env.LITURGIA_OCULTAR_TEXTO,
 ): boolean {
-  return valor?.trim().toLowerCase() === 'true';
+  return ocultar?.trim().toLowerCase() !== 'true';
 }
 
 const memoria = new Map<string, Promise<LiturgiaDoDia | null>>();
@@ -391,21 +424,50 @@ export const hojeIso = (): string => dataISO(new Date());
 
 // ── Ligação com os componentes ───────────────────────────────────────────────────
 
+/** O que se diz ao fim da leitura e o que o povo responde. O salmo não tem fecho. */
+const FECHO: Partial<Record<IdLeitura, { dito: string; resposta: string }>> = {
+  l1: { dito: 'Palavra do Senhor.', resposta: 'Graças a Deus.' },
+  l2: { dito: 'Palavra do Senhor.', resposta: 'Graças a Deus.' },
+  ev: { dito: 'Palavra da Salvação.', resposta: 'Glória a vós, Senhor.' },
+};
+
+/** Só o Evangelho tem resposta logo depois do anúncio ("Proclamação do Evangelho…"). */
+const RESPOSTA_DO_ANUNCIO_DO_EVANGELHO = 'Glória a vós, Senhor.';
+
 export interface LeituraDoCard {
   id: IdLeitura;
   rotulo: string;
   referencia: string;
+  /** O anúncio ("Leitura do livro…") e, no Evangelho, a resposta do povo. */
+  abertura?: { dito: string; resposta?: string };
+  /** Refrão do salmo, que o card destaca na frente do texto. */
+  refrao?: string;
   texto?: string[];
+  /** "Palavra do Senhor." / "Graças a Deus." Só vem junto com o texto. */
+  fecho?: { dito: string; resposta: string };
 }
 
-/** As leituras no formato do `LiturgiaDoDia.astro`. O refrão do salmo abre o texto do salmo. */
+/**
+ * As leituras no formato do `LiturgiaDoDia.astro`. Com texto, cada leitura traz o anúncio
+ * antes e a aclamação depois, como na missa. Sem texto (`LITURGIA_OCULTAR_TEXTO`), só o
+ * rótulo e a referência.
+ */
 export function leiturasDoCard(leituras: LeituraDoDia[]): LeituraDoCard[] {
-  return leituras.map(({ id, rotulo, referencia, texto, refrao }) => ({
-    id,
-    rotulo,
-    referencia,
-    texto: texto ? (refrao ? [`R. ${refrao}`, ...texto] : texto) : undefined,
-  }));
+  return leituras.map(({ id, rotulo, referencia, texto, refrao, abertura }) => {
+    const card: LeituraDoCard = { id, rotulo, referencia };
+    if (!texto) return card;
+    if (abertura) {
+      card.abertura =
+        id === 'ev'
+          ? { dito: abertura, resposta: RESPOSTA_DO_ANUNCIO_DO_EVANGELHO }
+          : { dito: abertura };
+    }
+    if (refrao) card.refrao = refrao;
+    card.texto = texto;
+    const fecho = FECHO[id];
+    if (fecho) card.fecho = fecho;
+    return card;
+  });
 }
 
 /** A leitura do Evangelho, para o resumo da página inicial. Ausente na Vigília Pascal. */
