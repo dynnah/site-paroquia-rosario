@@ -4,19 +4,33 @@ interface Props {
   nome: string;
   destaque?: string;
   grau?: 'Memória' | 'Festa' | 'Solenidade';
+  /** "mártires", "bispo, doutor da Igreja". Vem do feed automático; o Studio usa `grau`. */
+  funcao?: string;
   /** franciscana: cor terracota. mariana: cor mariano. Sem família, sem cor. */
   familia?: 'franciscana' | 'mariana';
   /** "1207–1231" */
   datas?: string;
-  /** Duas ou três frases, escritas pela paróquia. */
-  bio: string;
+  /** Duas ou três frases. Sem bio, o card mostra só o nome e os metadados. */
+  bio?: string;
   /** Página com a história completa. */
   href?: string;
+  /** Os outros santos do dia (só nomes), em "Também hoje". */
+  outros?: string[];
+  /** De onde vêm o santo e a bio, quando não foram escritos pela paróquia. */
+  fonte?: { rotulo: string; href: string };
 }
 
-const { nome, destaque, grau, familia, datas, bio, href } = Astro.props;
+const { nome, destaque, grau, funcao, familia, datas, bio, href, outros = [], fonte } = Astro.props;
 
 const rotuloFamilia = familia === 'franciscana' ? 'Família franciscana' : 'Família mariana';
+
+type ItemMeta = { texto: string; classe?: string };
+const meta = [
+  grau ? { texto: grau } : undefined,
+  funcao ? { texto: funcao.charAt(0).toUpperCase() + funcao.slice(1) } : undefined,
+  familia ? { texto: rotuloFamilia, classe: 'ros-santo__familia' } : undefined,
+  datas ? { texto: datas, classe: 'sem-quebra' } : undefined,
+].filter((item): item is ItemMeta => item !== undefined);
 ---
 
 <article class:list={['ros-santo', { 'ros-santo--mariano': familia === 'mariana' }]}>
@@ -30,25 +44,50 @@ const rotuloFamilia = familia === 'franciscana' ? 'Família franciscana' : 'Fam�
       </>
     )}
   </h3>
-  {(grau || familia || datas) && (
+  {meta.length > 0 && (
     <p class="ros-santo__meta">
-      {grau}
-      {grau && (familia || datas) && ' · '}
-      {familia && <span class="ros-santo__familia">{rotuloFamilia}</span>}
-      {familia && datas && ' · '}
-      {datas && <span class="sem-quebra">{datas}</span>}
+      {meta.map((item, indice) => (
+        <>
+          {indice > 0 && ' · '}
+          {item.classe ? <span class={item.classe}>{item.texto}</span> : item.texto}
+        </>
+      ))}
     </p>
   )}
-  <p class="ros-santo__bio">{bio}</p>
+  {bio && <p class="ros-santo__bio">{bio}</p>}
   {href && (
     <a class="ros-santo__link" href={href}>
       Ler a história
     </a>
+  )}
+  {outros.length > 0 && (
+    <p class="outros pequeno">
+      <strong>Também hoje:</strong> {outros.join(', ')}.
+    </p>
+  )}
+  {fonte && (
+    <p class="fonte">
+      Fonte: <a href={fonte.href}>{fonte.rotulo}</a>
+    </p>
   )}
 </article>
 
 <style>
   .sem-quebra {
     white-space: nowrap;
+  }
+  .outros {
+    margin: var(--espaco-4) 0 0;
+    color: var(--texto-suave);
+  }
+  /* Mesma linha de crédito do card de leituras (.ros-liturgia__fonte). */
+  .fonte {
+    font-size: 13px;
+    line-height: 18px;
+    color: var(--texto-suave);
+    margin: var(--espaco-4) 0 0;
+  }
+  .fonte a {
+    color: inherit;
   }
 </style>

@@ -19,6 +19,7 @@ import {
   tituloDaLiturgia,
 } from '../lib/liturgia';
 import { conteudo } from '../lib/sanity';
+import { EVANGELIZO, santosDoDia } from '../lib/santos';
 import CardHorarios from './CardHorarios.astro';
 import LiturgiaDoDia from './LiturgiaDoDia.astro';
 import LiturgiaIndisponivel from './LiturgiaIndisponivel.astro';
@@ -70,11 +71,12 @@ const textoIntegral = textoIntegralLigado();
 // Só a liturgia com leituras vira card; sem elas, a página mostra a reserva.
 const doDia = liturgia && liturgia.leituras.length > 0 ? liturgia : null;
 
-// Sem santo cadastrado no Studio, a celebração do dia já é o título do card de leituras
-// (memória, festa e solenidade não têm semana): repeti-la ao lado seria ruído.
+// O santo escrito no Studio vale mais; sem ele, o card vem do feed do Evangelizo
+// (`lib/santos.ts`), que traz os santos de todos os dias. Se o feed falhar, sem card.
 const santo = santos[0];
+const automatico = santo ? null : await santosDoDia(iso);
 const missa = texto.missa && horarios ? linhasDeHoje(horarios.missa.linhas, instante) : [];
-const temLateral = Boolean(santo) || missa.length > 0;
+const temLateral = Boolean(santo) || Boolean(automatico) || missa.length > 0;
 
 const GRAU = { memoria: 'Memória', festa: 'Festa', solenidade: 'Solenidade' } as const;
 const FAMILIA = { franciscana: 'franciscana', mariana: 'mariana', nenhuma: undefined } as const;
@@ -132,7 +134,7 @@ const navegacao: {
 
       {temLateral && (
         <aside class="ros-pagina__lateral" aria-label="Santo do dia e horário de missa">
-          {santo && (
+          {santo ? (
             <SantoDoDia
               nome={santo.nome}
               destaque={santo.destaque}
@@ -141,6 +143,20 @@ const navegacao: {
               datas={santo.datasDeVida}
               bio={santo.bio}
             />
+          ) : (
+            automatico && (
+              <SantoDoDia
+                nome={automatico.principal.nome}
+                funcao={automatico.principal.funcao}
+                datas={automatico.principal.epoca}
+                bio={automatico.principal.biografia?.texto}
+                outros={automatico.outros.map((outro) => outro.nome)}
+                fonte={{
+                  rotulo: EVANGELIZO.rotulo,
+                  href: automatico.principal.biografia?.href ?? EVANGELIZO.href,
+                }}
+              />
+            )
           )}
           {missa.length > 0 && texto.missa && (
             <CardHorarios titulo={texto.missa} linhas={missa} destacarHoje={periodo === 'hoje'} />
