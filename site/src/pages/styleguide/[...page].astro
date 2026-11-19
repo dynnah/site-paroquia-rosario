@@ -31,6 +31,7 @@ import {
   horariosConfissao,
   horariosMissa,
   liturgia,
+  cardsPorTipo,
   pastorais,
   pix,
   posts,
@@ -233,16 +234,25 @@ const mapaHref = urlMapa(PAROQUIA);
     </Secao>
 
     <Secao id="evento" titulo="Evento" origem="components/CardEvento">
-      <Quadro rotulo="Padrão, festa e franciscano">
+      <Quadro rotulo="Padrão (pastel neutro), festa, mariano, franciscano">
         <div class="grade-eventos">
           <CardEvento
             href="#"
             data="2026-10-07"
-            variante="festa"
+            variante="mariano"
             sobrelinha="Quarta-feira · Festa da padroeira"
             titulo="Nossa Senhora"
             destaque="do Rosário"
             meta="Missa solene às 17h na Matriz"
+          />
+          <CardEvento
+            href="#"
+            data="2026-06-13"
+            variante="festa"
+            sobrelinha="Domingo · Festa"
+            titulo="Trezena de"
+            destaque="Santo Antônio"
+            meta="até 13 de junho"
           />
           <CardEvento
             href="#"
@@ -272,6 +282,13 @@ const mapaHref = urlMapa(PAROQUIA);
     </Secao>
 
     <Secao id="pastoral" titulo="Pastoral" origem="components/CardPastoral">
+      <Quadro rotulo="Pastoral (marrom escuro) e movimento ou grupo (marrom mais claro)">
+        <div class="ros-grade">
+          {cardsPorTipo.map((card) => (
+            <CardPastoral {...card} />
+          ))}
+        </div>
+      </Quadro>
       <Quadro rotulo="Mariano, social e paroquial">
         <div class="ros-grade">
           {pastorais.map((pastoral) => (
@@ -356,25 +373,26 @@ const mapaHref = urlMapa(PAROQUIA);
         <Footer
           idBase="rodape-a"
           nome={PAROQUIA.nome}
-          assinatura={PAROQUIA.assinatura}
           endereco={enderecoEmLinhas(PAROQUIA)}
           mapaHref={mapaHref}
           navegacao={LINKS_PRINCIPAIS}
           institucional={LINKS_INSTITUCIONAIS}
-          redes={[{ rotulo: 'Instagram · @paroquiadorosariojp', href: '#' }]}
-          contato={[{ rotulo: 'WhatsApp da secretaria', href: '#' }]}
+          redes={[{ rotulo: 'Instagram', href: '#' }]}
+          contato={[
+            { rotulo: 'WhatsApp · (83) 3241-1433', href: '#' },
+            { rotulo: 'Ligar · (83) 3241-1433', href: '#' },
+          ]}
         />
       </Quadro>
       <Quadro rotulo="Celular · 360px" largura={360} semFundo>
         <Footer
           idBase="rodape-b"
           nome={PAROQUIA.nome}
-          assinatura={PAROQUIA.assinatura}
           endereco={enderecoEmLinhas(PAROQUIA)}
           mapaHref={mapaHref}
           navegacao={LINKS_PRINCIPAIS}
           institucional={LINKS_INSTITUCIONAIS}
-          redes={[{ rotulo: 'Instagram · @paroquiadorosariojp', href: '#' }]}
+          redes={[{ rotulo: 'Instagram', href: '#' }]}
         />
       </Quadro>
     </Secao>

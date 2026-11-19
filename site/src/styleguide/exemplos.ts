@@ -20,6 +20,26 @@ export const horariosConfissao = [
   { rotulo: 'Sábado', dias: [6], horas: ['15:00', '16:30'] },
 ];
 
+/** Os dois tons do filete na página Nossa Comunidade. */
+export const cardsPorTipo = [
+  {
+    tom: 'pastoral' as const,
+    categoria: 'Pastoral',
+    nome: 'Nome da pastoral',
+    descricao: 'Uma frase sobre o que a pastoral faz e quem pode participar.',
+    info: [{ rotulo: 'Encontros', valor: 'dia e horário' }],
+    acao: { rotulo: 'Saber mais', href: '#' },
+  },
+  {
+    tom: 'movimento' as const,
+    categoria: 'Movimento',
+    nome: 'Nome do movimento ou grupo',
+    descricao: 'Uma frase sobre o que o grupo faz e quem pode participar.',
+    info: [{ rotulo: 'Encontros', valor: 'dia e horário' }],
+    acao: { rotulo: 'Saber mais', href: '#' },
+  },
+];
+
 export const pastorais = [
   {
     familia: 'mariano' as const,
