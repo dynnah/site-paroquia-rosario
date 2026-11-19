@@ -6,6 +6,8 @@ interface Props {
   chave: string;
   /** Mostre sempre o titular, para quem doa conferir antes de pagar. */
   titular: string;
+  /** Banco, agência e conta, para quem prefere transferência. Opcional. */
+  conta?: string;
   /** Distingue blocos repetidos na mesma página. */
   id?: string;
   sobrelinha?: string;
@@ -18,6 +20,7 @@ interface Props {
 const {
   chave,
   titular,
+  conta,
   id = 'doacao-pix',
   sobrelinha = 'Dízimo e doações',
   titulo = 'Faça parte',
@@ -36,5 +39,13 @@ const {
     <div class="ros-pix__valor">{chave}</div>
     <CopiarChave client:visible chave={chave} />
   </div>
-  <p class="ros-pix__titular">Titular: {titular}</p>
+  <p class="ros-pix__titular">
+    Titular: {titular}
+    {conta && (
+      <>
+        <br />
+        {conta}
+      </>
+    )}
+  </p>
 </section>

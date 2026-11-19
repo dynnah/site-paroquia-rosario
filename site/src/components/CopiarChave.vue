@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref } from 'vue';
 import type { NomeIcone } from '../lib/icones';
+import { chavePixParaCopiar } from '../lib/pix';
 import Icone from './Icone.vue';
 
 // Dois elementos na raiz (botão + aviso para leitor de tela): sem herdar atributos do Astro.
 defineOptions({ inheritAttrs: false });
 
 const props = defineProps<{ chave: string }>();
+// CNPJ e CPF vão só com os dígitos (ver lib/pix.ts); a tela mostra a chave formatada.
+const paraCopiar = () => chavePixParaCopiar(props.chave);
 
 type Estado = 'ocioso' | 'copiado' | 'falhou';
 const estado = ref<Estado>('ocioso');
@@ -50,10 +53,10 @@ function copiarPorSelecao(texto: string): boolean {
 async function copiar() {
   let ok: boolean;
   try {
-    await navigator.clipboard.writeText(props.chave);
+    await navigator.clipboard.writeText(paraCopiar());
     ok = true;
   } catch {
-    ok = copiarPorSelecao(props.chave);
+    ok = copiarPorSelecao(paraCopiar());
   }
 
   estado.value = ok ? 'copiado' : 'falhou';
