@@ -13,7 +13,9 @@ interface Props {
   horariosHref?: string;
   /** Cabeçalho fixo no topo ao rolar. */
   fixo?: boolean;
+  /** Nome ao lado do logo. */
   nome?: string;
+  /** Linha de baixo, opcional. O cabeçalho do site mostra só o nome da paróquia. */
   assinatura?: string;
 }
 
@@ -22,8 +24,8 @@ const {
   caminhoAtual = '',
   horariosHref = '/horarios',
   fixo = true,
-  nome = 'Igreja do Rosário',
-  assinatura = 'Paróquia Nossa Senhora do Rosário',
+  nome = 'Paróquia Nossa Senhora do Rosário',
+  assinatura,
 } = Astro.props;
 
 const itens = links.map((link) => ({ ...link, atual: estaAtivo(link.href, caminhoAtual) }));
@@ -35,7 +37,7 @@ const itens = links.map((link) => ({ ...link, atual: estaAtivo(link.href, caminh
       <Image src={logo} alt="" width={48} height={48} densities={[1, 2]} loading="eager" />
       <span>
         <span class="ros-marca__nome">{nome}</span>
-        <span class="ros-marca__sub">{assinatura}</span>
+        {assinatura && <span class="ros-marca__sub">{assinatura}</span>}
       </span>
     </a>
     <nav class="ros-nav" aria-label="Principal">
@@ -46,7 +48,7 @@ const itens = links.map((link) => ({ ...link, atual: estaAtivo(link.href, caminh
       ))}
     </nav>
     <Botao href={horariosHref} icone="relogio">
-      Horários
+      <span class="ros-header__horarios">Horários</span>
     </Botao>
     <MenuGaveta client:visible links={itens} />
   </div>

@@ -34,6 +34,83 @@ a {
   color: var(--mariano);
 }
 
+/* ---------- bloco de data dos eventos ----------
+No design system o azul (mariano) é o tom padrão do bloco de data. Aqui o padrão é um pastel
+neutro, e o azul fica só para os eventos de Nossa Senhora (variante "mariano"). */
+.ros-data--neutro {
+  background: var(--fundo-afundado);
+  color: var(--acao);
+}
+
+/* ---------- cards de evento do mesmo tamanho ----------
+A moldura do card está no elemento interno, que só tinha a altura do próprio conteúdo. Ele passa a
+preencher a célula, e todas as linhas da grade ficam com a altura do maior card. */
+.ros-evento__in {
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.ros-grade:has(> .ros-evento) {
+  grid-auto-rows: 1fr;
+}
+
+/* ---------- cards de Nossa Comunidade ----------
+O filete de cima do card (CardPastoral) distingue as pastorais (marrom escuro) dos grupos,
+movimentos, ministérios e projetos (um marrom mais claro). */
+.ros-pastoral--pastoral .ros-pastoral__faixa {
+  background: var(--marrom);
+}
+
+.ros-pastoral--movimento .ros-pastoral__faixa {
+  background: color-mix(in srgb, var(--acao) 55%, var(--fundo-elevado));
+}
+
+/* Os cards de uma linha têm a mesma altura (a grade estica). O botão fica sempre no pé do card:
+o corpo ocupa o que sobra e o último item (o botão) desce até o fim. */
+.ros-pastoral__corpo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.ros-pastoral__corpo > :last-child {
+  margin-top: auto;
+}
+
+/* ---------- links de texto ----------
+O sublinhado padrão do navegador é grosso e colado nas letras. Aqui ele fica fino, afastado do
+texto e na cor do próprio link a 45%; ao passar o mouse ou focar, "acende" (cor cheia) e se afasta
+um pouco mais. Vale para os links soltos no texto (sem classe) e para os de apoio do design
+system (.ros-btn--fantasma e .ros-santo__link). Links com classe própria (menu, cards, botões,
+linhas de contato) mantêm o que o componente define. */
+a:where(:not([class])),
+.ros-btn--fantasma,
+.ros-santo__link {
+  text-decoration-line: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 0.28em;
+  text-decoration-skip-ink: auto;
+  text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
+}
+
+a:where(:not([class])):hover,
+.ros-btn--fantasma:hover,
+.ros-santo__link:hover {
+  text-decoration-color: currentColor;
+  text-underline-offset: 0.4em;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:where(:not([class])),
+  .ros-btn--fantasma,
+  .ros-santo__link {
+    transition:
+      text-decoration-color 0.2s ease,
+      text-underline-offset 0.2s ease,
+      color 0.2s ease;
+  }
+}
+
 /* Container de página: 16px no celular, 24px no tablet, 32px no desktop, máx. 1200px */
 .container {
   width: 100%;
@@ -50,6 +127,28 @@ a {
 
 @media (min-width: 1024px) {
   .container {
+    padding-inline: var(--espaco-8);
+  }
+}
+
+/* O hero acompanha a coluna do resto da página: mesma largura máxima e mesmas margens do .container
+   (16px no celular, 24px no tablet, 32px no desktop). O fundo bege continua de ponta a ponta; só o
+   conteúdo (título, horário, botões e o arco) alinha com os avisos, o Evangelho e as seções abaixo. */
+.ros-hero__in {
+  box-sizing: border-box;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--espaco-4);
+}
+
+@media (min-width: 640px) {
+  .ros-hero__in {
+    padding-inline: var(--espaco-6);
+  }
+}
+
+@media (min-width: 1024px) {
+  .ros-hero__in {
     padding-inline: var(--espaco-8);
   }
 }
@@ -85,6 +184,20 @@ a {
   top: var(--espaco-2);
 }
 
+/* ---------- rodapé sempre no fim da janela ----------
+   Em página curta (ou janela alta) o rodapé não fica solto no meio com um vazio embaixo: o corpo
+   ocupa a altura toda e o conteúdo (main) cresce para empurrá-lo para baixo. */
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+#conteudo {
+  flex: 1 0 auto;
+}
+
 /* ---------- cabeçalho fixo ---------- */
 
 .cabecalho-fixo {
@@ -104,6 +217,64 @@ a {
   min-height: var(--toque-min);
 }
 
+/* Marca só com o nome da paróquia ("Paróquia Nossa Senhora do Rosário"). Em maiúsculas com
+   espaçamento ele não cabe ao lado do menu, então fica em letras normais, em até duas linhas
+   (três no celular estreito), sem empurrar o menu nem o botão. */
+.ros-header .ros-marca__nome {
+  max-width: 10.5em;
+  font-size: 14px;
+  line-height: 17px;
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: normal;
+  text-wrap: balance;
+  /* Alinhamento óptico: sem letras com cauda na última linha, a tinta do texto fica ~1,5px acima
+     do centro da logo. 0,1em acompanha o tamanho da letra. */
+  transform: translateY(0.1em);
+}
+
+@container (min-width: 520px) {
+  .ros-header .ros-marca__nome {
+    font-size: 16px;
+    line-height: 19px;
+  }
+}
+
+/* Celular: o botão Menu passou a ter 44px de largura (ver "alvos de toque" abaixo). Os 3px a mais
+   saem do espaço entre os itens, para o nome da paróquia não perder uma linha de largura. */
+@container (max-width: 519px) {
+  .ros-header__in {
+    gap: var(--espaco-2);
+  }
+}
+
+/* Celular estreito (até 354px): o nome ficaria em 4 linhas e o cabeçalho cresceria. O botão
+   Horários mostra só o relógio; o texto segue para leitores de tela, e a barra fixa do rodapé do
+   celular já traz "Horários" escrito. */
+@container (max-width: 354px) {
+  .ros-header__horarios {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
+
+/* Alvos de toque de uma palavra: 44px também na largura. O design system só garante a altura, e
+   "Menu" (só o ícone, no celular) e "Tudo" ficavam com 41px e 36px de largura. O texto não muda de
+   lugar: o botão e o filtro centralizam o conteúdo, e o marcador dourado do filtro cobre os 44px. */
+.ros-menu-btn {
+  min-width: var(--toque-min);
+  justify-content: center;
+}
+
+.ros-filtros a {
+  min-width: var(--toque-min);
+  justify-content: center;
+}
+
 /* Âncoras (#conteudo, #secao) não ficam escondidas atrás do cabeçalho fixo */
 html {
   scroll-padding-top: calc(var(--espaco-16) + var(--espaco-4));
@@ -120,6 +291,9 @@ body:has(dialog:modal) {
 
 .ros-liturgia .ros-leitura {
   display: block;
+  /* O título invisível de cada leitura (h3.sr-only) é absoluto. Sem um pai posicionado, ele escapava
+     do recorte da área que rola e esticava a página, deixando um vazio embaixo do rodapé. */
+  position: relative;
 }
 
 /* Sem linha entre as leituras: ela se confundiria com as bordas das abas e do crédito. Quem separa
@@ -182,34 +356,74 @@ body:has(dialog:modal) {
   outline-offset: 2px;
 }
 
-/* ---------- liturgia: botão "Aa" (TamanhoTexto.vue guarda a escolha em data-tamanho) ---------- */
+/* ---------- liturgia: tamanho do texto ("Aa" em TamanhoTexto.vue guarda a escolha em data-tamanho) ----------
+   Quatro medidas andam juntas, para a hierarquia não se perder quando o fiel aumenta a letra:
+   texto da leitura, anúncio ("Leitura do livro…", menor que o texto), referência (em azul, maior
+   que o texto: é ela que marca onde começa cada leitura enquanto o texto rola) e a altura de linha.
+   Celular: o texto padrão tem 17px (piso do projeto no celular é 16px). */
 
-.ros-liturgia[data-tamanho='2'] .ros-leitura__texto {
-  font-size: 22px;
-  line-height: 36px;
+.ros-liturgia {
+  --lt-texto: 17px;
+  --lt-linha: 28px;
+  --lt-anuncio: 15px;
+  --lt-ref: 19px;
 }
 
-.ros-liturgia[data-tamanho='3'] .ros-leitura__texto {
-  font-size: 26px;
-  line-height: 42px;
+.ros-liturgia[data-tamanho='2'] {
+  --lt-texto: 21px;
+  --lt-linha: 34px;
+  --lt-anuncio: 17px;
+  --lt-ref: 22px;
 }
 
-/* Card largo (tablet e computador): a letra padrão é a menor (16px, o piso do projeto) para
-   caber mais texto. No celular fica a do design system (19px). "Aa" continua aumentando. */
+.ros-liturgia[data-tamanho='3'] {
+  --lt-texto: 25px;
+  --lt-linha: 40px;
+  --lt-anuncio: 19px;
+  --lt-ref: 26px;
+}
+
+.ros-liturgia .ros-leitura__texto {
+  font-size: var(--lt-texto);
+  line-height: var(--lt-linha);
+}
+
+/* A referência (Ap 5,1-10, Sl 95, Lc 19,41-44) é o marco de cada leitura: maior e mais forte que o
+   texto, em azul. O anúncio logo abaixo fica discreto, em itálico e menor. */
+.ros-liturgia .ros-leitura__ref {
+  font-size: var(--lt-ref);
+  line-height: 1.3;
+  font-weight: 700;
+}
+
+.ros-liturgia .ros-leitura__abertura {
+  font-size: var(--lt-anuncio);
+  line-height: 1.5;
+}
+
+/* Card largo (tablet e computador): o texto padrão é menor (15px) para caber mais de cada leitura
+   na tela, e o "Aa" aumenta. Fica numa variável do filho porque o próprio card é o container da
+   consulta e uma consulta só alcança o que está dentro dele. */
 @container (min-width: 640px) {
-  .ros-liturgia .ros-leitura__texto {
-    font-size: 16px;
-    line-height: 27px;
+  .ros-liturgia .ros-liturgia__leituras {
+    --lt-texto: 15px;
+    --lt-linha: 26px;
+    --lt-anuncio: 14px;
+    --lt-ref: 18px;
   }
 
-  .ros-liturgia[data-tamanho='2'] .ros-leitura__texto {
-    font-size: 20px;
-    line-height: 33px;
+  .ros-liturgia[data-tamanho='2'] .ros-liturgia__leituras {
+    --lt-texto: 19px;
+    --lt-linha: 32px;
+    --lt-anuncio: 16px;
+    --lt-ref: 21px;
   }
 
-  .ros-liturgia[data-tamanho='3'] .ros-leitura__texto {
-    font-size: 24px;
-    line-height: 38px;
+  .ros-liturgia[data-tamanho='3'] .ros-liturgia__leituras {
+    --lt-texto: 23px;
+    --lt-linha: 37px;
+    --lt-anuncio: 18px;
+    --lt-ref: 25px;
   }
 }
 
@@ -411,4 +625,31 @@ body:has(dialog:modal) {
   font-size: 24px;
   line-height: 32px;
   margin: var(--espaco-8) 0 var(--espaco-3);
+}
+
+/* ---------- troca de página mais suave ----------
+Transição nativa entre páginas (sem JavaScript): o navegador mantém a página antiga na tela e a
+nova aparece num fade curto. Só o cabeçalho e a barra do celular têm nome próprio, porque ficam no
+mesmo lugar e tamanho em todas as páginas e, por isso, não piscam. Nada que mude de posição ou
+altura entre as páginas (como o rodapé ou as abas do blog) pode ter nome: o navegador o
+"deslizaria" e esticaria durante a troca. Navegador sem suporte (Firefox, por ora) segue como
+antes. Quem pediu menos movimento não recebe a animação. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+
+  .ros-header {
+    view-transition-name: cabecalho;
+  }
+
+  .barra--fixa {
+    view-transition-name: barra-do-celular;
+  }
+
+  /* fade padrão (as duas páginas trocam de opacidade juntas, sem lampejo), só mais curto */
+  ::view-transition-group(*) {
+    animation-duration: 150ms;
+    animation-timing-function: ease;
+  }
 }

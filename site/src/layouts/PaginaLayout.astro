@@ -12,6 +12,7 @@ import { LINKS_INSTITUCIONAIS, LINKS_PRINCIPAIS } from '../lib/navegacao';
 import {
   dadosDaParoquia,
   enderecoEmLinhas,
+  linksDeContatoDoRodape,
   urlInstagram,
   urlMapa,
   urlWhatsApp,
@@ -35,21 +36,13 @@ const paroquia = dadosDaParoquia(await conteudo.configuracoes());
 const mapaHref = urlMapa(paroquia);
 const whatsappHref = urlWhatsApp(paroquia.whatsapp);
 const instagramHref = urlInstagram(paroquia.instagram);
-// O telefone da secretaria atende no WhatsApp: tocar no número abre a conversa.
-const telefoneHref = urlWhatsApp(paroquia.telefone);
 
 const redes: LinkSimples[] = [];
-if (instagramHref)
-  redes.push({ rotulo: `Instagram · @${paroquia.instagram}`, href: instagramHref });
+if (instagramHref) redes.push({ rotulo: 'Instagram', href: instagramHref });
 if (paroquia.youtube) redes.push({ rotulo: 'YouTube', href: paroquia.youtube });
 
-const contato: LinkSimples[] = [];
-if (paroquia.telefone && telefoneHref)
-  contato.push({ rotulo: `WhatsApp · ${paroquia.telefone}`, href: telefoneHref });
-// Só aparece à parte se for outro número que o telefone acima.
-if (whatsappHref && whatsappHref !== telefoneHref)
-  contato.push({ rotulo: 'WhatsApp da secretaria', href: whatsappHref });
-if (paroquia.email) contato.push({ rotulo: paroquia.email, href: `mailto:${paroquia.email}` });
+// WhatsApp e ligação em links separados (o telefone da secretaria atende nos dois).
+const contato: LinkSimples[] = linksDeContatoDoRodape(paroquia);
 ---
 
 <BaseLayout {...base}>
@@ -57,8 +50,7 @@ if (paroquia.email) contato.push({ rotulo: paroquia.email, href: `mailto:${paroq
     slot="cabecalho"
     links={LINKS_PRINCIPAIS}
     caminhoAtual={Astro.url.pathname}
-    nome={paroquia.assinatura}
-    assinatura={paroquia.nome}
+    nome={paroquia.nome}
   />
 
   <slot />
@@ -66,7 +58,6 @@ if (paroquia.email) contato.push({ rotulo: paroquia.email, href: `mailto:${paroq
   <Fragment slot="rodape">
     <Footer
       nome={paroquia.nome}
-      assinatura={paroquia.assinatura}
       endereco={enderecoEmLinhas(paroquia)}
       mapaHref={mapaHref}
       navegacao={LINKS_PRINCIPAIS}

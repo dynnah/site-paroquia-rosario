@@ -5,8 +5,10 @@ import { partesData } from '../lib/formatacao';
 import type { LinkSimples } from '../lib/tipos';
 
 interface Props {
+  /** Nome ao lado do logo. */
   nome: string;
-  assinatura: string;
+  /** Linha de baixo, opcional. O rodapé do site mostra só o nome da paróquia. */
+  assinatura?: string;
   /** [rua, "bairro · cidade – UF"] (veja enderecoEmLinhas em lib/paroquia.ts). */
   endereco: [string, string];
   mapaHref: string;
@@ -42,8 +44,8 @@ const externo = (href: string) => /^https?:\/\//.test(href);
       <a class="marca__link" href="/">
         <Image src={logo} alt="" width={48} height={48} densities={[1, 2]} loading="lazy" />
         <span>
-          <span class="marca__nome">{assinatura}</span>
-          <span class="marca__sub">{nome}</span>
+          <span class="marca__nome">{nome}</span>
+          {assinatura && <span class="marca__sub">{assinatura}</span>}
         </span>
       </a>
       <address>
@@ -51,7 +53,13 @@ const externo = (href: string) => /^https?:\/\//.test(href);
         <br />
         {endereco[1]}
       </address>
-      <a class="como-chegar" href={mapaHref} rel="noopener noreferrer">
+      <a
+        class="como-chegar"
+        href={mapaHref}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Como chegar (abre em outra aba)"
+      >
         Como chegar
       </a>
     </div>
@@ -162,13 +170,16 @@ const externo = (href: string) => /^https?:\/\//.test(href);
     height: 48px;
   }
 
+  /* Igual ao cabeçalho: só o nome da paróquia, em letras normais, em até duas linhas */
   .marca__nome {
     display: block;
+    max-width: 10.5em;
     font-weight: 700;
-    font-size: 15px;
-    line-height: 20px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    font-size: 16px;
+    line-height: 19px;
+    text-wrap: balance;
+    /* Alinhamento óptico (igual ao cabeçalho): a tinta do texto ficava ~1,5px acima do centro da logo */
+    transform: translateY(0.1em);
   }
 
   .marca__sub {
@@ -203,16 +214,31 @@ const externo = (href: string) => /^https?:\/\//.test(href);
   .rodape a:not(.marca__link) {
     display: inline-flex;
     align-items: center;
+    /* 44px também na largura: "Início" e "Blog" têm só 37px e 34px de texto. O sublinhado segue o texto. */
+    min-width: var(--toque-min);
     min-height: var(--toque-min);
     color: var(--texto);
     font-size: 16px;
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 4px;
+    /* Mesmo sublinhado suave dos links de texto do site (global.css). */
+    text-decoration-line: underline;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 0.28em;
+    text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
   }
 
   .rodape a:not(.marca__link):hover {
     color: var(--mariano);
+    text-decoration-color: currentColor;
+    text-underline-offset: 0.4em;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .rodape a:not(.marca__link) {
+      transition:
+        color 0.2s ease,
+        text-decoration-color 0.2s ease,
+        text-underline-offset 0.2s ease;
+    }
   }
 
   .como-chegar {
