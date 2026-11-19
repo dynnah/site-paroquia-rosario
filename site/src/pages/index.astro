@@ -1,7 +1,7 @@
 ---
 /**
- * Início: o horário primeiro. Avisos ativos, hero com a próxima missa, resumo do
- * Evangelho de hoje, horários, próximos eventos, últimos posts, pastorais e doação.
+ * Início: o horário primeiro. Avisos ativos, hero com a próxima missa, horários,
+ * próximos eventos, últimos posts, pastorais e doação.
  */
 import Aviso from '../components/Aviso.astro';
 import CardEvento from '../components/CardEvento.astro';
@@ -11,33 +11,27 @@ import CardPost from '../components/CardPost.astro';
 import DivisorTerco from '../components/DivisorTerco.astro';
 import DoacaoPix from '../components/DoacaoPix.astro';
 import Hero from '../components/Hero.astro';
-import LiturgiaResumo from '../components/LiturgiaResumo.astro';
 import SecaoPagina from '../components/SecaoPagina.astro';
 import PaginaLayout from '../layouts/PaginaLayout.astro';
 import { propsCardPost } from '../lib/blog';
 import { propsCardEvento } from '../lib/eventos';
-import { dataISO } from '../lib/formatacao';
 import { proximaMissa } from '../lib/horarios';
-import { evangelhoDoDia, liturgiaDoDia } from '../lib/liturgia';
 import { dadosDaParoquia, urlMapa } from '../lib/paroquia';
 import { propsCardPastoral } from '../lib/pastorais';
 import { conteudo } from '../lib/sanity';
 import { jsonLdIgreja, urlAbsoluta } from '../lib/seo';
 
 const agora = new Date();
-const [config, horarios, avisos, eventos, blog, pastorais, liturgia] = await Promise.all([
+const [config, horarios, avisos, eventos, blog, pastorais] = await Promise.all([
   conteudo.configuracoes(),
   conteudo.horarios(),
   conteudo.avisosAtivos(),
   conteudo.eventosProximos(3),
   conteudo.posts('tudo', 1, 3),
   conteudo.pastorais(),
-  liturgiaDoDia(dataISO(agora)),
 ]);
 
 const paroquia = dadosDaParoquia(config);
-// Sem a API (ou sem Evangelho no dia, como na Vigília Pascal), o resumo simplesmente não aparece.
-const evangelho = evangelhoDoDia(liturgia);
 const missa = horarios?.missa.linhas ?? [];
 const confissao = horarios?.confissao.linhas ?? [];
 const adoracao = horarios?.adoracao.linhas ?? [];
@@ -50,10 +44,10 @@ const igreja = jsonLdIgreja(paroquia, {
   secretaria: horarios?.secretaria,
 });
 
-// TODO(paroquia): chave Pix oficial e nome do titular, no documento "Configurações" do Studio.
+// Chave Pix, titular e conta bancária ficam no documento "Configurações" do Studio.
 const pix =
   config?.pixChave && config.pixTitular
-    ? { chave: config.pixChave, titular: config.pixTitular }
+    ? { chave: config.pixChave, titular: config.pixTitular, conta: config.pixConta }
     : null;
 ---
 
@@ -82,12 +76,6 @@ const pix =
     acaoPrimaria={{ rotulo: 'Ver horários', href: '/horarios', icone: 'relogio' }}
     acaoSecundaria={{ rotulo: 'Como chegar', href: urlMapa(paroquia), icone: 'local' }}
   />
-
-  {evangelho && (
-    <div class="container resumo">
-      <LiturgiaResumo href="/liturgia#ev-hoje" referencia={evangelho.referencia} />
-    </div>
-  )}
 
   {(missa.length > 0 || confissao.length > 0 || adoracao.length > 0) && (
     <SecaoPagina
@@ -144,11 +132,11 @@ const pix =
 
   {pastorais.length > 0 && (
     <SecaoPagina
-      id="pastorais"
-      sobrelinha="Pastorais e movimentos"
+      id="comunidade"
+      sobrelinha="Nossa Comunidade"
       titulo="Há um lugar"
       destaque="para você"
-      acao={{ rotulo: 'Ver pastorais', href: '/pastorais' }}
+      acao={{ rotulo: 'Conhecer a comunidade', href: '/nossa-comunidade' }}
     >
       <div class="ros-grade">
         {pastorais.slice(0, 3).map((pastoral) => (
@@ -164,7 +152,7 @@ const pix =
         <DivisorTerco />
       </div>
       <section class="container doacao" aria-label="Dízimo e doações">
-        <DoacaoPix chave={pix.chave} titular={pix.titular} />
+        <DoacaoPix chave={pix.chave} titular={pix.titular} conta={pix.conta} />
       </section>
     </>
   )}
@@ -175,15 +163,6 @@ const pix =
     display: grid;
     gap: var(--espaco-3);
     padding-top: var(--espaco-4);
-  }
-
-  .resumo {
-    padding-top: var(--espaco-6);
-  }
-
-  /* o cartão não vira uma faixa de 1200px no desktop; o container segue alinhado ao resto */
-  .resumo :global(.ros-liturgia-resumo) {
-    max-width: var(--medida-texto);
   }
 
   .divisor {
