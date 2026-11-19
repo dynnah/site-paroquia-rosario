@@ -162,8 +162,15 @@ export function interpretarSanto(linha: string, id?: string): SantoDoFeed | null
 const NAO_E_SANTO =
   /^(sant[ií]ssim|sagrad|nossa senhora|nosso senhor|senhor\b|jesus\b|cristo\b|natal\b|epifania|batismo do senhor|pentecostes|domingo\b|corpo e sangue|todos os santos|fi[eé]is defuntos|santa maria\s*(,|$)|santo nome|santa cruz|santo sepulcro|apresenta[çc]|anuncia[çc]|visita[çc]|assun[çc]|imaculad|dedica[çc]|c[áa]tedra|convers[ãa]o|transfigura[çc]|exalta[çc])/i;
 
+/**
+ * Alguns itens são o santo "na dedicação das suas basílicas" (18/11: "São Pedro e São Paulo, na
+ * dedicação das suas basílicas"). É a festa da dedicação, não o santo do dia: o que vem depois
+ * da vírgula entra em `funcao`.
+ */
+const FESTA_DE_DEDICACAO = /\bdedica[çc]/i;
+
 export function ehSanto(santo: SantoDoFeed): boolean {
-  return !NAO_E_SANTO.test(santo.nome);
+  return !NAO_E_SANTO.test(santo.nome) && !FESTA_DE_DEDICACAO.test(santo.funcao ?? '');
 }
 
 const LINK_DE_SANTO = /<a\b[^>]*?[?&;]id=([0-9a-f-]{36})[^>]*>([\s\S]*?)<\/a>/gi;

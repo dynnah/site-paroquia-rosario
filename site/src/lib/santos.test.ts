@@ -96,6 +96,15 @@ test('ehSanto deixa de fora solenidades e festas do Senhor e de Nossa Senhora', 
   }
 });
 
+test('ehSanto deixa de fora a festa da dedicação das basílicas (feed de 18/11)', () => {
+  const dedicacao = interpretarSanto('São Pedro e São Paulo, na dedicação das suas basílicas');
+  assert.ok(dedicacao);
+  assert.equal(dedicacao.nome, 'São Pedro e São Paulo');
+  assert.equal(ehSanto(dedicacao), false);
+  // o mesmo santo, sem ser a dedicação, continua valendo
+  assert.equal(ehSanto({ nome: 'São Pedro', funcao: 'apóstolo' }), true);
+});
+
 // ── Biografia ────────────────────────────────────────────────────────────────────
 
 test('decodificar entende entidades nomeadas e numéricas', () => {
