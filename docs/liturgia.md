@@ -1,12 +1,17 @@
 # Liturgia do dia: de onde vem e o que o site publica
 
-Decisão da Fase 5. Resumo: o site lê o **nome da celebração, a cor litúrgica e as referências das leituras** da API aberta `liturgia-diaria` (v2), uma vez por dia, no build. O **texto** das leituras não é publicado: quem quiser lê-lo vai à Liturgia Diária da CNBB pelo botão "Ler na Liturgia Diária".
+Decisão da Fase 5, revisada depois. Resumo: o site lê duas fontes, uma vez por dia, no build.
+
+- **Leituras:** a API aberta `liturgia-diaria` (v2) dá o nome da celebração, a cor litúrgica, as referências e o **texto** (Lecionário da CNBB). O texto só é publicado com `LITURGIA_TEXTO_INTEGRAL=true`; com a flag desligada, só as referências e o link "Ler na Liturgia Diária".
+- **Santo do dia:** o feed do **Evangelizo.org** dá todos os santos do dia, com função, época e, na maioria, a biografia. Ver "Santo do dia" abaixo.
+
+**Estado atual:** a flag está **ligada só no `site/.env` local** (fora do git). No ar, ela fica desligada até a CNBB autorizar o texto (pendência da Fase 8, ver "Ligar o texto integral").
 
 ## O que aparece no site
 
 | Onde | O quê |
 |---|---|
-| `/liturgia` | Leituras do dia: semana do tempo litúrgico, dia, cor, referências (1ª leitura, salmo, 2ª leitura, Evangelho). Santo do dia (Sanity) e missa de hoje ao lado. |
+| `/liturgia` | Leituras do dia: semana do tempo litúrgico, dia, cor, referências e, com a flag ligada, o texto (1ª leitura, salmo, 2ª leitura, Evangelho). Santo do dia e missa de hoje ao lado. |
 | `/liturgia/ontem`, `/liturgia/amanha` | O mesmo para o dia anterior e o seguinte, com a navegação "‹ Ontem · Amanhã ›". |
 | Início | Resumo de uma linha: "Evangelho de hoje · Lc 19,11-28". |
 
@@ -31,6 +36,10 @@ Só a `liturgia-diaria` foi testada de verdade (chamadas reais, 46 datas do ano 
 | AELF | Liturgia das Horas em francês. |
 | Catholic Readings API, Evangelium | A descrição não indica português. Não avaliadas. |
 | Site da CNBB | É o destino do link oficial. Não avaliei se tem API. |
+| **Evangelizo.org** (feed) | **Adotado para o santo do dia** (ver abaixo). Também traz as leituras, mas na tradução de Portugal (por exemplo "Anciãos", «aspas», "David"), diferente da que se ouve na missa no Brasil; por isso as leituras ficam na `liturgia-diaria`. Serve de alternativa para o texto se a CNBB não autorizar. |
+| Wikipédia (API REST) | Licença clara (CC BY-SA), mas achar o santo certo pelo nome da celebração é adivinhação e erra com santos de nome comum. O Evangelizo já entrega a lista pronta. |
+| Wikidata (data da festa) | Datas de festa desatualizadas (em 19/11 listou Santa Isabel da Hungria, que hoje é 17/11, e não o santo do dia). |
+| `LiturgicalCalendarAPI` (litcal) | Respondeu 400 ao pedir o calendário do Brasil em português; só dá nomes, sem biografia. Não insisti. |
 
 ## Riscos (e o que o código faz a respeito)
 
@@ -60,9 +69,29 @@ O tempo litúrgico só é preenchido quando o nome diz a palavra ("Advento", "Qu
 - **Domingo de Ramos:** o Evangelho aparece como `Mc 11,1-10 ou Mc 14,1-15,47 ou Mc 15,1-39`; a primeira é a da procissão. Os complementos que explicavam isso são removidos.
 - **Dado da fonte:** em 13/12/2026 o salmo vem como "Sl Lc 1" (o Magnificat). O site repete o que a API entrega.
 
+## Santo do dia: o feed do Evangelizo
+
+`site/src/lib/santos.ts`, testado em `santos.test.ts` e contra o feed ao vivo (14 dias seguidos).
+
+- **Endpoint:** `GET https://feed.evangelizo.org/v2/reader.php?date=AAAAMMDD&type=saint&lang=PT`. A documentação do feed (a página de erro dele lista os tipos) diz que serve para "exibir a leitura diária, o santo do dia etc." em outros sites. Só aceita datas até 30 dias à frente, o que basta para ontem, hoje e amanhã.
+- **O que devolve:** os santos do dia em ordem de importância ("S. Roque Gonzales e comp., mártires, +1628"). Alguns têm link para uma página de biografia (`display_saint.php?id=…`), que o adaptador lê (2 a 3 frases, sem o que está entre parênteses).
+- **O que o site mostra:** o primeiro santo vira o card "Santo do dia" (nome, função, época, biografia); os outros entram em "Também hoje"; a linha "Fonte: Evangelizo.org" leva à biografia completa. Sem imagem de santo.
+- **Santo do Studio vence:** se houver um `santo` do Sanity para o dia (`MM-DD`), o card é o dele e o feed nem é consultado. É assim que a paróquia corrige ou escreve a bio no tom da casa (santos franciscanos, por exemplo).
+- **Filtros:** solenidades e festas do Senhor e de Nossa Senhora ("Santíssimo Rei do Universo", "Santa Maria, na memória da sua Apresentação") não são "santo do dia"; o card passa para o próximo da lista, ou some se não houver.
+- **Falha:** 3 tentativas, timeout de 10 s; sem resposta, o card não aparece e o build segue. Biografia que falha deixa o card só com nome e dados.
+
+### Ressalvas
+
+1. **Termos de uso:** não achei os termos escritos do Evangelizo (o site só mostra "© Evangelizo.org 2001-2022"). O feed é documentado como feito para exibir leitura e santo do dia em outros sites, mas vale pedir confirmação por e-mail ao Evangelizo antes do lançamento (Fase 10).
+2. **Português de Portugal:** meses com maiúscula ("2 de Maio"), "Vietname", e grafias como "Gonzales" (a celebração da liturgia diz "González"). Pode aparecer diferença entre o título das leituras e o nome do santo; o santo do Studio corrige.
+3. **Santo errado no dia:** o feed segue o calendário romano geral em português; memórias próprias do Brasil podem não ser a primeira da lista. Quando isso incomodar, cadastre o santo no Studio.
+4. **Biografias vêm do Evangelizo** (em boa parte de textos da Wikipédia, CC BY-SA); por isso o crédito e o link ficam sempre no card.
+
 ## Ligar o texto integral (só com autorização)
 
-1. Peça autorização à CNBB ou à Arquidiocese para publicar a tradução das leituras.
+**Estado:** ligado no `site/.env` local para ver o site completo; desligado no ar. Fica como pendência da Fase 8 definir `LITURGIA_TEXTO_INTEGRAL` no Cloudflare só depois da autorização.
+
+1. Peça autorização à CNBB ou à Arquidiocese para publicar a tradução das leituras. Se a resposta for não, a alternativa é o texto do Evangelizo (tradução de Portugal, feed pensado para sites), que exigiria um segundo adaptador para as leituras.
 2. Com a resposta em mãos, defina `LITURGIA_TEXTO_INTEGRAL=true` (em `site/.env` para testar; em *Settings → Environment variables* no Cloudflare Pages para valer no ar).
 3. Refaça o build. As abas passam a mostrar o texto (sem números de versículo, com o refrão do salmo na frente) e a linha "Texto: Liturgia Diária, CNBB" aparece no fim do card. Ajuste o crédito ao que a autorização pedir.
 
