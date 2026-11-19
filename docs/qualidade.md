@@ -22,7 +22,7 @@ O que o Lighthouse ainda aponta é só efeito do servidor de teste local (sem HT
 - **Título e descrição por página.** O `BaseLayout` monta `<title>` ("Página · Paróquia Nossa Senhora do Rosário"; a página inicial usa o título inteiro, sem sufixo) e `<meta name="description">`. A descrição é cortada em até **160 caracteres, sempre numa palavra inteira** (`descricaoCurta` em `lib/seo.ts`), então um resumo longo de post não vira texto truncado no Google. Sem descrição, vale a padrão do site.
 - **Canônico e Open Graph.** Cada página tem `<link rel="canonical">`, `og:title`, `og:description`, `og:url`, `og:image` (1200 × 630), `og:locale pt_BR`, `og:site_name` e `twitter:card summary_large_image`. Posts do blog usam `og:type article`. A 404 sai com `noindex` e sem canônico.
 - **Imagem padrão:** `site/public/og-padrao.png`, o logo da fachada (sem recolorir) sobre o creme do design system. Gerada por `npm run og`. **Quando a paróquia mandar uma foto boa da fachada**, basta substituir o arquivo (mesmo nome, 1200 × 630). Cada página pode pedir outra imagem com a prop `imagem`.
-- **`sitemap-index.xml`** (`@astrojs/sitemap`) com 29 endereços: fora ficam a 404 e `/liturgia/ontem` e `/liturgia/amanha` (mudam de conteúdo todo dia; a página `/liturgia` é a que vale).
+- **`sitemap-index.xml`** (`@astrojs/sitemap`) com 24 endereços: fora ficam a 404 e `/liturgia/ontem` e `/liturgia/amanha` (mudam de conteúdo todo dia; a página `/liturgia` é a que vale).
 - **`robots.txt`** (`pages/robots.txt.ts`): libera tudo e aponta para o sitemap.
 - **`SITE_URL`:** canônico, Open Graph, sitemap e robots precisam do endereço final. Ele vem da variável `SITE_URL` (em `site/.env` ou no Cloudflare Pages). **Sem ela o build usa `http://localhost:4321` e avisa no terminal.** Pendência `TODO(paroquia)`: definir quando o domínio `.org.br` existir (Fase 8).
 
@@ -38,7 +38,7 @@ Só descrevem o que o site já publica; nada é inventado. Tudo passa por `seria
 
 Auditoria automática em todas as páginas, nas três larguras (`npm run auditar`). Achou e corrigi:
 
-- **Ordem dos títulos** (`heading-order`) em Horários, Agenda, Pastorais, Sacramentos, Blog (as quatro listas) e Contribua: o card do design system tem título `h3`, e ele vinha logo depois do `h1`. Cada uma ganhou um `h2` só para leitor de tela (`.sr-only`), sem mudar nada no visual nem no design system.
+- **Ordem dos títulos** (`heading-order`) em Horários, Agenda, Blog (as quatro listas) e Contribua (Nossa Comunidade tem um `h2` visível por seção): o card do design system tem título `h3`, e ele vinha logo depois do `h1`. Cada uma ganhou um `h2` só para leitor de tela (`.sr-only`), sem mudar nada no visual nem no design system.
 - **Botão de vídeo** (`label-content-name-mismatch`): o nome acessível era "Assistir ao vídeo: título" e o texto visível era a duração. Agora o nome inclui "duração 6:40".
 
 Conferido e já correto:
