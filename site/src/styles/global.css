@@ -262,6 +262,31 @@ body {
   }
 }
 
+/* Computador: o ícone da igreja, o menu e o botão Horários formam um grupo só, centralizado na
+   janela. O nome da paróquia sai da vista, mas continua no link do logo para leitores de tela.
+   Abaixo de 960px o menu vira o botão da gaveta e o nome aparece ao lado do logo. */
+@container (min-width: 960px) {
+  .ros-header__in {
+    justify-content: center;
+    gap: var(--espaco-8);
+  }
+
+  .ros-header__in > .ros-marca {
+    margin-right: 0;
+    /* sem o texto ao lado, não sobra espaço vazio no link do logo */
+    gap: 0;
+  }
+
+  .ros-header .ros-marca__nome {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
+
 /* Alvos de toque de uma palavra: 44px também na largura. O design system só garante a altura, e
    "Menu" (só o ícone, no celular) e "Tudo" ficavam com 41px e 36px de largura. O texto não muda de
    lugar: o botão e o filtro centralizam o conteúdo, e o marcador dourado do filtro cobre os 44px. */
