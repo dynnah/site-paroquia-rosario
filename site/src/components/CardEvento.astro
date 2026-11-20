@@ -1,5 +1,5 @@
 ---
-import { diaEMes } from '../lib/formatacao';
+import { diaEMes, partesData } from '../lib/formatacao';
 
 interface Props {
   href: string;
@@ -21,6 +21,8 @@ interface Props {
 
 const { href, data, sobrelinha, titulo, destaque, meta, variante = 'padrao' } = Astro.props;
 const { dia, mes } = diaEMes(data);
+// O ano evita dúvida na lista: sem ele, "dez" seguido de "mar" parece fora de ordem.
+const { ano } = partesData(data);
 ---
 
 <a class="ros-evento" href={href}>
@@ -37,6 +39,7 @@ const { dia, mes } = diaEMes(data);
     >
       <b>{dia}</b>
       <span>{mes}</span>
+      <span>{ano}</span>
     </div>
     <div>
       <p class="ros-sobrelinha">{sobrelinha}</p>
