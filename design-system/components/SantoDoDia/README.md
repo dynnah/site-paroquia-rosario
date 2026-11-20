@@ -1,9 +1,9 @@
-# Santo do dia
+# Saint of the day (`SantoDoDia`)
 
-Card só de texto com o santo ou a santa do dia: nome, grau da celebração e uma biografia curta. Sem imagem, sem ícone.
+Text-only card with the saint of the day: name, rank of the celebration and a short biography. No image, no icon (no saint pictures downloaded from the internet).
 
-- **Ordem:** rótulo "Santo do dia" em `texto-suave` → nome em serifa (sobrenome ou título em itálico) → uma linha de metadados → bio → link "Ler a história".
-- **Metadados:** grau (Memória, Festa, Solenidade) · família · datas de vida, separados por "·". A família é o único toque de cor: `terracota` para santos franciscanos (São Francisco, Santa Clara, Santo Antônio, Santa Isabel da Hungria); com `ros-santo--mariano`, `mariano` para Nossa Senhora. Os demais ficam sem cor.
-- **Bio:** 2 ou 3 frases, escritas pela paróquia, no máximo `medida-texto`. A história completa fica numa página própria.
-- Mesmo visual do card de liturgia (fundo `fundo-elevado`, borda `linha`, sem sombra), para os dois conviverem lado a lado.
-- Em dia sem memória obrigatória, mostre o santo do martirológio do dia.
+- **Order:** "Santo do dia" label in `texto-suave` → serif name (surname or title in italic) → one metadata line → bio → "Ler a história" link.
+- **Metadata:** rank (Memória, Festa, Solenidade) · family · life dates, separated by "·". The family is the only touch of colour: `terracota` for Franciscan saints (St Francis, St Clare, St Anthony, St Elizabeth of Hungary); with `ros-santo--mariano`, `mariano` for Our Lady. The others stay uncoloured. Dates use `ros-santo__datas` so they never break across lines.
+- **Bio:** 2 or 3 sentences written by the parish, at most `medida-texto` wide. The full story lives on its own page.
+- **Automatic feed:** when the Studio has no saint for the day, the card shows the feed's saint, with "Também hoje" (`ros-santo__outros`) listing the other saints and a credit line (`ros-santo__fonte`, the same line as the readings card). A saint written in the Studio always replaces the feed.
+- Same look as the liturgy card (`fundo-elevado` background, `linha` border, no shadow), so the two sit side by side.

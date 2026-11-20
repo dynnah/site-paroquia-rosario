@@ -1,10 +1,11 @@
-# Página do post
+# Post page (`PaginaPost`)
 
-A leitura de uma coluna, em uma faixa central de no máximo 720px, com o vídeo do YouTube no topo quando houver.
+Reading a column, in a central strip at most 720px wide, with the YouTube video on top when there is one. The same layout serves plain text pages (Nossa história, Contribua), without author or media.
 
-- **Ordem:** voltar ao Blog → coluna → título em serifa (32px no celular, 44px no desktop) → autor em negrito · data → vídeo ou foto → texto → rodapé com o autor.
-- **Vídeo:** `ros-video ros-video--grande`, a mesma fachada leve do card (miniatura + play; o player carrega ao clicar), com uma legenda pequena embaixo.
-- **Texto:** 19/32px, parágrafos com espaço, intertítulos em serifa e citação em serifa itálica `mariano`, sem caixa nem barra lateral.
-- **Rodapé:** nome e uma linha sobre o autor (pároco, coordenadora da juventude etc.). Sem foto.
-- Posts só de vídeo podem ter apenas uma ou duas linhas de texto. Posts de texto podem ter uma foto no lugar do vídeo, ou nada.
-- Os nomes dos exemplos (Frei Antônio, Ana Clara) são fictícios.
+- **Order:** back to the Blog → column → serif title (32px on the phone, 44px on desktop) → author in bold · date → video or photo → text → footer with the author.
+- **Video:** `ros-video ros-video--grande`, the same light facade as the card (thumbnail + play; the player loads on click), with a small caption below.
+- **Text:** 19/32px, paragraphs with space, `h2` and `h3` subtitles in serif, lists with room between items, and a quote in italic serif `mariano`, no box or side bar. A reading block right after a subtitle can use `ros-artigo__texto--compacto` to skip the opening gap; `ros-artigo__subtitulo` is a standalone subtitle.
+- **Summary** (`ros-artigo__resumo`): a lead paragraph under the title; **empty state** (`ros-artigo__vazio`): wrapper for the "being prepared" message.
+- **Footer:** name and one line about the author (parish priest, youth coordinator…). No photo.
+- Video-only posts may have just a line or two of text. Text posts may have a photo in place of the video, or nothing.
+- The names in the examples (Frei Antônio, Ana Clara) are fictitious.

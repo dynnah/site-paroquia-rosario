@@ -1,7 +1,7 @@
-# Selo litúrgico
+# Liturgical badge (`SeloLiturgico`)
 
-Mostra a cor e o tempo litúrgico do dia, no hero ou no card de horários.
+Shows the colour and season of the day, in the hero or in the schedule card.
 
-- O texto diz o tempo, a bolinha mostra a cor. A cor nunca aparece sozinha, sem o nome.
-- Os tokens `liturgico-*` só existem para este selo. Não use em botões ou fundos.
-- Branco leva contorno `ouro` para aparecer sobre o creme.
+- The text names the season, the dot shows the colour. The colour never appears alone, without the name.
+- The `liturgico-*` tokens exist only for this badge. Do not use them on buttons or backgrounds.
+- White gets a `ouro` outline so it shows on cream.

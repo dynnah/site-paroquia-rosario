@@ -1,9 +1,11 @@
-# Cabeçalho
+# Header (`Cabecalho`)
 
-Barra do topo com logo, assinatura, menu e o botão "Horários", que fica visível em qualquer largura.
+Top bar with the logo, the parish name, the menu and the "Horários" button, which stays visible at every width.
 
-- Abaixo de 960px de largura do contêiner, os links somem e aparece o botão **Menu**, que abre uma gaveta em tela cheia com os mesmos links em `subtitulo`.
-- O subtítulo "Paróquia Nossa Senhora do Rosário" aparece a partir de 520px.
-- Página atual: `aria-current="page"` mostra o fundo `fundo-afundado` e um filete `ouro` embaixo.
-- Em telas de celular, o cabeçalho pode ser fixo (`position: sticky; top: 0`).
-- Quem usa fornece: o logo (`assets/Logos/logo-fachada-transparente.png`), os links e o JavaScript da gaveta (alternar `aria-expanded`).
+- **Phone (< 960px of container width):** logo + parish name, the "Horários" button and a **Menu** button that opens the drawer (see `Gaveta`). The name takes at most two lines (three on the narrowest phones). Below 520px the gap tightens to `espaco-2`, so the 44px Menu button does not cost the name a line.
+- **Very narrow phone (≤ 354px):** "Horários" shows only the clock; the text stays for screen readers (`.ros-header__horarios`). The phone bar already spells it out.
+- **Desktop (≥ 960px):** the logo icon, the menu links and "Horários" form **one group centred in the window**. The parish name leaves the screen but stays in the logo link for screen readers.
+- Only the parish name is shown, in normal letters (not uppercase). `ros-marca__sub` is an optional second line, hidden on desktop.
+- Current page: `aria-current="page"` gives the `fundo-afundado` background and a gold rule underneath.
+- Every target is 44px: the logo link, the menu links, and the Menu button (also 44px wide).
+- `ros-header--fixo` makes it sticky at the top. Whoever uses it provides the logo (`assets/Logos/logo-fachada-transparente.png`), the links and the drawer's JavaScript.

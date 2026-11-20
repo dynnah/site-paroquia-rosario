@@ -1,11 +1,11 @@
-# Card de post
+# Post card (`CardPost`)
 
-Card de uma coluna do blog, de texto ou de vídeo, para a listagem e para a página inicial.
+Card for a blog column, text or video, for the list and for the home page.
 
-- **Coluna** (a primeira linha, em negrito pequeno) diz quem escreve: `ros-coluna--paroco` em `terracota` ("Palavra do Pároco"), `ros-coluna--juventude` em `mariano` ("Juventude"). Novas colunas, como Catequese ou Pastoral Social, usam `ros-coluna` sem cor.
-- **Texto:** coluna → título em serifa → resumo de uma ou duas frases → autor · data · tempo de leitura.
-- **Vídeo:** a miniatura do YouTube em 16:9 no topo, com um botão de play claro e a duração; embaixo, coluna → título → autor · data · "vídeo". O resumo é opcional.
-- O card inteiro é um link. Sem imagem de autor, sem ícones de categoria.
-- Em grade `ros-blog__grade`: 1 coluna no celular, 2 no tablet, 3 no desktop.
+- **Column** (the first line, small bold) says who writes: `ros-coluna--paroco` in `terracota` ("Palavra do Pároco"), `ros-coluna--juventude` in `mariano` ("Juventude"). New columns, such as Catequese or Pastoral Social, use `ros-coluna` with no colour.
+- **Text:** column → serif title → one or two sentences of summary → author · date · reading time.
+- **Video:** the 16:9 YouTube thumbnail on top, with a light play button and the duration; below, column → title → author · date · "vídeo". The summary is optional.
+- The whole card is a link. No author picture, no category icons.
+- In a `ros-blog__grade`: 1 column on the phone, 2 on the tablet, 3 on desktop.
 
-**Vídeo do YouTube (`ros-video`).** Mostre só a miniatura (`https://i.ytimg.com/vi/<ID>/hqdefault.jpg`) e carregue o player ao clicar, trocando o bloco por um `<iframe>` de `https://www.youtube-nocookie.com/embed/<ID>?autoplay=1`. Assim a página abre rápido no celular e o YouTube não rastreia quem não clicou. O cadastro do post só precisa do link do vídeo; o ID e a miniatura saem dele.
+**YouTube video (`ros-video`).** Show only the thumbnail (`https://i.ytimg.com/vi/<ID>/hqdefault.jpg`) and load the player on click, swapping the block for an `<iframe>` with the `ros-video__player` class (`ros-video__player--grande` on the post page). Without JavaScript the thumbnail is a link to YouTube. The page opens fast on the phone and YouTube does not track people who did not click. The post only needs the video link; the ID and the thumbnail come from it.

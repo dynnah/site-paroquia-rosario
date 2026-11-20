@@ -1,8 +1,8 @@
-# Aviso
+# Notice (`Aviso`)
 
-Faixa de comunicado no topo da página ou entre seções.
+Announcement strip at the top of the page or between sections.
 
-- **Informativo** (padrão, `mariano-suave`): avisos da semana, inscrições abertas.
-- **Festa** (`--festa`, fundo `ouro-suave` com estrela dourada): novena, solenidade, festa da padroeira. No máximo um por vez.
-- **Mudança** (`--mudanca`, borda `alerta`): horário cancelado ou alterado. Use `role="alert"` e tire do ar quando a data passar.
-- Título em negrito + uma frase. Nada de parágrafos longos.
+- **Informative** (default, `mariano-suave`): the week's notices, open enrolments.
+- **Feast** (`--festa`, `ouro-suave` background with a gold star): novena, solemnity, patron feast. At most one at a time.
+- **Change** (`--mudanca`, `alerta` border): a cancelled or changed time. Use `role="alert"` and take it down when the date passes.
+- Bold title + one sentence. No long paragraphs.

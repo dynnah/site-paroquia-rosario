@@ -1,8 +1,9 @@
-# Evento
+# Event (`Evento`)
 
-Card de agenda com o bloco de data em arco, sobrelinha, título em serifa e local.
+Agenda card with the arched date block, eyebrow, serif title and place.
 
-- Bloco de data em tom suave com o número colorido: `mariano-suave` (padrão), `ros-data--festa` (`ouro-suave`) para solenidades e a festa da padroeira, `ros-data--franciscano` (`terracota-suave`) para datas franciscanas.
-- Sobrelinha: dia da semana · categoria ou horário, como "Quarta-feira · Festa da padroeira".
-- Título em serifa; o nome próprio do santo ou da festa pode ir em itálico (`<em>`).
-- O card inteiro é um link. Mostre os 3 a 6 próximos eventos na página inicial, numa grade `ros-grade`.
+- **Date block tones** (soft fill, coloured number): **neutral by default** (`fundo-afundado` + `acao`); `ros-data--festa` (`ouro-suave`) for feasts and solemnities; `ros-data--franciscano` (`terracota-suave`) for the friars' dates; `ros-data--mariano` (`mariano-suave`, blue) **only** for Our Lady and the patron feast, so blue keeps its meaning.
+- Eyebrow: weekday · category or time, as in "Quarta-feira · Festa da padroeira".
+- Serif title; the proper name of the saint or feast may go in italic (`<em>`).
+- The whole card is a link. Show the next 3 to 6 events on the home page, in a `ros-grade`.
+- **Equal height:** in a `ros-grade`, all rows take the height of the tallest card, so the cards line up.

@@ -1,6 +1,6 @@
-# Divisor terço
+# Rosary divider (`DivisorTerco`)
 
-Fileira de contas em `ouro` entre grandes seções: cinco pequenas, uma grande, cinco pequenas.
+A row of `ouro` beads between large sections: five small, one large, five small.
 
-- Entre seções da página, nunca dentro de cards. No máximo dois por página.
-- `role="separator"`: é decorativo, leitores de tela só anunciam a separação.
+- Between sections of the page, never inside cards. At most two per page.
+- `role="separator"`: it is decorative, screen readers only announce the separation.

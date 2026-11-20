@@ -1,9 +1,9 @@
-# Doação Pix
+# Pix donation (`DoacaoPix`)
 
-Bloco de dízimo e doação com a chave Pix e o botão de copiar.
+Tithe and donation block with the Pix key and the copy button.
 
-- Fundo `terracota-suave`: o vínculo é com a história franciscana da construção (a "campanha do centavo").
-- Mostre sempre o titular da conta, para quem doa conferir antes de pagar.
-- O botão "Copiar chave" troca o texto para "Chave copiada" por 3 segundos. Quem usa fornece o JavaScript.
-- No celular, o botão fica embaixo da chave; a partir de 560px, ao lado.
-- A chave do exemplo é fictícia: troque pela chave oficial da paróquia.
+- `terracota-suave` background: the link is with the Franciscan history of the building (the "campanha do centavo").
+- Always show the **account holder**, so the donor can check before paying. Below it, an optional second line with the **bank account** (bank, agency, account), separated with `<br>`.
+- The "Copiar chave" button changes its text to "Chave copiada" for 3 seconds. Whoever uses it provides the JavaScript.
+- On the phone the button sits under the key; from 560px, beside it.
+- The sample key and account are fictitious: replace them with the parish's official data (kept in the Studio, never in the code).
