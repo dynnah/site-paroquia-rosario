@@ -8,6 +8,9 @@
  * No terceiro parágrafo, as aspas de “Deus sabe onde e de quem” só fechavam. A Dynnah confirmou em
  * 20/11/2026 que a citação começa em "Deus", e a abertura foi posta ali.
  *
+ * O texto vem da Wikipédia (licença CC BY-SA 4.0), que exige crédito e o link da licença: por isso
+ * a página termina com a linha de `CREDITO_HISTORIA`. Não tire essa linha sem trocar a fonte.
+ *
  * O ID é fixo: importar de novo com `--replace` atualiza o mesmo documento.
  */
 import type { DocumentoSeed } from './exemplos.ts';
@@ -22,6 +25,19 @@ export const PARAGRAFOS_HISTORIA = [
   'Eles ajudaram Frei Martinho na construção da nova igreja Frei Amadeu Laumann e Frei José Jost, carpinteiro, entre outros. Em 1º de novembro de 1928, pouco mais de um ano após a bênção da primeira pedra, serviços divinos já podiam ser celebrados em uma parte improvisada da nova construção. Em 2 de fevereiro de 1929, os frades foram transferidos da Igreja de São Pedro González para Nossa Senhora do Rosário. Antes, a Ordem Franciscana havia alugado uma casa onde ficavam durante o dia.',
 ];
 
+export const ARTIGO_WIKIPEDIA =
+  'https://en.wikipedia.org/wiki/Church_and_Convent_of_Our_Lady_of_the_Rosary_(Jo%C3%A3o_Pessoa)';
+export const LICENCA_CC_BY_SA = 'https://creativecommons.org/licenses/by-sa/4.0/deed.pt-br';
+
+/** Linha de crédito no fim da página: cada trecho com `href` vira um link. */
+export const CREDITO_HISTORIA = [
+  { texto: 'Texto traduzido e adaptado do artigo “' },
+  { texto: 'Church and Convent of Our Lady of the Rosary (João Pessoa)', href: ARTIGO_WIKIPEDIA },
+  { texto: '”, da Wikipédia, sob a licença ' },
+  { texto: 'CC BY-SA 4.0', href: LICENCA_CC_BY_SA },
+  { texto: '.' },
+];
+
 /** Chaves fixas (`h1`, `h2`…): importar de novo não troca as chaves dos blocos. */
 function bloco(texto: string, indice: number) {
   return {
@@ -33,6 +49,22 @@ function bloco(texto: string, indice: number) {
   };
 }
 
+function blocoCredito() {
+  const ligacoes = CREDITO_HISTORIA.filter((t) => 'href' in t);
+  return {
+    _type: 'block',
+    _key: 'hc',
+    style: 'normal',
+    markDefs: ligacoes.map((t, i) => ({ _type: 'link', _key: `hl${i + 1}`, href: t.href })),
+    children: CREDITO_HISTORIA.map((t, i) => ({
+      _type: 'span',
+      _key: `hc${i + 1}`,
+      text: t.texto,
+      marks: 'href' in t ? [`hl${ligacoes.indexOf(t) + 1}`] : [],
+    })),
+  };
+}
+
 export function gerarHistoria(): DocumentoSeed[] {
   return [
     {
@@ -40,7 +72,7 @@ export function gerarHistoria(): DocumentoSeed[] {
       _type: 'pagina',
       titulo: 'Nossa história',
       slug: { _type: 'slug', current: 'nossa-historia' },
-      corpo: PARAGRAFOS_HISTORIA.map(bloco),
+      corpo: [...PARAGRAFOS_HISTORIA.map(bloco), blocoCredito()],
     },
   ];
 }
