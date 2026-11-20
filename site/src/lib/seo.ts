@@ -57,6 +57,23 @@ export function urlAbsoluta(caminho: string, site: URL | string | undefined): st
 }
 
 /**
+ * Enquanto o site está em teste (endereço `*.pages.dev`, antes da aprovação final), a variável
+ * `BLOQUEAR_BUSCADORES=true` pede ao Google e aos outros buscadores que não listem nada. Sem a
+ * variável, ou com qualquer outro valor, o site fica aberto aos buscadores. Para lançar: apague a
+ * variável no Cloudflare Pages e refaça o build.
+ */
+export function bloquearBuscadores(valor: string | undefined): boolean {
+  return valor?.trim().toLowerCase() === 'true';
+}
+
+/** Conteúdo do `robots.txt`: tudo liberado e com o sitemap, ou nada liberado em modo de teste. */
+export function textoRobots(site: URL | string | undefined, bloquear: boolean): string {
+  if (bloquear) return 'User-agent: *\nDisallow: /\n';
+  const sitemap = urlAbsoluta('sitemap-index.xml', site);
+  return `User-agent: *\nAllow: /\n\nSitemap: ${sitemap}\n`;
+}
+
+/**
  * JSON para dentro de um `<script type="application/ld+json">`. Troca `<`, `>`, `&` e
  * os separadores de linha do Unicode por escapes, para que um texto vindo do Studio
  * nunca consiga fechar a tag `<script>` nem quebrar o JavaScript.

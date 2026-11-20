@@ -3,6 +3,7 @@ import { test } from 'node:test';
 import { PAROQUIA } from './paroquia.ts';
 import type { GrupoHorarios } from './sanity.tipos.ts';
 import {
+  bloquearBuscadores,
   descricaoCurta,
   horarioDeFuncionamento,
   jsonLdEvento,
@@ -10,6 +11,7 @@ import {
   LIMITE_DESCRICAO,
   serializarJsonLd,
   telefoneInternacional,
+  textoRobots,
   urlAbsoluta,
 } from './seo.ts';
 
@@ -198,4 +200,25 @@ test('jsonLdEvento sem horário: só a data, sem inventar uma hora', () => {
   );
   assert.equal(ld.startDate, '2027-06-01');
   assert.equal(ld.endDate, '2027-06-13');
+});
+
+// ── site em teste (BLOQUEAR_BUSCADORES) ──────────────────────────────────────────
+
+test('bloquearBuscadores só liga com "true" (sem diferenciar maiúsculas nem espaços)', () => {
+  for (const ligado of ['true', 'TRUE', ' true ']) assert.equal(bloquearBuscadores(ligado), true);
+  for (const desligado of [undefined, '', 'false', '1', 'sim', 'truee'])
+    assert.equal(bloquearBuscadores(desligado), false, String(desligado));
+});
+
+test('textoRobots libera tudo e indica o sitemap quando o site está aberto', () => {
+  assert.equal(
+    textoRobots(new URL('https://exemplo.org.br'), false),
+    'User-agent: *\nAllow: /\n\nSitemap: https://exemplo.org.br/sitemap-index.xml\n',
+  );
+});
+
+test('textoRobots em modo de teste proíbe tudo e não indica sitemap', () => {
+  const texto = textoRobots(new URL('https://paroquia.pages.dev'), true);
+  assert.equal(texto, 'User-agent: *\nDisallow: /\n');
+  assert.ok(!texto.includes('Sitemap'));
 });

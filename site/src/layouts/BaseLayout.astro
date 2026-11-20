@@ -2,7 +2,7 @@
 import '../styles/tokens.css';
 import '../styles/bundle.css';
 import '../styles/global.css';
-import { descricaoCurta, serializarJsonLd, urlAbsoluta } from '../lib/seo';
+import { bloquearBuscadores, descricaoCurta, serializarJsonLd, urlAbsoluta } from '../lib/seo';
 import type { PropsSeo } from '../lib/seo';
 
 interface Props extends PropsSeo {
@@ -25,6 +25,10 @@ const {
   tipoOg = 'website',
   imagem = '/og-padrao.png',
 } = Astro.props;
+
+// Site em teste (BLOQUEAR_BUSCADORES=true): nenhuma página pede para ser listada nos buscadores.
+const emTeste = bloquearBuscadores(import.meta.env.BLOQUEAR_BUSCADORES);
+const naoListar = noindex || emTeste;
 
 const tituloCompleto = semSufixo ? title : `${title} · ${NOME_PAROQUIA}`;
 const descricao = descricaoCurta(description) ?? DESCRICAO_PADRAO;
@@ -54,7 +58,11 @@ const FONTES =
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{tituloCompleto}</title>
     <meta name="description" content={descricao} />
-    {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonico} />}
+    {naoListar ? (
+      <meta name="robots" content={emTeste ? 'noindex, nofollow' : 'noindex'} />
+    ) : (
+      <link rel="canonical" href={canonico} />
+    )}
 
     <meta property="og:type" content={tipoOg} />
     <meta property="og:site_name" content={NOME_PAROQUIA} />
