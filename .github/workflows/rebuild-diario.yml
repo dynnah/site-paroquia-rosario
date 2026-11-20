@@ -1,0 +1,40 @@
+# Rebuild diário do site.
+#
+# O site é estático: a liturgia do dia e o "Próxima missa" são gerados no build. Todo dia, logo
+# depois da meia-noite em São Paulo, este workflow chama o Deploy Hook do Cloudflare Pages, que
+# refaz o build e publica o site com a liturgia nova (ver docs/deploy.md).
+#
+# Precisa de um secret no GitHub: CLOUDFLARE_DEPLOY_HOOK_URL.
+name: Rebuild diário
+
+on:
+  schedule:
+    # 00h05 em São Paulo (UTC-3, sem horário de verão) = 03h05 UTC.
+    - cron: '5 3 * * *'
+  # Permite rodar na mão: Actions → Rebuild diário → Run workflow.
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: rebuild-diario
+  cancel-in-progress: false
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Chamar o Deploy Hook do Cloudflare Pages
+        env:
+          DEPLOY_HOOK_URL: ${{ secrets.CLOUDFLARE_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$DEPLOY_HOOK_URL" ]; then
+            echo "::error::Falta o secret CLOUDFLARE_DEPLOY_HOOK_URL (veja docs/deploy.md)."
+            exit 1
+          fi
+          # A URL do hook é um segredo: não use `set -x` nem imprima a variável.
+          curl --fail --silent --show-error \
+            --retry 3 --retry-delay 15 --retry-all-errors \
+            --request POST "$DEPLOY_HOOK_URL" > /dev/null
+          echo "Build pedido ao Cloudflare Pages."

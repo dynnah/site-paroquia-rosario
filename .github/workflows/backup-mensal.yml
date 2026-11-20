@@ -1,0 +1,91 @@
+# Backup mensal do conteúdo do Sanity.
+#
+# Exporta o dataset (documentos publicados e imagens) para um arquivo .tar.gz e o guarda como
+# artefato do workflow por 90 dias, o máximo do GitHub. Roda no dia 1 de cada mês. Para restaurar:
+# `npx sanity dataset import arquivo.tar.gz production` (ver docs/deploy.md).
+#
+# Precisa de um secret e de uma variável no GitHub (Settings → Secrets and variables → Actions):
+#   secret   SANITY_BACKUP_TOKEN  token de leitura do Sanity
+#   variável SANITY_PROJECT_ID    ID do projeto no Sanity (não é segredo)
+#   variável SANITY_DATASET       opcional; padrão "production"
+name: Backup mensal do Sanity
+
+on:
+  schedule:
+    # Dia 1, 01h30 em São Paulo = 04h30 UTC.
+    - cron: '30 4 1 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backup-sanity
+  cancel-in-progress: false
+
+jobs:
+  exportar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SANITY_AUTH_TOKEN: ${{ secrets.SANITY_BACKUP_TOKEN }}
+      SANITY_PROJECT_ID: ${{ vars.SANITY_PROJECT_ID }}
+      SANITY_DATASET: ${{ vars.SANITY_DATASET || 'production' }}
+    steps:
+      - name: Conferir a configuração
+        run: |
+          if [ -z "$SANITY_AUTH_TOKEN" ]; then
+            echo "::error::Falta o secret SANITY_BACKUP_TOKEN (veja docs/deploy.md)."
+            exit 1
+          fi
+          if [ -z "$SANITY_PROJECT_ID" ]; then
+            echo "::error::Falta a variável SANITY_PROJECT_ID (veja docs/deploy.md)."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar o Studio (traz a CLI do Sanity)
+        run: npm ci --workspace studio
+
+      - name: Exportar o dataset
+        id: exportar
+        working-directory: studio
+        env:
+          SANITY_STUDIO_PROJECT_ID: ${{ vars.SANITY_PROJECT_ID }}
+        run: |
+          arquivo="rosario-sanity-${SANITY_DATASET}-$(date -u +%Y-%m-%d).tar.gz"
+          # Só os documentos publicados (--no-drafts): o dataset do plano Free é público, então o
+          # backup não guarda nada que já não esteja no ar, mesmo se o repositório for público.
+          npx sanity dataset export "$SANITY_DATASET" "$RUNNER_TEMP/$arquivo" \
+            --project-id "$SANITY_PROJECT_ID" --no-drafts --overwrite
+          echo "arquivo=$arquivo" >> "$GITHUB_OUTPUT"
+
+      - name: Conferir o arquivo
+        env:
+          ARQUIVO: ${{ steps.exportar.outputs.arquivo }}
+        run: |
+          caminho="$RUNNER_TEMP/$ARQUIVO"
+          test -s "$caminho"
+          tar -tzf "$caminho" | grep -q 'data.ndjson$'
+          documentos=$(tar -xzOf "$caminho" --wildcards '*data.ndjson' | wc -l)
+          if [ "$documentos" -lt 1 ]; then
+            echo "::error::O backup não tem nenhum documento."
+            exit 1
+          fi
+          tamanho=$(du -h "$caminho" | cut -f1)
+          echo "### Backup do Sanity" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Arquivo: \`$ARQUIVO\` ($tamanho)" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Documentos: $documentos" >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backup-sanity
+          path: ${{ runner.temp }}/${{ steps.exportar.outputs.arquivo }}
+          retention-days: 90
+          if-no-files-found: error
