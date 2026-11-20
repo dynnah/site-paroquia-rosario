@@ -5,7 +5,9 @@ import PaginaInterna from '../../layouts/PaginaInterna.astro';
 import { propsCardEvento } from '../../lib/eventos';
 import { conteudo } from '../../lib/sanity';
 
-const eventos = await conteudo.eventosProximos(200);
+// Primeiro o que vem aí (do mais perto ao mais distante), depois o que já passou (do mais recente
+// ao mais antigo). A página é refeita todo dia, então um evento muda de grupo no dia seguinte.
+const { proximos, passados } = await conteudo.eventosAgenda();
 ---
 
 <PaginaInterna
@@ -15,7 +17,7 @@ const eventos = await conteudo.eventosProximos(200);
   intro="Festas, celebrações e encontros da nossa comunidade."
   barraMobile
 >
-  {eventos.length === 0 ? (
+  {proximos.length === 0 && passados.length === 0 ? (
     <EstadoVazio
       titulo="Ainda não há eventos marcados."
       texto="Quando houver festa, celebração ou encontro, ele aparece aqui."
@@ -23,13 +25,49 @@ const eventos = await conteudo.eventosProximos(200);
     />
   ) : (
     <>
-      {/* Os cards têm título h3 (design system): este h2, só para leitor de tela, mantém a ordem h1 → h2 → h3. */}
-      <h2 class="sr-only">Próximos eventos</h2>
-      <div class="ros-grade">
-        {eventos.map((evento) => (
-          <CardEvento {...propsCardEvento(evento)} />
-        ))}
-      </div>
+      {proximos.length > 0 ? (
+        <section class="secao" aria-labelledby="proximos-titulo">
+          {/* Os cards têm título h3 (design system): o h2 mantém a ordem h1 → h2 → h3. */}
+          <h2 class={passados.length > 0 ? 'titulo-2' : 'sr-only'} id="proximos-titulo">
+            Próximos eventos
+          </h2>
+          <div class="ros-grade">
+            {proximos.map((evento) => (
+              <CardEvento {...propsCardEvento(evento)} />
+            ))}
+          </div>
+        </section>
+      ) : (
+        <EstadoVazio
+          titulo="Ainda não há novos eventos marcados."
+          texto="Quando houver festa, celebração ou encontro, ele aparece aqui."
+          acao={{ rotulo: 'Ver horários', href: '/horarios' }}
+        />
+      )}
+
+      {passados.length > 0 && (
+        <section class="secao" aria-labelledby="passados-titulo">
+          <h2 class="titulo-2" id="passados-titulo">
+            Já aconteceram
+          </h2>
+          <div class="ros-grade">
+            {passados.map((evento) => (
+              <CardEvento {...propsCardEvento(evento)} />
+            ))}
+          </div>
+        </section>
+      )}
     </>
   )}
 </PaginaInterna>
+
+<style>
+  .secao {
+    display: grid;
+    gap: var(--espaco-6);
+  }
+
+  .secao h2 {
+    margin: 0;
+  }
+</style>

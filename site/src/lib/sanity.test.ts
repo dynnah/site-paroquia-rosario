@@ -81,6 +81,45 @@ test('eventosProximos ordena por data e ignora os que já passaram', async () =>
   ]);
 });
 
+test('eventosAgenda: próximos do mais perto ao mais distante e passados do mais recente ao mais antigo', async () => {
+  const { proximos, passados } = await conteudo.eventosAgenda();
+  assert.deepEqual(ids(proximos), [
+    'exemplo-evento-padrao',
+    'exemplo-evento-festa',
+    'exemplo-evento-franciscano',
+  ]);
+  assert.deepEqual(ids(passados), ['exemplo-evento-passado']);
+});
+
+test('eventosAgenda limita os passados aos mais recentes', async () => {
+  const antigos = Array.from({ length: 5 }, (_, i) => ({
+    _id: `antigo-${i}`,
+    slug: `antigo-${i}`,
+    titulo: `Antigo ${i}`,
+    inicio: `2026-0${i + 1}-10T20:00:00.000Z`,
+    semHorario: false,
+    categoria: 'padrao',
+  }));
+  const fonte = (async () => antigos) as never;
+  const { proximos, passados } = await criarConteudo(fonte, () => AGORA).eventosAgenda(2);
+  assert.deepEqual(proximos, []);
+  assert.deepEqual(ids(passados), ['antigo-4', 'antigo-3']);
+});
+
+test('eventosProximos mantém o evento de dia inteiro de hoje, mesmo sem fim', async () => {
+  const hoje = {
+    _id: 'hoje',
+    slug: 'hoje',
+    titulo: 'Hoje',
+    inicio: '2026-11-17T03:00:00.000Z',
+    semHorario: true,
+    categoria: 'padrao',
+  };
+  const ontem = { ...hoje, _id: 'ontem', slug: 'ontem', inicio: '2026-11-16T03:00:00.000Z' };
+  const fonte = (async () => [ontem, hoje]) as never;
+  assert.deepEqual(ids(await criarConteudo(fonte, () => AGORA).eventosProximos(5)), ['hoje']);
+});
+
 test('evento por slug traz a descrição; slug desconhecido dá null', async () => {
   const evento = await conteudo.evento('exemplo-encontro-de-formacao');
   assert.equal(evento?.local, 'Salão paroquial');

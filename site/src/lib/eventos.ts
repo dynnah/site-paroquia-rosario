@@ -80,10 +80,42 @@ export function quandoAcontece(evento: Pick<Evento, 'inicio' | 'fim' | 'semHorar
   return inicio;
 }
 
-/** O evento já terminou (ou, sem horário de fim, já começou) em relação a `agora`? */
-export function jaAconteceu(
-  evento: Pick<Evento, 'inicio' | 'fim'>,
+type DatasDoEvento = Pick<Evento, 'inicio' | 'fim'> & Partial<Pick<Evento, 'semHorario'>>;
+
+/**
+ * Quando o evento termina: o `fim`, se houver; senão o início. Evento sem horário e sem `fim`
+ * (um dia inteiro) vale até o fim daquele dia em São Paulo (UTC−3, sem horário de verão), para
+ * não "já ter acontecido" à meia-noite do próprio dia.
+ */
+export function terminoDoEvento(evento: DatasDoEvento): Date {
+  if (evento.fim) return new Date(evento.fim);
+  if (!evento.semHorario) return new Date(evento.inicio);
+  const { ano, mes, dia } = partesData(evento.inicio);
+  return new Date(Date.UTC(ano, mes - 1, dia + 1, 3) - 1);
+}
+
+/** O evento já terminou em relação a `agora`? */
+export function jaAconteceu(evento: DatasDoEvento, agora: Date = new Date()): boolean {
+  return terminoDoEvento(evento).getTime() < agora.getTime();
+}
+
+/**
+ * Separa a agenda em dois grupos. `proximos`: o que ainda não terminou (inclui o que está
+ * acontecendo agora), do mais perto de acontecer ao mais distante. `passados`: o que já
+ * terminou, do que aconteceu há menos tempo ao mais antigo.
+ */
+export function separarAgenda<T extends DatasDoEvento>(
+  eventos: readonly T[],
   agora: Date = new Date(),
-): boolean {
-  return new Date(evento.fim ?? evento.inicio).getTime() < agora.getTime();
+): { proximos: T[]; passados: T[] } {
+  const proximos: T[] = [];
+  const passados: T[] = [];
+  for (const evento of eventos) (jaAconteceu(evento, agora) ? passados : proximos).push(evento);
+  proximos.sort((a, b) => Date.parse(a.inicio) - Date.parse(b.inicio));
+  passados.sort(
+    (a, b) =>
+      terminoDoEvento(b).getTime() - terminoDoEvento(a).getTime() ||
+      Date.parse(b.inicio) - Date.parse(a.inicio),
+  );
+  return { proximos, passados };
 }

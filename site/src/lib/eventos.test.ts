@@ -1,6 +1,13 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { jaAconteceu, propsCardEvento, quandoAcontece, separarDestaque } from './eventos.ts';
+import {
+  jaAconteceu,
+  propsCardEvento,
+  quandoAcontece,
+  separarAgenda,
+  separarDestaque,
+  terminoDoEvento,
+} from './eventos.ts';
 import type { Evento } from './sanity.tipos.ts';
 
 // 28 de novembro de 2026 é sábado; 20h UTC = 17h em São Paulo.
@@ -130,4 +137,110 @@ test('o card usa o título sem o trecho em destaque', () => {
   const card = propsCardEvento(festa);
   assert.equal(card.titulo, 'Festa de Nossa Senhora');
   assert.equal(card.destaque, 'do Rosário');
+});
+
+// ── dia inteiro e ordem da agenda ───────────────────────────────────────────────
+// Perdão de Assis: 2 de agosto de 2027, sem horário e sem fim (00h em São Paulo = 03h UTC).
+const perdao: Evento = {
+  _id: 'e3',
+  slug: 'perdao-de-assis',
+  titulo: 'Perdão de Assis',
+  inicio: '2027-08-02T03:00:00.000Z',
+  semHorario: true,
+  categoria: 'franciscano',
+};
+
+test('evento de dia inteiro sem fim vale até as 23h59 do próprio dia (São Paulo)', () => {
+  assert.equal(terminoDoEvento(perdao).toISOString(), '2027-08-03T02:59:59.999Z');
+  assert.equal(jaAconteceu(perdao, new Date('2027-08-02T00:30:00-03:00')), false);
+  assert.equal(jaAconteceu(perdao, new Date('2027-08-02T23:59:00-03:00')), false);
+  assert.equal(jaAconteceu(perdao, new Date('2027-08-03T00:00:00-03:00')), true);
+  assert.equal(jaAconteceu(perdao, new Date('2027-08-01T12:00:00-03:00')), false);
+});
+
+test('com horário e sem fim, o evento termina no próprio início', () => {
+  assert.equal(terminoDoEvento(festa).toISOString(), festa.inicio);
+});
+
+const ev = (id: string, inicio: string, resto: Partial<Evento> = {}): Evento => ({
+  _id: id,
+  slug: id,
+  titulo: id,
+  inicio,
+  categoria: 'padrao',
+  ...resto,
+});
+
+test('separarAgenda: o que vem aí do mais perto ao mais distante; o que passou do mais recente ao mais antigo', () => {
+  const agora = new Date('2026-11-20T12:00:00-03:00');
+  const eventos = [
+    ev('fev-2027', '2027-02-10T20:00:00.000Z'),
+    ev('out-2026', '2026-10-01T20:00:00.000Z'),
+    ev('dez-2026', '2026-12-20T20:00:00.000Z'),
+    ev('nov-passado', '2026-11-15T20:00:00.000Z'),
+    ev('nov-proximo', '2026-11-25T20:00:00.000Z'),
+    ev('mar-2026', '2026-03-05T20:00:00.000Z'),
+  ];
+  const { proximos, passados } = separarAgenda(eventos, agora);
+  assert.deepEqual(
+    proximos.map((e) => e._id),
+    ['nov-proximo', 'dez-2026', 'fev-2027'],
+  );
+  assert.deepEqual(
+    passados.map((e) => e._id),
+    ['nov-passado', 'out-2026', 'mar-2026'],
+  );
+});
+
+test('separarAgenda: o que está acontecendo agora fica no topo dos próximos', () => {
+  const agora = new Date('2026-11-20T12:00:00-03:00');
+  const emCurso = ev('semana', '2026-11-16T03:00:00.000Z', {
+    fim: '2026-11-23T02:59:00.000Z',
+    semHorario: true,
+  });
+  const { proximos, passados } = separarAgenda(
+    [ev('proximo', '2026-11-21T20:00:00.000Z'), emCurso],
+    agora,
+  );
+  assert.deepEqual(
+    proximos.map((e) => e._id),
+    ['semana', 'proximo'],
+  );
+  assert.deepEqual(passados, []);
+});
+
+test('separarAgenda: no passado vale quando terminou, não quando começou', () => {
+  const agora = new Date('2026-12-30T12:00:00-03:00');
+  const longo = ev('longo', '2026-12-01T03:00:00.000Z', {
+    fim: '2026-12-26T02:59:00.000Z',
+    semHorario: true,
+  });
+  const curto = ev('curto', '2026-12-10T20:00:00.000Z');
+  const { passados } = separarAgenda([curto, longo], agora);
+  // o "longo" começou antes, mas terminou depois do "curto": aconteceu há menos tempo
+  assert.deepEqual(
+    passados.map((e) => e._id),
+    ['longo', 'curto'],
+  );
+});
+
+test('separarAgenda: o evento de dia inteiro de hoje ainda é próximo, e o de ontem já passou', () => {
+  const agora = new Date('2027-08-02T15:00:00-03:00');
+  const ontem = ev('ontem', '2027-08-01T03:00:00.000Z', { semHorario: true });
+  const { proximos, passados } = separarAgenda([ontem, perdao], agora);
+  assert.deepEqual(
+    proximos.map((e) => e._id),
+    ['e3'],
+  );
+  assert.deepEqual(
+    passados.map((e) => e._id),
+    ['ontem'],
+  );
+});
+
+test('separarAgenda não altera a lista original', () => {
+  const lista = [ev('b', '2027-02-10T20:00:00.000Z'), ev('a', '2026-12-20T20:00:00.000Z')];
+  const copia = [...lista];
+  separarAgenda(lista, new Date('2026-11-20T12:00:00-03:00'));
+  assert.deepEqual(lista, copia);
 });

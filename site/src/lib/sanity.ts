@@ -10,6 +10,7 @@
  * falha com mensagem clara, para nunca publicar um site vazio por engano.
  */
 import { createClient, type SanityClient } from '@sanity/client';
+import { separarAgenda } from './eventos.ts';
 import { dataISO } from './formatacao.ts';
 import type {
   Aviso,
@@ -109,8 +110,12 @@ export const CONSULTAS = {
     && (!defined(fim) || dateTime(fim) >= dateTime($agora))]
     | order(inicio desc){ _id, titulo, texto, tipo, link${LINK} }`,
 
-  eventosProximos: `*[_type == "evento" && dateTime(coalesce(fim, inicio)) >= dateTime($agora)]
-    | order(inicio asc)[0...$limite]${EVENTO}`,
+  // Traz de um dia antes de agora em diante: sobra para o evento de dia inteiro de hoje (sem
+  // horário e sem fim), que `separarAgenda` confere em seguida com a regra certa.
+  eventosProximos: `*[_type == "evento" && dateTime(coalesce(fim, inicio)) >= dateTime($desde)]
+    | order(inicio asc)[0...500]${EVENTO}`,
+
+  eventosTodos: `*[_type == "evento"] | order(inicio asc)[0...1000]${EVENTO}`,
 
   evento: `*[_type == "evento" && slug.current == $slug][0]{
     _id, "slug": slug.current, titulo, destaque, inicio, fim, "semHorario": coalesce(semHorario, false),
@@ -223,6 +228,8 @@ export type TipoComSlug = 'evento' | 'pastoral' | 'sacramento' | 'post' | 'pagin
  * Cria as funções de leitura sobre uma fonte de dados.
  * `buscar` e `agora` são injetáveis para testar as consultas sem rede.
  */
+const UM_DIA_MS = 24 * 60 * 60 * 1000;
+
 export function criarConteudo(buscar: Buscar, agora: () => Date = () => new Date()) {
   /** "Agora" arredondado ao minuto: consultas repetidas no build caem no mesmo cache. */
   const instante = () => {
@@ -239,8 +246,22 @@ export function criarConteudo(buscar: Buscar, agora: () => Date = () => new Date
     /** Avisos dentro do período de exibição, do mais recente para o mais antigo. */
     avisosAtivos: () => buscar<Aviso[]>(CONSULTAS.avisosAtivos, { agora: instante() }, []),
 
-    eventosProximos: (limite = 3) =>
-      buscar<Evento[]>(CONSULTAS.eventosProximos, { agora: instante(), limite }, []),
+    /** Os próximos eventos, do mais perto ao mais distante (o que acontece hoje conta). */
+    eventosProximos: async (limite = 3) => {
+      const desde = new Date(Date.parse(instante()) - UM_DIA_MS).toISOString();
+      const eventos = await buscar<Evento[]>(CONSULTAS.eventosProximos, { desde }, []);
+      return separarAgenda(eventos, agora()).proximos.slice(0, limite);
+    },
+
+    /**
+     * A agenda inteira em dois grupos: o que vem aí (do mais perto ao mais distante) e o que já
+     * passou (do mais recente ao mais antigo, só os `limitePassados` últimos).
+     */
+    eventosAgenda: async (limitePassados = 12) => {
+      const todos = await buscar<Evento[]>(CONSULTAS.eventosTodos, {}, []);
+      const { proximos, passados } = separarAgenda(todos, agora());
+      return { proximos, passados: passados.slice(0, limitePassados) };
+    },
 
     evento: (slug: string) => buscar<EventoDetalhe | null>(CONSULTAS.evento, { slug }, null),
 
