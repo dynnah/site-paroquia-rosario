@@ -20,7 +20,7 @@ const { data } = Astro.props;
   <h2 class="ros-liturgia__titulo" id="lt-reserva">
     Leituras do dia
   </h2>
-  <p class="reserva__texto corpo">
+  <p class="ros-liturgia__reserva corpo">
     As leituras e o Evangelho deste dia estão na Liturgia Diária da CNBB. Leia antes da missa, em
     casa ou a caminho da igreja.
   </p>
@@ -28,10 +28,3 @@ const { data } = Astro.props;
     Ler na {LITURGIA_OFICIAL.rotulo}
   </Botao>
 </article>
-
-<style>
-  .reserva__texto {
-    margin: var(--espaco-4) 0;
-    max-width: var(--medida-texto);
-  }
-</style>

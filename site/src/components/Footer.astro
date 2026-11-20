@@ -38,14 +38,14 @@ const ano = partesData().ano;
 const externo = (href: string) => /^https?:\/\//.test(href);
 ---
 
-<footer class="rodape">
-  <div class="container grade">
-    <div class="marca">
-      <a class="marca__link" href="/">
+<footer class="ros-rodape">
+  <div class="container ros-rodape__grade">
+    <div class="ros-rodape__marca">
+      <a class="ros-rodape__marca-link" href="/">
         <Image src={logo} alt="" width={48} height={48} densities={[1, 2]} loading="lazy" />
         <span>
-          <span class="marca__nome">{nome}</span>
-          {assinatura && <span class="marca__sub">{assinatura}</span>}
+          <span class="ros-rodape__nome">{nome}</span>
+          {assinatura && <span class="ros-rodape__sub">{assinatura}</span>}
         </span>
       </a>
       <address>
@@ -54,7 +54,7 @@ const externo = (href: string) => /^https?:\/\//.test(href);
         {endereco[1]}
       </address>
       <a
-        class="como-chegar"
+        class="ros-rodape__como-chegar"
         href={mapaHref}
         target="_blank"
         rel="noopener noreferrer"
@@ -65,7 +65,7 @@ const externo = (href: string) => /^https?:\/\//.test(href);
     </div>
 
     <nav aria-labelledby={`${idBase}-navegue`}>
-      <h2 class="titulo" id={`${idBase}-navegue`}>
+      <h2 class="ros-rodape__titulo" id={`${idBase}-navegue`}>
         Navegue
       </h2>
       <ul>
@@ -78,7 +78,7 @@ const externo = (href: string) => /^https?:\/\//.test(href);
     </nav>
 
     <nav aria-labelledby={`${idBase}-paroquia`}>
-      <h2 class="titulo" id={`${idBase}-paroquia`}>
+      <h2 class="ros-rodape__titulo" id={`${idBase}-paroquia`}>
         A paróquia
       </h2>
       <ul>
@@ -92,7 +92,7 @@ const externo = (href: string) => /^https?:\/\//.test(href);
 
     {(redes.length > 0 || contato.length > 0) && (
       <div>
-        <h2 class="titulo">Fale com a gente</h2>
+        <h2 class="ros-rodape__titulo">Fale com a gente</h2>
         <ul>
           {contato.map((link) => (
             <li>
@@ -113,7 +113,7 @@ const externo = (href: string) => /^https?:\/\//.test(href);
     )}
   </div>
 
-  <div class="base">
+  <div class="ros-rodape__base">
     <div class="container">
       <p>
         © {ano} {nome}.
@@ -121,138 +121,3 @@ const externo = (href: string) => /^https?:\/\//.test(href);
     </div>
   </div>
 </footer>
-
-<style>
-  .rodape {
-    /* container queries, como os demais componentes: a grade segue a largura do rodapé */
-    container-type: inline-size;
-    background: var(--fundo-afundado);
-    color: var(--texto-suave);
-    border-top: 1px solid var(--linha);
-  }
-
-  .grade {
-    display: grid;
-    gap: var(--espaco-8);
-    padding-block: var(--espaco-12) var(--espaco-8);
-  }
-
-  @container (min-width: 640px) {
-    .grade {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-
-  @container (min-width: 1024px) {
-    .grade {
-      grid-template-columns: 1.4fr 1fr 1fr 1fr;
-      gap: var(--espaco-12);
-      padding-block: var(--espaco-16) var(--espaco-12);
-    }
-  }
-
-  .marca {
-    display: grid;
-    gap: var(--espaco-3);
-    align-content: start;
-  }
-
-  .marca__link {
-    display: flex;
-    align-items: center;
-    gap: var(--espaco-2);
-    color: var(--texto);
-    text-decoration: none;
-  }
-
-  .marca__link img {
-    width: 48px;
-    height: 48px;
-  }
-
-  /* Igual ao cabeçalho: só o nome da paróquia, em letras normais, em até duas linhas */
-  .marca__nome {
-    display: block;
-    max-width: 10.5em;
-    font-weight: 700;
-    font-size: 16px;
-    line-height: 19px;
-    text-wrap: balance;
-    /* Alinhamento óptico (igual ao cabeçalho): a tinta do texto ficava ~1,5px acima do centro da logo */
-    transform: translateY(0.1em);
-  }
-
-  .marca__sub {
-    display: block;
-    font-size: 15px;
-    line-height: 20px;
-    color: var(--texto-suave);
-  }
-
-  address {
-    font-style: normal;
-    font-size: 16px;
-    line-height: 24px;
-  }
-
-  .titulo {
-    margin: 0 0 var(--espaco-2);
-    font-family: var(--font-sans);
-    font-size: 15px;
-    line-height: 22px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    color: var(--texto);
-  }
-
-  ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-
-  .rodape a:not(.marca__link) {
-    display: inline-flex;
-    align-items: center;
-    /* 44px também na largura: "Início" e "Blog" têm só 37px e 34px de texto. O sublinhado segue o texto. */
-    min-width: var(--toque-min);
-    min-height: var(--toque-min);
-    color: var(--texto);
-    font-size: 16px;
-    /* Mesmo sublinhado suave dos links de texto do site (global.css). */
-    text-decoration-line: underline;
-    text-decoration-thickness: 1.5px;
-    text-underline-offset: 0.28em;
-    text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
-  }
-
-  .rodape a:not(.marca__link):hover {
-    color: var(--mariano);
-    text-decoration-color: currentColor;
-    text-underline-offset: 0.4em;
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .rodape a:not(.marca__link) {
-      transition:
-        color 0.2s ease,
-        text-decoration-color 0.2s ease,
-        text-underline-offset 0.2s ease;
-    }
-  }
-
-  .como-chegar {
-    justify-self: start;
-  }
-
-  .base {
-    border-top: 1px solid var(--linha);
-    padding-block: var(--espaco-6);
-    font-size: 14px;
-    line-height: 20px;
-  }
-
-  .base p {
-    margin: 0;
-  }
-</style>

@@ -31,7 +31,7 @@ const {
 const itens = links.map((link) => ({ ...link, atual: estaAtivo(link.href, caminhoAtual) }));
 ---
 
-<header class:list={['ros-header', { 'cabecalho-fixo': fixo }]}>
+<header class:list={['ros-header', { 'ros-header--fixo': fixo }]}>
   <div class="ros-header__in">
     <a class="ros-marca" href="/">
       <Image src={logo} alt="" width={48} height={48} densities={[1, 2]} loading="eager" />

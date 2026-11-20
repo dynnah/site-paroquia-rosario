@@ -38,7 +38,7 @@ const grupos = horarios
     <>
       {/* Os cards têm título h3 (design system): este h2 só para leitor de tela mantém a ordem h1 → h2 → h3. */}
       <h2 class="sr-only">Horários por tipo</h2>
-      <div class:list={['grade-horarios', { 'grade-horarios--painel': grupos.length === 5 }]}>
+      <div class:list={['ros-horarios-grade', { 'ros-horarios-grade--painel': grupos.length === 5 }]}>
         {grupos.map(({ chave, titulo, grupo }) => (
           <div class="bloco" style={`--area: ${chave}`}>
             <CardHorarios titulo={titulo} linhas={grupo.linhas} />

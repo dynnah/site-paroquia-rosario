@@ -23,7 +23,7 @@ const { rotulo, anterior, proxima } = Astro.props;
 ---
 
 {(anterior || proxima) && (
-  <nav class="datas" aria-label={rotulo}>
+  <nav class="ros-datas" aria-label={rotulo}>
     {anterior ? (
       <Botao variante="fantasma" href={anterior.href} rel="prev">
         <span aria-hidden="true">‹</span>
@@ -42,14 +42,3 @@ const { rotulo, anterior, proxima } = Astro.props;
     )}
   </nav>
 )}
-
-<style>
-  .datas {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--espaco-3) var(--espaco-6);
-    padding-top: var(--espaco-6);
-  }
-</style>

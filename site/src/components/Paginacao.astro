@@ -27,7 +27,7 @@ const {
 ---
 
 {totalPaginas > 1 && (
-  <nav class="paginacao" aria-label={rotulo}>
+  <nav class="ros-paginacao" aria-label={rotulo}>
     {pagina > 1 ? (
       <Botao variante="fantasma" href={href(pagina - 1)} rel="prev">
         ← {rotuloAnterior}
@@ -35,7 +35,7 @@ const {
     ) : (
       <span />
     )}
-    <p class="paginacao__posicao pequeno">
+    <p class="ros-paginacao__posicao pequeno">
       Página {pagina} de {totalPaginas}
     </p>
     {pagina < totalPaginas ? (
@@ -47,20 +47,3 @@ const {
     )}
   </nav>
 )}
-
-<style>
-  .paginacao {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--espaco-3) var(--espaco-6);
-    padding-top: var(--espaco-6);
-    border-top: 1px solid var(--linha);
-  }
-
-  .paginacao__posicao {
-    margin: 0;
-    color: var(--texto-suave);
-  }
-</style>

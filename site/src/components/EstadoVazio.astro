@@ -12,37 +12,12 @@ interface Props {
 const { titulo, texto, acao } = Astro.props;
 ---
 
-<div class="vazio">
-  <p class="vazio__titulo">{titulo}</p>
-  {texto && <p class="vazio__texto">{texto}</p>}
+<div class="ros-vazio">
+  <p class="ros-vazio__titulo">{titulo}</p>
+  {texto && <p class="ros-vazio__texto">{texto}</p>}
   {acao && (
     <Botao variante="secundario" href={acao.href}>
       {acao.rotulo}
     </Botao>
   )}
 </div>
-
-<style>
-  .vazio {
-    display: grid;
-    justify-items: start;
-    gap: var(--espaco-3);
-    padding: var(--espaco-8) var(--espaco-6);
-    background: var(--fundo-afundado);
-    border-radius: var(--raio-g);
-  }
-
-  .vazio__titulo {
-    margin: 0;
-    font-family: var(--font-serif);
-    font-weight: 600;
-    font-size: 20px;
-    line-height: 28px;
-  }
-
-  .vazio__texto {
-    margin: 0;
-    max-width: var(--medida-texto);
-    color: var(--texto-suave);
-  }
-</style>

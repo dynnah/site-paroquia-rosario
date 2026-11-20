@@ -23,8 +23,8 @@ const { titulo, destaque, intro, ...layout } = Astro.props;
 ---
 
 <PaginaLayout {...layout}>
-  <div class="container pagina">
-    <header class="pagina__cab">
+  <div class="container ros-interna">
+    <header>
       <h1 class="ros-pagina__titulo">
         {titulo}
         {destaque && (
@@ -34,28 +34,8 @@ const { titulo, destaque, intro, ...layout } = Astro.props;
           </>
         )}
       </h1>
-      {intro && <p class="pagina__intro corpo-grande">{intro}</p>}
+      {intro && <p class="ros-interna__intro corpo-grande">{intro}</p>}
     </header>
     <slot />
   </div>
 </PaginaLayout>
-
-<style>
-  .pagina {
-    display: grid;
-    gap: var(--espaco-8);
-    padding-block: var(--espaco-8) var(--espaco-12);
-  }
-
-  .pagina__intro {
-    max-width: var(--medida-texto);
-    margin: var(--espaco-2) 0 0;
-    color: var(--texto-suave);
-  }
-
-  @media (min-width: 1024px) {
-    .pagina {
-      padding-block: var(--espaco-12) var(--espaco-16);
-    }
-  }
-</style>

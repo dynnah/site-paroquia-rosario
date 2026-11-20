@@ -64,8 +64,8 @@ const { id, titulo, duracao, grande = true } = Astro.props;
     evento.preventDefault();
 
     const player = document.createElement('iframe');
-    player.className = 'video-yt__player';
-    player.classList.toggle('video-yt__player--grande', raiz.dataset.grande === 'true');
+    player.className = 'ros-video__player';
+    player.classList.toggle('ros-video__player--grande', raiz.dataset.grande === 'true');
     player.src = urlPlayerYouTube(raiz.dataset.id);
     player.title = raiz.dataset.titulo ?? 'Vídeo do YouTube';
     player.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
@@ -75,9 +75,3 @@ const { id, titulo, duracao, grande = true } = Astro.props;
     player.focus();
   });
 </script>
-
-<style>
-  .fachada {
-    text-decoration: none;
-  }
-</style>

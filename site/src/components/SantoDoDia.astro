@@ -29,7 +29,7 @@ const meta = [
   grau ? { texto: grau } : undefined,
   funcao ? { texto: funcao.charAt(0).toUpperCase() + funcao.slice(1) } : undefined,
   familia ? { texto: rotuloFamilia, classe: 'ros-santo__familia' } : undefined,
-  datas ? { texto: datas, classe: 'sem-quebra' } : undefined,
+  datas ? { texto: datas, classe: 'ros-santo__datas' } : undefined,
 ].filter((item): item is ItemMeta => item !== undefined);
 ---
 
@@ -61,33 +61,13 @@ const meta = [
     </a>
   )}
   {outros.length > 0 && (
-    <p class="outros pequeno">
+    <p class="ros-santo__outros pequeno">
       <strong>Também hoje:</strong> {outros.join(', ')}.
     </p>
   )}
   {fonte && (
-    <p class="fonte">
+    <p class="ros-santo__fonte">
       Fonte: <a href={fonte.href}>{fonte.rotulo}</a>
     </p>
   )}
 </article>
-
-<style>
-  .sem-quebra {
-    white-space: nowrap;
-  }
-  .outros {
-    margin: var(--espaco-4) 0 0;
-    color: var(--texto-suave);
-  }
-  /* Mesma linha de crédito do card de leituras (.ros-liturgia__fonte). */
-  .fonte {
-    font-size: 13px;
-    line-height: 18px;
-    color: var(--texto-suave);
-    margin: var(--espaco-4) 0 0;
-  }
-  .fonte a {
-    color: inherit;
-  }
-</style>

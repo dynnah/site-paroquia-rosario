@@ -25,14 +25,14 @@ const pagina = await conteudo.pagina(slug);
   description={pagina?.resumo ?? descricaoReserva}
   titulo={pagina?.titulo ?? tituloReserva}
 >
-  {pagina?.resumo && <p class="lead corpo-grande">{pagina.resumo}</p>}
+  {pagina?.resumo && <p class="ros-artigo__resumo corpo-grande">{pagina.resumo}</p>}
 
   {pagina ? (
     <div class="ros-artigo__texto">
       <TextoRico texto={pagina.corpo} />
     </div>
   ) : (
-    <div class="vazio">
+    <div class="ros-artigo__vazio">
       <EstadoVazio
         titulo="Esta página está sendo preparada."
         texto="Volte em breve."
@@ -43,14 +43,3 @@ const pagina = await conteudo.pagina(slug);
 
   <slot />
 </ArtigoLayout>
-
-<style>
-  .lead {
-    margin: var(--espaco-4) 0 0;
-    color: var(--texto-suave);
-  }
-
-  .vazio {
-    margin-top: var(--espaco-8);
-  }
-</style>

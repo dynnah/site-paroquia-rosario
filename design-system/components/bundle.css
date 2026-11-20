@@ -1,74 +1,206 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&display=swap');
 
-/* ---------- base ---------- */
+/*
+  Igreja do Rosário: component styles. Uses only the variables from tokens.css.
+  Class names and token names are Portuguese on purpose (the site markup depends on them);
+  comments and documentation are English. Components are container-query driven:
+  every `ros-*` root with `container-type` answers to its own width, not the window's.
+*/
+
+/* ---------- base & reset ---------- */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+img, svg, video { max-width: 100%; }
+img { height: auto; }
 body { margin: 0; font-family: var(--font-sans); font-size: 17px; line-height: 26px; background: var(--fundo); color: var(--texto); -webkit-font-smoothing: antialiased; }
+a { color: var(--mariano); }
+:where(a, button, input, [tabindex]):focus-visible { outline: 2px solid var(--foco); outline-offset: 2px; }
+
+/* layout helpers: the only classes without the `ros-` prefix (used on every page) */
+.container { width: 100%; max-width: var(--container-max); margin-inline: auto; padding-inline: var(--espaco-4); }
+@media (min-width: 640px) { .container { padding-inline: var(--espaco-6); } }
+@media (min-width: 1024px) { .container { padding-inline: var(--espaco-8); } }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* preview helpers (design-system previews only) */
 .ros-pv { padding: var(--espaco-4); display: flex; flex-wrap: wrap; gap: var(--espaco-4); align-items: flex-start; }
 .ros-pv-col { padding: var(--espaco-4); display: grid; gap: var(--espaco-4); }
 .ros-pv-label { font-size: 12px; line-height: 16px; color: var(--texto-suave); margin: 0 0 var(--espaco-2); letter-spacing: .08em; text-transform: uppercase; font-weight: 700; }
+
+/* eyebrow, serif and italic helpers */
 .ros-sobrelinha { font-family: var(--font-sans); font-size: 13px; line-height: 16px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--ouro-texto); margin: 0; }
 .ros-serif { font-family: var(--font-serif); }
 .ros-italico { font-family: var(--font-serif); font-style: italic; font-weight: 500; }
-:where(a, button, input, [tabindex]):focus-visible { outline: 2px solid var(--foco); outline-offset: 2px; }
 
-/* ---------- botão ---------- */
+/* ---------- button ---------- */
 .ros-btn { font: inherit; font-weight: 600; font-size: 16px; line-height: 20px; min-height: var(--toque-min); padding: 0 var(--espaco-6); display: inline-flex; align-items: center; justify-content: center; gap: var(--espaco-2); border-radius: var(--raio-m); border: 1.5px solid transparent; cursor: pointer; text-decoration: none; transition: background-color .15s, color .15s; }
 .ros-btn svg { width: 18px; height: 18px; flex: none; }
 .ros-btn--primario { background: var(--acao); color: var(--sobre-acao); }
 .ros-btn--primario:hover { background: var(--marrom); color: var(--sobre-marrom); }
 .ros-btn--secundario { background: transparent; color: var(--mariano); border-color: var(--mariano); }
 .ros-btn--secundario:hover { background: var(--mariano-suave); }
-.ros-btn--fantasma { background: transparent; color: var(--mariano); padding: 0 var(--espaco-3); text-decoration: underline; text-underline-offset: 4px; }
+.ros-btn--fantasma { background: transparent; color: var(--mariano); padding: 0 var(--espaco-3); }
 .ros-btn--claro { background: var(--creme); color: var(--marrom); }
 .ros-btn--bloco { width: 100%; }
 .ros-btn[disabled] { opacity: .45; cursor: not-allowed; }
 
-/* ---------- cabeçalho ---------- */
+/* ---------- text links ----------
+   The browser's default underline is thick and touches the letters. Here it is thin, set off from the
+   text and drawn in the link's own colour at 45%; on hover or focus it lights up (full colour) and moves
+   a little further away. Applies to plain links in running text (no class) and to the two support links
+   (.ros-btn--fantasma and .ros-santo__link). Links with their own class (menu, cards, buttons, contact
+   rows) keep what their component defines. Must come after `.ros-btn`, which sets `text-decoration: none`. */
+a:where(:not([class])),
+.ros-btn--fantasma,
+.ros-santo__link {
+  text-decoration-line: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 0.28em;
+  text-decoration-skip-ink: auto;
+  text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
+}
+a:where(:not([class])):hover,
+.ros-btn--fantasma:hover,
+.ros-santo__link:hover {
+  text-decoration-color: currentColor;
+  text-underline-offset: 0.4em;
+}
+@media (prefers-reduced-motion: no-preference) {
+  a:where(:not([class])),
+  .ros-btn--fantasma,
+  .ros-santo__link {
+    transition: text-decoration-color .2s ease, text-underline-offset .2s ease, color .2s ease;
+  }
+}
+
+/* ---------- header ----------
+   Phone: logo + parish name, "Horários" button, "Menu" button (opens the drawer).
+   Desktop (≥960px): logo, menu and "Horários" form one centred group; the name is only for screen readers.
+   Every touch target is 44px. */
 .ros-header { container-type: inline-size; background: var(--fundo-elevado); border-bottom: 1px solid var(--linha); }
-.ros-header__in { display: flex; align-items: center; gap: var(--espaco-3); padding: var(--espaco-2) var(--espaco-4); min-height: 64px; box-sizing: border-box; }
-.ros-marca { display: flex; align-items: center; gap: var(--espaco-2); text-decoration: none; color: var(--texto); margin-right: auto; }
+.ros-header--fixo { position: sticky; top: 0; z-index: 50; }
+.ros-header__in { display: flex; align-items: center; gap: var(--espaco-3); padding: var(--espaco-2) var(--espaco-4); min-height: 64px; }
+.ros-marca { display: flex; align-items: center; gap: var(--espaco-2); min-height: var(--toque-min); text-decoration: none; color: var(--texto); margin-right: auto; }
 .ros-marca img { width: 40px; height: 40px; }
-.ros-marca__nome { display: block; font-weight: 700; font-size: 13px; line-height: 18px; letter-spacing: .08em; text-transform: uppercase; }
+/* only the parish name, in normal letters and at most two lines (three on the narrowest phones) */
+.ros-marca__nome {
+  display: block; max-width: 10.5em; font-weight: 700; font-size: 14px; line-height: 17px;
+  white-space: normal; text-wrap: balance;
+  /* optical alignment: without descenders on the last line the ink sits ~1.5px above the logo's centre */
+  transform: translateY(0.1em);
+}
 .ros-marca__sub { display: none; font-size: 13px; line-height: 16px; color: var(--texto-suave); }
 .ros-nav { display: none; gap: var(--espaco-1); }
-.ros-nav a { color: var(--texto); text-decoration: none; font-weight: 600; font-size: 16px; padding: var(--espaco-2) var(--espaco-3); border-radius: var(--raio-m); }
+.ros-nav a { display: inline-flex; align-items: center; min-height: var(--toque-min); color: var(--texto); text-decoration: none; font-weight: 600; font-size: 16px; padding: var(--espaco-2) var(--espaco-3); border-radius: var(--raio-m); }
 .ros-nav a:hover, .ros-nav a[aria-current="page"] { background: var(--fundo-afundado); }
 .ros-nav a[aria-current="page"] { box-shadow: inset 0 -2px 0 var(--ouro); }
-.ros-menu-btn { font: inherit; font-weight: 700; font-size: 15px; display: inline-flex; align-items: center; gap: var(--espaco-2); min-height: var(--toque-min); padding: 0 var(--espaco-3); background: transparent; border: 1.5px solid var(--linha-forte); color: var(--texto); border-radius: var(--raio-m); cursor: pointer; }
+.ros-menu-btn { font: inherit; font-weight: 700; font-size: 15px; display: inline-flex; align-items: center; justify-content: center; gap: var(--espaco-2); min-width: var(--toque-min); min-height: var(--toque-min); padding: 0 var(--espaco-3); background: transparent; border: 1.5px solid var(--linha-forte); color: var(--texto); border-radius: var(--raio-m); cursor: pointer; }
 .ros-header .ros-btn { padding: 0 var(--espaco-3); }
 .ros-menu-btn__txt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-@container (min-width: 520px) { .ros-marca__sub { display: block; } .ros-marca__nome { font-size: 15px; } .ros-menu-btn__txt { position: static; width: auto; height: auto; clip: auto; } .ros-header .ros-btn { padding: 0 var(--espaco-4); } }
+/* phone: tighter gap, so the 44px Menu button does not cost the name a line */
+@container (max-width: 519px) { .ros-header__in { gap: var(--espaco-2); } }
+/* very narrow phone (≤354px): "Horários" shows only the clock; the text stays for screen readers
+   (the phone's bottom bar already spells it out) */
+@container (max-width: 354px) { .ros-header__horarios { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } }
+@container (min-width: 520px) {
+  .ros-marca__sub { display: block; }
+  .ros-marca__nome { font-size: 16px; line-height: 19px; }
+  .ros-menu-btn__txt { position: static; width: auto; height: auto; clip: auto; }
+  .ros-header .ros-btn { padding: 0 var(--espaco-4); }
+}
 @container (min-width: 960px) {
-  .ros-header__in { padding: var(--espaco-3) var(--espaco-8); }
+  .ros-header__in { justify-content: center; gap: var(--espaco-8); padding: var(--espaco-3) var(--espaco-8); }
   .ros-nav { display: flex; }
   .ros-menu-btn { display: none; }
+  .ros-header__in > .ros-marca { margin-right: 0; gap: 0; }
   .ros-marca img { width: 48px; height: 48px; }
   .ros-marca__sub { display: none; }
-  .ros-marca__nome { white-space: nowrap; }
+  /* the name leaves the screen but stays in the logo link for screen readers */
+  .ros-marca__nome { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   .ros-nav a { padding: var(--espaco-2) 10px; }
 }
-@container (min-width: 1180px) { .ros-marca__sub { display: block; } .ros-nav a { padding: var(--espaco-2) var(--espaco-3); } }
+@container (min-width: 1180px) { .ros-nav a { padding: var(--espaco-2) var(--espaco-3); } }
 
-/* ---------- hero ---------- */
-.ros-hero { container-type: inline-size; background: var(--fundo-afundado); }
-.ros-hero__in { display: grid; gap: var(--espaco-6); padding: var(--espaco-8) var(--espaco-4); }
+/* ---------- drawer (menu on the phone) ----------
+   A native <dialog> opened with showModal(); full screen, with a close button at the top. */
+.ros-gaveta { position: fixed; inset: 0; width: 100%; max-width: none; height: 100%; max-height: none; margin: 0; padding: 0; border: 0; background: var(--fundo-elevado); color: var(--texto); }
+.ros-gaveta[open] { display: flex; flex-direction: column; }
+.ros-gaveta::backdrop { background: transparent; }
+.ros-gaveta__topo { display: flex; align-items: center; justify-content: space-between; gap: var(--espaco-3); min-height: var(--espaco-16); padding: var(--espaco-2) var(--espaco-4); border-bottom: 1px solid var(--linha); }
+.ros-gaveta__titulo { font-weight: 700; font-size: 15px; line-height: 18px; letter-spacing: .08em; text-transform: uppercase; }
+.ros-gaveta__fechar { font: inherit; font-weight: 700; font-size: 15px; display: inline-flex; align-items: center; gap: var(--espaco-2); min-height: var(--toque-min); padding: 0 var(--espaco-3); background: transparent; border: 1.5px solid var(--linha-forte); color: var(--texto); border-radius: var(--raio-m); cursor: pointer; }
+.ros-gaveta__nav { flex: 1; overflow-y: auto; }
+.ros-gaveta__lista { list-style: none; margin: 0; padding: var(--espaco-2) var(--espaco-4) var(--espaco-8); }
+.ros-gaveta__lista li + li { border-top: 1px solid var(--linha); }
+.ros-gaveta__lista a { display: flex; align-items: center; min-height: calc(var(--toque-min) + var(--espaco-3)); padding: 0 var(--espaco-3); font-size: 20px; line-height: 28px; font-weight: 700; color: var(--texto); text-decoration: none; border-radius: var(--raio-m); }
+.ros-gaveta__lista a:hover, .ros-gaveta__lista a[aria-current="page"] { background: var(--fundo-afundado); }
+.ros-gaveta__lista a[aria-current="page"] { box-shadow: inset 0 -2px 0 var(--ouro); }
+
+/* ---------- hero ("arch with the facade") ----------
+   Light background with two large arches and a soft hill; the facade sits in an arch with a thin gold
+   outline and a disc of light behind it, and the hero's bottom edge cuts its base. The content aligns with
+   the site container. The drawing grows with the hero's width (cqw), up to the container's limit. */
+.ros-hero { container-type: inline-size; position: relative; overflow: hidden; background: var(--fundo); --deco: color-mix(in srgb, var(--linha) 65%, var(--fundo)); }
+.ros-hero__in { position: relative; z-index: 1; display: grid; gap: var(--espaco-6); max-width: var(--container-max); margin-inline: auto; padding: var(--espaco-8) var(--espaco-4); }
 .ros-hero__titulo { font-family: var(--font-serif); font-weight: 600; font-size: 36px; line-height: 42px; margin: var(--espaco-2) 0 0; color: var(--texto); }
 .ros-hero__titulo em { display: block; font-style: italic; font-weight: 500; color: var(--mariano); }
 .ros-hero__texto { font-size: 18px; line-height: 28px; color: var(--texto-suave); margin: var(--espaco-3) 0 0; max-width: var(--medida-texto); }
 .ros-hero__acoes { display: flex; flex-wrap: wrap; gap: var(--espaco-3); margin-top: var(--espaco-6); }
-.ros-hero__proxima { display: flex; align-items: center; gap: var(--espaco-3); background: var(--fundo-elevado); border: 1px solid var(--linha); border-radius: var(--raio-m); padding: var(--espaco-3) var(--espaco-4); margin-top: var(--espaco-6); max-width: 420px; }
+.ros-hero__proxima { display: flex; align-items: center; gap: var(--espaco-3); background: var(--fundo-elevado); border: 1px solid var(--linha); border-radius: var(--raio-m); box-shadow: var(--sombra-card); padding: var(--espaco-3) var(--espaco-4); margin-top: var(--espaco-6); max-width: 420px; }
+.ros-hero__proxima svg { width: 28px; height: 28px; color: var(--mariano); flex: none; }
 .ros-hero__proxima strong { font-size: 28px; line-height: 32px; font-weight: 700; }
 .ros-hero__proxima span { font-size: 15px; line-height: 20px; color: var(--texto-suave); }
-.ros-arco { display: none; aspect-ratio: 4 / 5; border-radius: var(--raio-arco) var(--raio-arco) var(--raio-m) var(--raio-m); background: var(--fundo-elevado); place-items: center; overflow: hidden; border: 3px solid var(--ouro); box-sizing: border-box; max-width: 360px; width: 100%; justify-self: center; }
-.ros-arco img { width: 62%; height: auto; }
+/* eyebrow with a thin gold rule after the text; the rule only takes what is left of the line (up to 200px) */
+.ros-hero__in .ros-sobrelinha { display: flex; align-items: center; gap: var(--espaco-4); }
+.ros-hero__in .ros-sobrelinha::after { content: ''; flex: 1 1 0; min-width: 0; max-width: 200px; height: 1px; background: var(--ouro); }
+
+/* background drawing: two arches and a hill (decoration only, aria-hidden) */
+.ros-hero__fundo { position: absolute; inset: 0; pointer-events: none; }
+.ros-hero__colina { position: absolute; inset-inline: 0; bottom: 0; display: block; width: 100%; height: clamp(var(--espaco-16), 4.4cqw, 110px); fill: var(--fundo-afundado); }
+.ros-hero__fundo-arco { display: none; position: absolute; top: var(--espaco-8); bottom: 0; width: clamp(calc(var(--espaco-16) * 4), 17.8cqw, 400px); border: var(--espaco-6) solid var(--deco); border-bottom: 0; border-radius: var(--raio-arco) var(--raio-arco) 0 0; }
+
+/* the arch: soft gold fill, a thin gold outline a little outside, and a disc of light */
+.ros-arco { position: relative; display: none; aspect-ratio: 4 / 5; justify-self: center; justify-items: center; align-items: end; width: 100%; max-width: 360px; background: var(--ouro-suave); border-radius: var(--raio-arco) var(--raio-arco) 0 0; }
+.ros-arco::before { content: ''; position: absolute; inset: calc(-1 * var(--espaco-2)) calc(-1 * var(--espaco-2)) 0; border: 1.5px solid var(--ouro); border-bottom: 0; border-radius: var(--raio-arco) var(--raio-arco) 0 0; pointer-events: none; }
+.ros-arco::after { content: ''; position: absolute; top: 12%; left: 50%; width: 72%; aspect-ratio: 1; transform: translateX(-50%); border-radius: 50%; background: color-mix(in srgb, var(--ouro-suave) 45%, var(--fundo-elevado)); }
+/* the logo image is square and its drawing fills 88% of it */
+.ros-arco img { position: relative; z-index: 1; width: 90%; height: auto; }
+/* photo variant: the photo fills and is clipped by the arch (no outline or disc) */
+.ros-arco--foto { overflow: hidden; }
+.ros-arco--foto::before, .ros-arco--foto::after { display: none; }
 .ros-arco--foto img { width: 100%; height: 100%; object-fit: cover; }
+
 @container (min-width: 600px) { .ros-arco { display: grid; max-width: 280px; } }
+@container (min-width: 640px) { .ros-hero__in { padding-inline: var(--espaco-6); } }
 @container (min-width: 900px) {
-  .ros-arco { max-width: 360px; }
-  .ros-hero__in { grid-template-columns: 1.3fr 1fr; align-items: center; padding: var(--espaco-16) var(--espaco-8); gap: var(--espaco-12); }
+  .ros-hero__in { grid-template-columns: 1.3fr 1fr; align-items: stretch; gap: var(--espaco-12); padding-block: var(--espaco-16) var(--espaco-12); min-height: min(36cqw, 760px); }
+  .ros-hero__in > :first-child { align-self: center; }
   .ros-hero__titulo { font-size: 56px; line-height: 60px; }
+  /* the arch follows the hero's height and runs past its bottom edge, which cuts the base; it grows with
+     the width (23.5%, as in the 1440px drawing) up to a limit: at 1440px or less it is the usual 340px */
+  .ros-arco { align-self: stretch; aspect-ratio: auto; max-width: clamp(340px, 23.5cqw, 560px); margin-bottom: calc(-1 * (var(--espaco-12) + var(--espaco-6))); }
+  .ros-arco img { width: 100%; }
+  .ros-arco::after { top: 6%; }
+  .ros-hero__fundo-arco--dir { display: block; top: var(--espaco-4); right: calc(-1 * var(--espaco-12)); width: clamp(calc(var(--espaco-16) * 4.5), 20cqw, 450px); }
+}
+@container (min-width: 1024px) { .ros-hero__in { padding-inline: var(--espaco-8); } }
+@container (min-width: 1100px) { .ros-hero__titulo { font-size: 64px; line-height: 68px; } }
+/* only with room on both sides: the left arch sits just before the text, which aligns with the container */
+@container (min-width: 1280px) {
+  .ros-hero__fundo-arco--esq { display: block; right: calc(100% - (max(0px, (100% - var(--container-max)) / 2) + var(--espaco-8) - var(--espaco-6))); }
 }
 
-/* ---------- horários ---------- */
+/* ---------- section header (home page sections) ---------- */
+.ros-secao { padding-block: var(--espaco-12); }
+.ros-secao--afundada { background: var(--fundo-afundado); }
+.ros-secao__cab { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: var(--espaco-3) var(--espaco-6); margin-bottom: var(--espaco-6); }
+.ros-secao__titulo { margin: var(--espaco-1) 0 0; }
+.ros-secao__titulo em { color: var(--mariano); }
+@media (min-width: 1024px) { .ros-secao { padding-block: var(--espaco-16); } }
+
+/* ---------- schedule (Horários) ---------- */
 .ros-horarios { container-type: inline-size; background: var(--fundo-elevado); border: 1px solid var(--linha); border-radius: var(--raio-g); box-shadow: var(--sombra-card); padding: var(--espaco-4); }
 .ros-horarios__topo { display: flex; align-items: baseline; justify-content: space-between; gap: var(--espaco-3); flex-wrap: wrap; margin-bottom: var(--espaco-3); }
 .ros-horarios__topo h3 { font-family: var(--font-serif); font-weight: 600; font-size: 26px; line-height: 32px; margin: 0; }
@@ -78,23 +210,43 @@ body { margin: 0; font-family: var(--font-sans); font-size: 17px; line-height: 2
 .ros-horarios__nota { display: block; font-weight: 400; font-size: 15px; line-height: 20px; color: var(--texto-suave); }
 .ros-horarios__horas { display: flex; gap: var(--espaco-2); flex-wrap: wrap; justify-content: flex-end; }
 .ros-hora { font-weight: 600; font-size: 22px; line-height: 28px; padding: 2px var(--espaco-3); border-radius: var(--raio-m); background: var(--fundo-afundado); color: var(--texto); font-variant-numeric: tabular-nums; }
-.ros-horarios__dia--hoje { background: var(--mariano-suave); margin: 0 calc(var(--espaco-4) * -1); padding-left: var(--espaco-4); padding-right: var(--espaco-4); border-top-color: transparent; }
+/* "today": footer-toned background; the time stays blue inside the blue outline, the "hoje" tag is a quiet grey */
+.ros-horarios__dia--hoje { background: var(--fundo-afundado); margin: 0 calc(var(--espaco-4) * -1); padding-left: var(--espaco-4); padding-right: var(--espaco-4); border-color: var(--fundo-afundado); }
 .ros-horarios__dia--hoje .ros-hora { background: var(--fundo-elevado); color: var(--mariano); box-shadow: inset 0 0 0 1px var(--mariano); }
-.ros-hoje { font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--mariano); margin-left: var(--espaco-2); }
+.ros-hoje { font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--texto-suave); margin-left: var(--espaco-2); }
 @container (min-width: 640px) {
   .ros-horarios { padding: var(--espaco-6); }
   .ros-horarios__lista { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--espaco-3); }
   .ros-horarios__dia { flex-direction: column; align-items: flex-start; justify-content: flex-start; border: 1px solid var(--linha); border-radius: var(--raio-m); padding: var(--espaco-3) var(--espaco-4); }
-  .ros-horarios__dia--hoje { margin: 0; border-color: var(--mariano-suave); }
+  .ros-horarios__dia--hoje { margin: 0; border-color: var(--fundo-afundado); }
   .ros-horarios__horas { justify-content: flex-start; }
 }
 
-/* ---------- evento ---------- */
+/* grid of schedule cards (home page and /horarios). The cards have very different heights (Mass has five
+   rows, the Rosary one), and a row grid left holes under the short ones. In columns every card rises to
+   the one above. Phone (<640px): one column. Reading order: down one column, then the next. */
+.ros-horarios-grade > * { break-inside: avoid; margin-bottom: var(--espaco-6); }
+.ros-horarios-grade > :last-child { margin-bottom: 0; }
+@media (min-width: 640px) { .ros-horarios-grade { column-count: 2; column-gap: var(--espaco-6); } }
+/* schedule page on desktop (with five cards): Mass on the left; Confession and Rosary on top; Secretary
+   and Adoration below. Each block says where it goes in `--area`; cards in a row share their height. */
+@media (min-width: 1024px) {
+  .ros-horarios-grade--painel { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-areas: 'missa confissao rosario' 'missa secretaria adoracao'; gap: var(--espaco-6); column-count: auto; }
+  .ros-horarios-grade--painel > * { grid-area: var(--area); margin-bottom: 0; }
+}
+
+/* ---------- event ----------
+   Date block tones: neutral by default; --festa gold (feasts and solemnities); --franciscano terracotta
+   (the friars' dates); --mariano blue, only for Our Lady and the patron feast. */
+.ros-grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--espaco-6); }
+/* event cards in one grid share the height of the tallest */
+.ros-grade:has(> .ros-evento) { grid-auto-rows: 1fr; }
 .ros-evento { container-type: inline-size; display: block; text-decoration: none; color: inherit; }
-.ros-evento__in { display: flex; gap: var(--espaco-4); align-items: flex-start; background: var(--fundo-elevado); border: 1px solid var(--linha); border-radius: var(--raio-m); padding: var(--espaco-4); box-shadow: var(--sombra-card); }
-.ros-data { flex: none; width: 64px; text-align: center; background: var(--mariano-suave); color: var(--mariano); border-radius: var(--raio-arco) var(--raio-arco) var(--raio-p) var(--raio-p); padding: var(--espaco-4) 0 var(--espaco-2); }
+.ros-evento__in { display: flex; gap: var(--espaco-4); align-items: flex-start; height: 100%; background: var(--fundo-elevado); border: 1px solid var(--linha); border-radius: var(--raio-m); padding: var(--espaco-4); box-shadow: var(--sombra-card); }
+.ros-data { flex: none; width: 64px; text-align: center; background: var(--fundo-afundado); color: var(--acao); border-radius: var(--raio-arco) var(--raio-arco) var(--raio-p) var(--raio-p); padding: var(--espaco-4) 0 var(--espaco-2); }
 .ros-data b { display: block; font-family: var(--font-serif); font-size: 28px; line-height: 28px; font-weight: 700; }
 .ros-data span { display: block; font-size: 12px; line-height: 16px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; margin-top: 2px; }
+.ros-data--mariano { background: var(--mariano-suave); color: var(--mariano); }
 .ros-data--franciscano { background: var(--terracota-suave); color: var(--terracota); }
 .ros-data--festa { background: var(--ouro-suave); color: var(--ouro-texto); }
 .ros-evento__titulo { font-family: var(--font-serif); font-size: 22px; line-height: 28px; font-weight: 600; margin: var(--espaco-1) 0 0; }
@@ -102,21 +254,26 @@ body { margin: 0; font-family: var(--font-sans); font-size: 17px; line-height: 2
 .ros-evento__meta { font-size: 15px; line-height: 22px; color: var(--texto-suave); margin: var(--espaco-1) 0 0; }
 @container (min-width: 520px) { .ros-evento__in { padding: var(--espaco-6); gap: var(--espaco-6); } .ros-data { width: 76px; } .ros-evento__titulo { font-size: 26px; line-height: 32px; } }
 
-/* ---------- pastoral ---------- */
+/* ---------- community card (Nossa Comunidade) ----------
+   The top strip says what kind of group it is. On the Nossa Comunidade page: --pastoral dark brown;
+   --movimento (movements, groups, ministries, projects) a lighter brown. Other pages may use the family
+   tones: --franciscano, --mariano, --social. The button always sits at the foot of the card. */
 .ros-pastoral { container-type: inline-size; background: var(--fundo-elevado); border: 1px solid var(--linha); border-radius: var(--raio-g); overflow: hidden; display: flex; flex-direction: column; }
 .ros-pastoral__faixa { height: 4px; background: var(--acao); }
 .ros-pastoral--franciscano .ros-pastoral__faixa { background: var(--terracota); }
 .ros-pastoral--mariano .ros-pastoral__faixa { background: var(--mariano); }
 .ros-pastoral--social .ros-pastoral__faixa { background: var(--verde); }
-.ros-pastoral__corpo { padding: var(--espaco-4); display: grid; gap: var(--espaco-2); }
+.ros-pastoral--pastoral .ros-pastoral__faixa { background: var(--marrom); }
+.ros-pastoral--movimento .ros-pastoral__faixa { background: color-mix(in srgb, var(--acao) 55%, var(--fundo-elevado)); }
+.ros-pastoral__corpo { flex: 1; padding: var(--espaco-4); display: flex; flex-direction: column; gap: var(--espaco-2); }
+.ros-pastoral__corpo > :last-child { margin-top: auto; }
 .ros-pastoral__corpo h3 { font-family: var(--font-serif); font-weight: 600; font-size: 24px; line-height: 30px; margin: 0; }
 .ros-pastoral__corpo p { margin: 0; color: var(--texto-suave); }
 .ros-pastoral__info { list-style: none; padding: 0; margin: var(--espaco-2) 0; display: grid; gap: var(--espaco-1); font-size: 15px; line-height: 22px; }
 .ros-pastoral__info b { color: var(--texto); }
 @container (min-width: 400px) { .ros-pastoral__corpo { padding: var(--espaco-6); } }
-.ros-grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--espaco-6); }
 
-/* ---------- aviso ---------- */
+/* ---------- notice ---------- */
 .ros-aviso { display: flex; gap: var(--espaco-3); align-items: flex-start; border-radius: var(--raio-m); padding: var(--espaco-4); background: var(--mariano-suave); color: var(--texto); border: 1px solid transparent; }
 .ros-aviso svg { flex: none; width: 22px; height: 22px; color: var(--mariano); margin-top: 2px; }
 .ros-aviso p { margin: 0; }
@@ -127,7 +284,7 @@ body { margin: 0; font-family: var(--font-sans); font-size: 17px; line-height: 2
 .ros-aviso--mudanca { background: var(--fundo-elevado); border-color: var(--alerta); border-left-width: 1px; }
 .ros-aviso--mudanca svg { color: var(--alerta); }
 
-/* ---------- selo litúrgico ---------- */
+/* ---------- liturgical colour badge ---------- */
 .ros-selo { display: inline-flex; align-items: center; gap: var(--espaco-2); font-size: 15px; line-height: 20px; font-weight: 600; padding: var(--espaco-1) var(--espaco-3) var(--espaco-1) var(--espaco-2); border-radius: var(--raio-arco); background: var(--fundo-elevado); border: 1px solid var(--linha); color: var(--texto); }
 .ros-selo i { width: 14px; height: 14px; border-radius: 50%; display: inline-block; }
 .ros-selo--verde i { background: var(--liturgico-verde); }
@@ -136,58 +293,80 @@ body { margin: 0; font-family: var(--font-sans); font-size: 17px; line-height: 2
 .ros-selo--vermelho i { background: var(--liturgico-vermelho); }
 .ros-selo--rosa i { background: var(--liturgico-rosa); }
 
-/* ---------- divisor terço ---------- */
+/* ---------- rosary divider ---------- */
 .ros-terco { display: flex; align-items: center; justify-content: center; gap: 7px; padding: var(--espaco-6) 0; }
 .ros-terco::before, .ros-terco::after { content: ""; flex: 1; max-width: 160px; height: 1px; background: var(--linha); }
 .ros-terco i { width: 5px; height: 5px; border-radius: 50%; background: var(--ouro); display: block; }
 .ros-terco i.grande { width: 10px; height: 10px; margin: 0 4px; }
 
-/* ---------- doação pix ---------- */
+/* ---------- Pix donation ---------- */
 .ros-pix { container-type: inline-size; background: var(--terracota-suave); border-radius: var(--raio-g); padding: var(--espaco-6) var(--espaco-4); }
 .ros-pix h3 { font-family: var(--font-serif); font-weight: 600; font-size: 26px; line-height: 32px; margin: var(--espaco-2) 0 var(--espaco-2); }
 .ros-pix h3 em { font-weight: 500; }
 .ros-pix p { margin: 0 0 var(--espaco-4); color: var(--texto); max-width: var(--medida-texto); }
 .ros-pix__chave { display: flex; flex-direction: column; gap: var(--espaco-3); }
 .ros-pix__valor { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 16px; line-height: 22px; background: var(--fundo-elevado); border: 1px dashed var(--linha-forte); border-radius: var(--raio-m); padding: var(--espaco-3) var(--espaco-4); word-break: break-all; color: var(--texto); }
+/* holder on the first line and, optionally, the bank account on the next (separated with <br>) */
 .ros-pix .ros-pix__titular { font-size: 15px; color: var(--texto-suave); margin: var(--espaco-2) 0 0; }
 .ros-pix .ros-sobrelinha { color: var(--terracota); }
 @container (min-width: 560px) { .ros-pix { padding: var(--espaco-8); } .ros-pix__chave { flex-direction: row; align-items: stretch; } .ros-pix__valor { flex: 1; } }
 
-/* ---------- liturgia do dia ---------- */
-.ros-liturgia { container-type: inline-size; background: var(--fundo-elevado); border: 1px solid var(--linha); border-radius: var(--raio-g); padding: var(--espaco-6) var(--espaco-4); }
+/* ---------- daily liturgy ----------
+   The readings come one after the other, as in the missal; the tabs are plain links that jump to a reading
+   (and highlight the one on screen). Four sizes move together so the hierarchy survives when the reader
+   enlarges the text with "Aa": --lt-texto (reading), --lt-anuncio (announcement, smaller), --lt-ref
+   (reference, bigger: it marks where each reading starts) and --lt-linha (line height).
+   Phone: 17px by default (the project floor on phones is 16px). Wide card: 15px, so more fits on screen. */
+.ros-liturgia { container-type: inline-size; --lt-texto: 17px; --lt-linha: 28px; --lt-anuncio: 15px; --lt-ref: 19px; background: var(--fundo-elevado); border: 1px solid var(--linha); border-radius: var(--raio-g); padding: var(--espaco-6) var(--espaco-4); }
+.ros-liturgia[data-tamanho='2'] { --lt-texto: 21px; --lt-linha: 34px; --lt-anuncio: 17px; --lt-ref: 22px; }
+.ros-liturgia[data-tamanho='3'] { --lt-texto: 25px; --lt-linha: 40px; --lt-anuncio: 19px; --lt-ref: 26px; }
 .ros-liturgia__data { font-size: 15px; line-height: 22px; color: var(--texto-suave); margin: 0; }
 .ros-liturgia__titulo { font-family: var(--font-serif); font-weight: 600; font-size: 26px; line-height: 32px; margin: var(--espaco-1) 0 0; color: var(--texto); }
 .ros-liturgia__celebracao { display: flex; align-items: center; gap: var(--espaco-2); font-size: 15px; line-height: 22px; color: var(--texto-suave); margin: var(--espaco-2) 0 0; }
 .ros-liturgia__cor { width: 10px; height: 10px; border-radius: 50%; flex: none; box-shadow: inset 0 0 0 1px rgba(74,55,38,0.25); }
-.ros-liturgia__barra { display: flex; align-items: center; gap: var(--espaco-2); margin-top: var(--espaco-6); border-bottom: 1px solid var(--linha); }
+/* the line under the tabs is drawn beneath them (1px, no border) and the current tab covers it with its
+   underline, so both sit on exactly the same line */
+.ros-liturgia__barra { display: flex; align-items: center; gap: var(--espaco-2); margin-top: var(--espaco-6); box-shadow: inset 0 -1px 0 var(--linha); }
 .ros-liturgia__abas { display: flex; gap: var(--espaco-4); overflow-x: auto; scrollbar-width: none; flex: 1; }
-.ros-liturgia__abas input { position: absolute; opacity: 0; pointer-events: none; }
-.ros-aba { flex: none; font-weight: 600; font-size: 16px; line-height: 22px; min-height: var(--toque-min); display: inline-flex; align-items: center; color: var(--texto-suave); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.ros-aba { flex: none; font-weight: 600; font-size: 16px; line-height: 22px; min-height: var(--toque-min); display: inline-flex; align-items: center; color: var(--texto-suave); text-decoration: none; cursor: pointer; border-bottom: 2px solid transparent; }
 .ros-aba:hover { color: var(--texto); }
-.ros-liturgia__abas input:checked + .ros-aba { color: var(--texto); border-bottom-color: var(--ouro); }
-.ros-liturgia__abas input:focus-visible + .ros-aba { outline: 2px solid var(--foco); outline-offset: 2px; }
+.ros-aba[aria-current] { color: var(--texto); border-bottom-color: var(--mariano); }
 .ros-aa { flex: none; font: inherit; font-family: var(--font-serif); font-size: 17px; min-width: var(--toque-min); min-height: var(--toque-min); background: transparent; border: 0; color: var(--texto-suave); cursor: pointer; border-radius: var(--raio-m); }
 .ros-aa:hover { background: var(--fundo-afundado); color: var(--texto); }
-.ros-leitura { display: none; padding-top: var(--espaco-6); }
-.ros-leitura__ref { font-size: 15px; line-height: 22px; font-weight: 600; color: var(--mariano); margin: 0; }
-.ros-leitura__texto { font-size: 19px; line-height: 32px; max-width: var(--medida-texto); margin: var(--espaco-3) 0 0; color: var(--texto); }
+/* no line between readings (it would blend with the tabs and the credit): the bigger gap and the blue reference separate them. `position: relative` keeps the sr-only <h3> inside the scroll area. */
+.ros-leitura { position: relative; padding-top: var(--espaco-6); }
+.ros-leitura + .ros-leitura { padding-top: var(--espaco-8); }
+/* the reference (Ap 5,1-10, Sl 95, Lc 19,41-44) is each reading's landmark: bigger and bolder than the text, in blue */
+.ros-leitura__ref { font-size: var(--lt-ref); line-height: 1.3; font-weight: 700; color: var(--mariano); margin: 0; }
+.ros-leitura__texto { font-size: var(--lt-texto); line-height: var(--lt-linha); max-width: var(--medida-texto); margin: var(--espaco-3) 0 0; color: var(--texto); }
 .ros-leitura__texto p { margin: 0 0 var(--espaco-4); }
-.ros-leitura__aclamacao { font-size: 16px; line-height: 24px; font-style: italic; color: var(--texto-suave); margin: var(--espaco-2) 0 0; }
-.ros-liturgia__fonte { font-size: 13px; line-height: 18px; color: var(--texto-suave); margin: var(--espaco-6) 0 0; }
+/* announcement before the reading, psalm refrain, and the people's answer after it (bold, as in the missal) */
+.ros-leitura__abertura { font-size: var(--lt-anuncio); line-height: 1.5; font-style: italic; color: var(--texto-suave); }
+.ros-leitura__abertura strong { font-style: normal; color: var(--texto); }
+.ros-leitura__refrao { color: var(--texto); }
+.ros-leitura__fecho { margin-top: var(--espaco-6); }
+/* the credit sits at the foot of the card (on desktop it stays put under the scrolling text) */
+.ros-liturgia__fonte { font-size: 13px; line-height: 18px; color: var(--texto-suave); margin: var(--espaco-4) 0 0; padding-top: var(--espaco-3); border-top: 1px solid var(--linha); }
 .ros-liturgia__fonte a { color: inherit; }
+/* fallback card when the readings are unavailable */
+.ros-liturgia__reserva { margin: var(--espaco-4) 0; max-width: var(--medida-texto); }
 @container (min-width: 640px) {
   .ros-liturgia { padding: var(--espaco-8); }
   .ros-liturgia__titulo { font-size: 30px; line-height: 36px; }
   .ros-liturgia__abas { gap: var(--espaco-6); }
+  /* the sizes live on the child because the card itself is the query container, and a query only reaches what is inside it */
+  .ros-liturgia .ros-liturgia__leituras { --lt-texto: 15px; --lt-linha: 26px; --lt-anuncio: 14px; --lt-ref: 18px; }
+  .ros-liturgia[data-tamanho='2'] .ros-liturgia__leituras { --lt-texto: 19px; --lt-linha: 32px; --lt-anuncio: 16px; --lt-ref: 21px; }
+  .ros-liturgia[data-tamanho='3'] .ros-liturgia__leituras { --lt-texto: 23px; --lt-linha: 37px; --lt-anuncio: 18px; --lt-ref: 25px; }
 }
-/* resumo para a página inicial */
+/* summary for the home page */
 .ros-liturgia-resumo { display: flex; gap: var(--espaco-4); align-items: center; background: var(--fundo-elevado); border: 1px solid var(--linha); border-radius: var(--raio-m); padding: var(--espaco-4); text-decoration: none; color: inherit; }
 .ros-liturgia-resumo__icone { flex: none; width: 48px; height: 48px; border-radius: var(--raio-arco) var(--raio-arco) var(--raio-p) var(--raio-p); background: var(--mariano-suave); color: var(--mariano); display: grid; place-items: center; }
 .ros-liturgia-resumo__icone svg { width: 24px; height: 24px; }
 .ros-liturgia-resumo b { display: block; color: var(--texto); font-family: var(--font-serif); font-weight: 600; font-size: 20px; line-height: 26px; }
 .ros-liturgia-resumo__meta { display: block; font-size: 15px; line-height: 22px; color: var(--texto-suave); }
 
-/* ---------- santo do dia ---------- */
+/* ---------- saint of the day (text only: no images) ---------- */
 .ros-santo { container-type: inline-size; background: var(--fundo-elevado); border: 1px solid var(--linha); border-radius: var(--raio-g); padding: var(--espaco-6) var(--espaco-4); }
 .ros-santo__rotulo { font-size: 15px; line-height: 22px; color: var(--texto-suave); margin: 0; }
 .ros-santo__nome { font-family: var(--font-serif); font-weight: 600; font-size: 26px; line-height: 32px; margin: var(--espaco-1) 0 0; color: var(--texto); }
@@ -195,26 +374,51 @@ body { margin: 0; font-family: var(--font-sans); font-size: 17px; line-height: 2
 .ros-santo__meta { font-size: 15px; line-height: 22px; color: var(--texto-suave); margin: var(--espaco-2) 0 0; }
 .ros-santo__familia { color: var(--terracota); font-weight: 600; }
 .ros-santo--mariano .ros-santo__familia { color: var(--mariano); }
+.ros-santo__datas { white-space: nowrap; }
 .ros-santo__bio { font-size: 17px; line-height: 28px; margin: var(--espaco-4) 0 0; max-width: var(--medida-texto); color: var(--texto); }
-.ros-santo__link { display: inline-flex; align-items: center; min-height: var(--toque-min); margin-top: var(--espaco-2); font-weight: 600; color: var(--mariano); text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
+.ros-santo__link { display: inline-flex; align-items: center; min-height: var(--toque-min); margin-top: var(--espaco-2); font-weight: 600; color: var(--mariano); }
+.ros-santo__outros { margin: var(--espaco-4) 0 0; color: var(--texto-suave); }
+/* same credit line as the readings card */
+.ros-santo__fonte { font-size: 13px; line-height: 18px; color: var(--texto-suave); margin: var(--espaco-4) 0 0; }
+.ros-santo__fonte a { color: inherit; }
 @container (min-width: 520px) { .ros-santo { padding: var(--espaco-8); } .ros-santo__nome { font-size: 30px; line-height: 36px; } }
 
-/* ---------- página liturgia (composição) ---------- */
+/* ---------- page composition: Liturgia ----------
+   Phone order: title, readings, dates, saint and Mass (people from WhatsApp want the Gospel first).
+   `display: contents` releases the title and dates into the page grid just so they can be ordered.
+   Desktop (≥1000px): the dates rise to the title row and the readings card takes the height of the column
+   beside it (saint + Mass); the text scrolls inside the card, with tabs and title fixed. */
 .ros-pagina { container-type: inline-size; background: var(--fundo); }
-.ros-pagina__in { display: grid; gap: var(--espaco-6); padding: var(--espaco-6) var(--espaco-4) var(--espaco-12); }
+.ros-pagina__in { display: grid; gap: var(--espaco-6); max-width: var(--container-max); margin-inline: auto; padding: var(--espaco-6) var(--espaco-4) var(--espaco-12); }
 .ros-pagina__titulo { font-family: var(--font-serif); font-weight: 600; font-size: 36px; line-height: 42px; margin: var(--espaco-1) 0 0; }
 .ros-pagina__lateral { display: grid; gap: var(--espaco-6); align-content: start; }
+.ros-pagina__especiais { margin: var(--espaco-4) 0 0; color: var(--texto-suave); }
+.ros-pagina--liturgia .ros-pagina__cab { display: contents; }
+.ros-pagina--liturgia .ros-pagina__leitura { order: 1; }
+.ros-pagina--liturgia .ros-pagina__datas { order: 2; }
+.ros-pagina--liturgia .ros-pagina__lateral { order: 3; }
+.ros-pagina--liturgia .ros-pagina__datas > nav { padding-top: 0; }
+/* the reading area scrolls inside the card when the card has a fixed height (desktop); outside the query on
+   purpose, because the card is a container and a query inside it would measure the card, not the page */
+.ros-pagina--liturgia .ros-pagina__leitura--com-lateral .ros-liturgia__leituras { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding-right: var(--espaco-2); scrollbar-width: thin; scrollbar-color: var(--texto-suave) transparent; }
 @container (min-width: 1000px) {
   .ros-pagina__in { grid-template-columns: minmax(0, 1.6fr) minmax(320px, 1fr); padding: var(--espaco-12) var(--espaco-8) var(--espaco-16); gap: var(--espaco-8); }
   .ros-pagina__cab { grid-column: 1 / -1; }
+  /* a reading column wider than 1.6fr, for more text per line */
+  .ros-pagina--liturgia .ros-pagina__in { grid-template-columns: minmax(0, 2.1fr) minmax(320px, 1fr); }
+  .ros-pagina--liturgia .ros-pagina__cab { display: flex; grid-column: 1; grid-row: 1; align-items: center; justify-content: space-between; gap: var(--espaco-6); }
+  .ros-pagina--liturgia .ros-pagina__datas > nav { flex-wrap: nowrap; justify-content: flex-end; }
+  .ros-pagina--liturgia .ros-pagina__leitura { grid-column: 1; grid-row: 2; }
+  .ros-pagina--liturgia .ros-pagina__lateral { grid-column: 2; grid-row: 2; }
+  /* `contain: size` takes the text out of the height: the row height comes from the column beside it or from
+     the minimum. The minimum follows the window (the card fills the screen below the title; 15rem is the
+     header, the title and some air), at least 480px and at most 60rem, so the text has plenty of room even
+     when the saint of the day has little to say. */
+  .ros-pagina--liturgia .ros-pagina__leitura--com-lateral { display: flex; flex-direction: column; gap: var(--espaco-4); contain: size; min-height: clamp(calc(var(--espaco-12) * 10), calc(100dvh - 15rem), 60rem); }
+  .ros-pagina--liturgia .ros-pagina__leitura--com-lateral .ros-liturgia { display: flex; flex: 1; flex-direction: column; min-height: 0; }
 }
-/* abas sem JavaScript: o rádio marcado mostra a leitura correspondente */
-.ros-liturgia:has(input[value="l1"]:checked) .ros-leitura[data-leitura="l1"],
-.ros-liturgia:has(input[value="sl"]:checked) .ros-leitura[data-leitura="sl"],
-.ros-liturgia:has(input[value="l2"]:checked) .ros-leitura[data-leitura="l2"],
-.ros-liturgia:has(input[value="ev"]:checked) .ros-leitura[data-leitura="ev"] { display: block; }
 
-/* ---------- blog: card de post ---------- */
+/* ---------- blog: post card ---------- */
 .ros-post { container-type: inline-size; display: flex; flex-direction: column; background: var(--fundo-elevado); border: 1px solid var(--linha); border-radius: var(--raio-g); overflow: hidden; text-decoration: none; color: inherit; height: 100%; }
 .ros-post:hover .ros-post__titulo { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
 .ros-post__corpo { padding: var(--espaco-6) var(--espaco-4); display: flex; flex-direction: column; gap: var(--espaco-2); flex: 1; }
@@ -226,8 +430,8 @@ body { margin: 0; font-family: var(--font-sans); font-size: 17px; line-height: 2
 .ros-post__meta { font-size: 14px; line-height: 20px; color: var(--texto-suave); margin: auto 0 0; padding-top: var(--espaco-2); }
 @container (min-width: 420px) { .ros-post__corpo { padding: var(--espaco-6); } }
 
-/* miniatura de vídeo (fachada leve do YouTube) */
-.ros-video { position: relative; aspect-ratio: 16 / 9; background: var(--fundo-afundado); display: grid; place-items: center; overflow: hidden; border: 0; padding: 0; width: 100%; cursor: pointer; font: inherit; color: inherit; }
+/* video thumbnail (a light YouTube facade) and the player that replaces it on click */
+.ros-video { position: relative; aspect-ratio: 16 / 9; background: var(--fundo-afundado); display: grid; place-items: center; overflow: hidden; border: 0; padding: 0; width: 100%; cursor: pointer; font: inherit; color: inherit; text-decoration: none; }
 .ros-video img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .ros-video__play { position: relative; width: 56px; height: 56px; border-radius: 50%; background: var(--fundo-elevado); color: var(--texto); display: grid; place-items: center; box-shadow: 0 1px 3px rgba(74,55,38,0.15); }
 .ros-video__play svg { width: 22px; height: 22px; margin-left: 3px; }
@@ -235,16 +439,28 @@ body { margin: 0; font-family: var(--font-sans); font-size: 17px; line-height: 2
 .ros-video--grande { border-radius: var(--raio-g); }
 .ros-video--grande .ros-video__play { width: 72px; height: 72px; }
 .ros-video--grande .ros-video__play svg { width: 28px; height: 28px; }
+.ros-video__player { display: block; width: 100%; aspect-ratio: 16 / 9; border: 0; }
+.ros-video__player--grande { border-radius: var(--raio-g); }
 
-/* filtros (mesmo desenho das abas da liturgia) */
+/* filters (same drawing as the liturgy tabs) */
 .ros-filtros { display: flex; gap: var(--espaco-6); overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--linha); }
-.ros-filtros a { flex: none; font-weight: 600; font-size: 16px; line-height: 22px; min-height: var(--toque-min); display: inline-flex; align-items: center; color: var(--texto-suave); text-decoration: none; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.ros-filtros a { flex: none; font-weight: 600; font-size: 16px; line-height: 22px; min-width: var(--toque-min); min-height: var(--toque-min); display: inline-flex; align-items: center; justify-content: center; color: var(--texto-suave); text-decoration: none; border-bottom: 2px solid transparent; margin-bottom: -1px; }
 .ros-filtros a:hover { color: var(--texto); }
 .ros-filtros a[aria-current="true"] { color: var(--texto); border-bottom-color: var(--ouro); }
 
-/* página do blog */
+/* pagination and date navigation: ghost button on the left, secondary on the right; an empty side keeps the other in its corner */
+.ros-paginacao, .ros-datas { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--espaco-3) var(--espaco-6); padding-top: var(--espaco-6); }
+.ros-paginacao { border-top: 1px solid var(--linha); }
+.ros-paginacao__posicao { margin: 0; color: var(--texto-suave); }
+
+/* empty state */
+.ros-vazio { display: grid; justify-items: start; gap: var(--espaco-3); padding: var(--espaco-8) var(--espaco-6); background: var(--fundo-afundado); border-radius: var(--raio-g); }
+.ros-vazio__titulo { margin: 0; font-family: var(--font-serif); font-weight: 600; font-size: 20px; line-height: 28px; }
+.ros-vazio__texto { margin: 0; max-width: var(--medida-texto); color: var(--texto-suave); }
+
+/* blog page */
 .ros-blog { container-type: inline-size; background: var(--fundo); }
-.ros-blog__in { display: grid; gap: var(--espaco-6); padding: var(--espaco-8) var(--espaco-4) var(--espaco-12); }
+.ros-blog__in { display: grid; gap: var(--espaco-6); max-width: var(--container-max); margin-inline: auto; padding: var(--espaco-8) var(--espaco-4) var(--espaco-12); }
 .ros-blog__intro { font-size: 18px; line-height: 28px; color: var(--texto-suave); margin: var(--espaco-2) 0 0; max-width: var(--medida-texto); }
 .ros-blog__grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--espaco-6); }
 .ros-blog__destaque .ros-post__titulo { font-size: 26px; line-height: 32px; }
@@ -256,22 +472,69 @@ body { margin: 0; font-family: var(--font-sans); font-size: 17px; line-height: 2
   .ros-blog__destaque .ros-post__titulo { font-size: 32px; line-height: 40px; }
 }
 
-/* página do post */
+/* plain inner page (title, optional intro, then the content) */
+.ros-interna { display: grid; gap: var(--espaco-8); padding-block: var(--espaco-8) var(--espaco-12); }
+.ros-interna__intro { max-width: var(--medida-texto); margin: var(--espaco-2) 0 0; color: var(--texto-suave); }
+@media (min-width: 1024px) { .ros-interna { padding-block: var(--espaco-12) var(--espaco-16); } }
+
+/* post / text page */
 .ros-artigo { container-type: inline-size; background: var(--fundo); }
 .ros-artigo__in { max-width: 720px; margin: 0 auto; padding: var(--espaco-8) var(--espaco-4) var(--espaco-12); }
 .ros-artigo__voltar { font-size: 15px; color: var(--texto-suave); text-decoration: none; display: inline-flex; min-height: var(--toque-min); align-items: center; }
 .ros-artigo__titulo { font-family: var(--font-serif); font-weight: 600; font-size: 32px; line-height: 40px; margin: var(--espaco-2) 0 0; color: var(--texto); }
+.ros-artigo__resumo { margin: var(--espaco-4) 0 0; color: var(--texto-suave); }
+.ros-artigo__vazio { margin-top: var(--espaco-8); }
 .ros-artigo__autor { font-size: 15px; line-height: 22px; color: var(--texto-suave); margin: var(--espaco-3) 0 0; }
 .ros-artigo__autor b { color: var(--texto); font-weight: 600; }
 .ros-artigo__midia { margin: var(--espaco-8) 0 0; }
 .ros-artigo__midia figcaption { font-size: 14px; line-height: 20px; color: var(--texto-suave); margin-top: var(--espaco-2); }
 .ros-artigo__texto { font-size: 19px; line-height: 32px; color: var(--texto); margin-top: var(--espaco-8); }
+/* a reading block right after a subtitle skips the opening gap */
+.ros-artigo__texto--compacto { margin-top: 0; }
 .ros-artigo__texto p { margin: 0 0 var(--espaco-6); }
+.ros-artigo__texto ul, .ros-artigo__texto ol { margin: 0 0 var(--espaco-6); padding-left: var(--espaco-6); }
+.ros-artigo__texto li { margin-bottom: var(--espaco-2); }
 .ros-artigo__texto h2 { font-family: var(--font-serif); font-weight: 600; font-size: 24px; line-height: 32px; margin: var(--espaco-8) 0 var(--espaco-3); }
+.ros-artigo__texto h3 { font-family: var(--font-serif); font-weight: 600; font-size: 20px; line-height: 28px; margin: var(--espaco-6) 0 var(--espaco-2); }
 .ros-artigo__texto blockquote { margin: var(--espaco-8) 0; padding: 0; font-family: var(--font-serif); font-style: italic; font-size: 24px; line-height: 34px; color: var(--mariano); }
+.ros-artigo__subtitulo { font-family: var(--font-serif); font-weight: 600; font-size: 24px; line-height: 32px; margin: var(--espaco-8) 0 var(--espaco-3); }
 .ros-artigo__rodape { border-top: 1px solid var(--linha); margin-top: var(--espaco-8); padding-top: var(--espaco-6); font-size: 15px; line-height: 24px; color: var(--texto-suave); }
 .ros-artigo__rodape b { display: block; color: var(--texto); font-weight: 600; font-size: 16px; }
 @container (min-width: 640px) {
   .ros-artigo__in { padding: var(--espaco-12) var(--espaco-8) var(--espaco-16); }
   .ros-artigo__titulo { font-size: 44px; line-height: 52px; }
 }
+
+/* ---------- footer ---------- */
+.ros-rodape { container-type: inline-size; background: var(--fundo-afundado); color: var(--texto-suave); border-top: 1px solid var(--linha); }
+.ros-rodape__grade { display: grid; gap: var(--espaco-8); padding-block: var(--espaco-12) var(--espaco-8); }
+.ros-rodape__marca { display: grid; gap: var(--espaco-3); align-content: start; }
+.ros-rodape__marca-link { display: flex; align-items: center; gap: var(--espaco-2); color: var(--texto); text-decoration: none; }
+.ros-rodape__marca-link img { width: 48px; height: 48px; }
+/* same as the header: just the parish name, in normal letters, at most two lines */
+.ros-rodape__nome { display: block; max-width: 10.5em; font-weight: 700; font-size: 16px; line-height: 19px; text-wrap: balance; transform: translateY(0.1em); }
+.ros-rodape__sub { display: block; font-size: 15px; line-height: 20px; color: var(--texto-suave); }
+.ros-rodape address { font-style: normal; font-size: 16px; line-height: 24px; }
+.ros-rodape__titulo { margin: 0 0 var(--espaco-2); font-family: var(--font-sans); font-size: 15px; line-height: 22px; font-weight: 700; letter-spacing: .04em; color: var(--texto); }
+.ros-rodape ul { list-style: none; margin: 0; padding: 0; }
+/* 44px wide as well ("Início" and "Blog" are only 37px and 34px of text); the underline follows the text */
+.ros-rodape a:not(.ros-rodape__marca-link) { display: inline-flex; align-items: center; min-width: var(--toque-min); min-height: var(--toque-min); color: var(--texto); font-size: 16px; text-decoration-line: underline; text-decoration-thickness: 1.5px; text-underline-offset: 0.28em; text-decoration-color: color-mix(in srgb, currentColor 45%, transparent); }
+.ros-rodape a:not(.ros-rodape__marca-link):hover { color: var(--mariano); text-decoration-color: currentColor; text-underline-offset: 0.4em; }
+@media (prefers-reduced-motion: no-preference) {
+  .ros-rodape a:not(.ros-rodape__marca-link) { transition: color .2s ease, text-decoration-color .2s ease, text-underline-offset .2s ease; }
+}
+.ros-rodape__como-chegar { justify-self: start; }
+.ros-rodape__base { border-top: 1px solid var(--linha); padding-block: var(--espaco-6); font-size: 14px; line-height: 20px; }
+.ros-rodape__base p { margin: 0; }
+@container (min-width: 640px) { .ros-rodape__grade { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@container (min-width: 1024px) { .ros-rodape__grade { grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: var(--espaco-12); padding-block: var(--espaco-16) var(--espaco-12); } }
+
+/* ---------- phone bar (Horários · Como chegar · WhatsApp) ----------
+   Fixed to the bottom of the screen below 1024px; a spacer reserves its height so it never covers the footer. */
+.ros-barra { background: var(--fundo-elevado); border-top: 1px solid var(--linha); }
+.ros-barra--fixa { position: fixed; inset: auto 0 0; z-index: 40; padding-bottom: env(safe-area-inset-bottom); }
+.ros-barra ul { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; list-style: none; margin: 0; padding: 0; }
+.ros-barra a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--espaco-1); min-height: calc(var(--toque-min) + var(--espaco-3)); padding: var(--espaco-2); color: var(--texto); font-size: 14px; line-height: 18px; font-weight: 600; text-decoration: none; }
+.ros-barra a svg { width: 22px; height: 22px; color: var(--mariano); }
+.ros-barra-espaco { height: calc(var(--toque-min) + var(--espaco-3) + env(safe-area-inset-bottom)); }
+@media (min-width: 1024px) { .ros-barra--fixa, .ros-barra-espaco { display: none; } }

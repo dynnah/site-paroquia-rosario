@@ -25,14 +25,14 @@ const tituloId = `${id}-titulo`;
 ---
 
 <section
-  class:list={['secao', { 'secao--afundada': fundo === 'afundado' }]}
+  class:list={['ros-secao', { 'ros-secao--afundada': fundo === 'afundado' }]}
   aria-labelledby={tituloId}
 >
   <div class="container">
-    <header class="secao__cab">
+    <header class="ros-secao__cab">
       <div>
         {sobrelinha && <p class="ros-sobrelinha">{sobrelinha}</p>}
-        <h2 class="titulo-2 secao__titulo" id={tituloId}>
+        <h2 class="titulo-2 ros-secao__titulo" id={tituloId}>
           {titulo}
           {destaque && (
             <>
@@ -51,36 +51,3 @@ const tituloId = `${id}-titulo`;
     <slot />
   </div>
 </section>
-
-<style>
-  .secao {
-    padding-block: var(--espaco-12);
-  }
-
-  .secao--afundada {
-    background: var(--fundo-afundado);
-  }
-
-  .secao__cab {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: var(--espaco-3) var(--espaco-6);
-    margin-bottom: var(--espaco-6);
-  }
-
-  .secao__titulo {
-    margin: var(--espaco-1) 0 0;
-  }
-
-  .secao__titulo em {
-    color: var(--mariano);
-  }
-
-  @media (min-width: 1024px) {
-    .secao {
-      padding-block: var(--espaco-16);
-    }
-  }
-</style>
