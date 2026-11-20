@@ -1,113 +1,71 @@
-# Igreja do Rosário
+# Igreja do Rosário: design system
 
-Design system do site da **Paróquia Nossa Senhora do Rosário**, em Jaguaribe, João Pessoa (PB). A igreja foi erguida pelos frades franciscanos a partir de 1927 e é um prédio neoclássico. A comunidade é de bairro e atende muita gente idosa, jovens do EJC e da catequese, famílias do projeto de cestas básicas. Tudo aqui parte do que a paróquia já mostra no Instagram (@paroquiadorosariojp): o logo da fachada em marrom e creme, títulos em serifa com itálico, azul mariano nas festas de Nossa Senhora, ouro do altar e o marrom do hábito franciscano.
+Visual language of the site of **Paróquia Nossa Senhora do Rosário** (Jaguaribe, João Pessoa). It starts from what the parish already shows on Instagram: the facade logo in brown and cream, serif titles with an italic pair, Marian blue, altar gold and the brown of the Franciscan habit.
 
-O site é **celular primeiro**. A maioria das visitas vem de um link no Instagram ou no WhatsApp, num celular, procurando um horário. Tudo é desenhado para 360px e cresce a partir daí.
+**Phone first.** Most visits come from an Instagram or WhatsApp link, on a phone, looking for a time. Everything is designed for 360px and grows from there.
 
-## Princípios
+## Files
 
-1. **O horário primeiro.** Missa, confissão e secretaria aparecem acima da dobra em qualquer tela. Ninguém precisa abrir um menu para saber a que horas é a missa de domingo.
-2. **Legível para a vovó.** Corpo de texto nunca abaixo de 16px no celular (o token `corpo` é 17px), contraste AA em tudo, alvos de toque de `toque-min` (44px).
-3. **Delicado, nunca duro.** Fundo creme como papel de folheto, texto em marrom suave (não preto), cores de destaque em tons claros com o texto colorido por cima. Cor cheia e escura só no logo. Sem degradês, sem vidro, sem sombras pesadas.
-4. **Romano + itálico.** O gesto tipográfico da paróquia: uma linha em Playfair Display reta, a outra em itálico ("Nossa Senhora / *do Rosário*", "O Perdão / *de Assis*").
+| File | What it is |
+|---|---|
+| `tokens.css`, `tokens.json` | Design tokens (CSS variables, light and dark theme). Keep the two in sync |
+| `components/bundle.css` | Every `ros-*` class, reset and base styles. No JavaScript needed for the visuals |
+| `components/<Name>/preview.html` | Reference markup for the component. Copy it, do not invent another structure |
+| `components/<Name>/README.md` | Usage rules for the component |
+| `assets/Logos/` | The facade logo (original and transparent), see its README |
 
-## Voz
+**Language.** Docs, comments and labels are English. Identifiers stay Portuguese because the site depends on them: token names (`--fundo`), classes (`ros-evento`) and folder names (`Cabecalho`). Sample copy in the previews is Portuguese on purpose: it is the site's real voice.
 
-- Acolhedora e direta: "Venha participar", "Fale com a secretaria".
-- Datas e horários no formato dos posts: **17h**, **8h40**, **02 de novembro**, **Dom · 22 de agosto**.
-- Nomes de festa e de santos por extenso, com maiúsculas: "Festa de Nossa Senhora do Rosário".
-- Sem jargão de marketing, sem excesso de exclamações. Um "rogai por nós!" é bem-vindo; três seguidos não.
-- Botões com verbo: "Ver horários", "Quero participar", "Copiar chave Pix".
+## Principles
 
-## Cores
+1. **The time comes first.** Mass, confession and the secretary's hours show above the fold on any screen.
+2. **Readable by older people.** Body text never below 16px on phones (`corpo` is 17px), AA contrast everywhere, touch targets of `toque-min` (44px) in height **and** width, visible focus.
+3. **Delicate, never harsh.** Cream background, soft brown text, highlights as a soft fill with coloured text on top. A solid dark colour only on the logo and the primary button. No gradients, glass, heavy shadows, emoji or category icons.
+4. **Roman + italic.** One line in upright Playfair Display, the next in italic: "Nossa Senhora / *do Rosário*".
 
-Os tokens são semânticos e têm dois temas, `claro` (padrão) e `escuro`.
+## Tokens at a glance
 
-| Papel | Token | Onde usar |
+| Role | Tokens | Use |
 |---|---|---|
-| Fundo | `fundo`, `fundo-elevado`, `fundo-afundado` | Página, cards, faixas alternadas |
-| Texto | `texto`, `texto-suave` | Todo texto. `texto-suave` para datas e legendas |
-| Identidade | `marrom` + `creme` | Só o logo e blocos grandes de identidade (rodapé, capa). Texto sobre marrom é `sobre-marrom` (creme) |
-| Ação | `acao` + `sobre-acao` | Botão primário: um marrom médio, mais leve que o do logo |
-| Mariano | `mariano`, `mariano-suave` | Links, foco, botão secundário, festas de Nossa Senhora |
-| Ouro | `ouro`, `ouro-suave`, `ouro-texto` | Contas do terço, filetes, molduras; `ouro-suave` no fundo de avisos de festa. `ouro` nunca é texto: use `ouro-texto` |
-| Franciscano | `terracota`, `terracota-suave` | Conteúdo franciscano: 100 anos dos frades, São Francisco, Perdão de Assis |
-| Estado | `verde`, `alerta` | "Aberto agora" e erros/mudanças de horário. Só para estado |
-| Litúrgico | `liturgico-*` | **Só** no selo de cor litúrgica do dia |
+| Background | `fundo`, `fundo-elevado`, `fundo-afundado` | Page, cards, alternating bands and footer |
+| Text | `texto`, `texto-suave` | All text; `texto-suave` for dates and captions |
+| Identity | `marrom`, `creme` | Logo and large identity blocks only |
+| Action | `acao`, `sobre-acao` | The primary button: **one per screen** |
+| Marian | `mariano`, `mariano-suave` | Links, focus, secondary button, Our Lady's feasts |
+| Gold | `ouro`, `ouro-suave`, `ouro-texto` | Beads, rules, frames. Never text: use `ouro-texto` |
+| Franciscan | `terracota`, `terracota-suave` | Franciscan content |
+| State | `verde`, `alerta` | "Open now", errors, schedule changes only |
+| Liturgical | `liturgico-*` | The liturgical colour badge only |
 
-Regra prática: numa tela, **um** botão `acao` (a ação principal), o resto `mariano` contornado ou fantasma. Destaques usam o par **fundo suave + texto colorido** (`mariano-suave` + `mariano`, `terracota-suave` + `terracota`, `ouro-suave` + `ouro-texto`), nunca o fundo cheio com texto claro. Ouro ocupa no máximo um décimo da tela.
+Highlights are always **soft fill + coloured text** (`mariano-suave` + `mariano`, `terracota-suave` + `terracota`, `ouro-suave` + `ouro-texto`). Type: **Playfair Display** (titles) and **Nunito Sans** (everything else). Spacing `espaco-*`, radii `raio-*`, one barely visible shadow `sombra-card`.
 
-## Tipografia
+## Layout
 
-Duas famílias do Google Fonts:
+- Breakpoints `640px` and `1024px`; the container stops at `container-max` (1200px) with side margins of 16 / 24 / 32px (`.container`). Sections are 48px apart on phones, 64px on desktop. Paragraphs are limited to `medida-texto` (68ch).
+- Components use **container queries**: a card lays itself out by the width it has, not the screen's. Grids use `repeat(auto-fill, minmax(280px, 1fr))`.
+- **Phone:** header with the "Horários" and "Menu" buttons (drawer menu) plus a fixed bottom bar (Horários · Como chegar · WhatsApp). **Desktop (≥ 960px):** logo icon, menu and "Horários" centred as one group.
 
-- **Playfair Display** (`serif`): títulos. Peso 600 reto, 500 itálico.
-- **Nunito Sans** (`sans`): todo o resto. 400, 600 e 700. Traço arredondado e aberto, mais suave que uma sans geométrica, e confortável em parágrafos longos como as leituras.
+## Shapes
 
-Escala responsiva: `display` (56px) só a partir de `bp-desktop`. No celular o título do hero é `titulo-1` (36px). Em CSS: `font-size: clamp(36px, 6vw, 56px)`. A `sobrelinha` (13px, caixa alta, 0.16em) vem acima de títulos de evento, como em "02 DE NOVEMBRO · DIA DE".
+- **The arch.** The facade's windows are arches: the date block, the hero arch and the background arches round only their top corners (`raio-arco`).
+- **The rosary.** The section divider is a row of gold beads: five small, one large, five small. Never inside cards.
+- Icons: 1.75px stroke, rounded, `currentColor` (Lucide). The logo is never recoloured; on the dark theme it sits on a `creme` square.
 
-## Layout responsivo
+## Voice
 
-| Faixa | A partir de | Colunas | Margem lateral | Entre seções |
-|---|---|---|---|---|
-| Celular | `bp-celular` (0) | 1 | `espaco-4` (16px) | `espaco-12` (48px) |
-| Tablet | `bp-tablet` (640px) | 2 | `espaco-6` (24px) | `espaco-12` |
-| Desktop | `bp-desktop` (1024px) | 3 (ou 2 + 1 lateral) | `espaco-8` (32px) | `espaco-16` (64px) |
-| Largo | `bp-largo` (1280px) | o container trava em `container-max` (1200px) | auto | `espaco-16` |
+Welcoming and direct, in Brazilian Portuguese. Times as **7h**, **17h**, **8h40**; dates as "17 de novembro". Buttons start with a verb: "Ver horários", "Quero participar", "Copiar chave".
 
-- Grades de cards usam `grid-template-columns: repeat(auto-fill, minmax(280px, 1fr))`, sem quebra manual.
-- Os componentes usam **container queries** (`container-type: inline-size`): um card de horários se arruma pela largura que ele tem, não pela tela. O mesmo card funciona na coluna lateral do desktop e na tela cheia do celular.
-- Menu: Início · Liturgia · Agenda · Pastorais · Blog · Sacramentos · Contato (Nossa história vai para o rodapé). Links completos a partir de `bp-desktop`; abaixo disso, botão "Menu" que abre uma gaveta. O botão "Horários" fica sempre visível no cabeçalho.
-- No celular, uma barra fixa no rodapé com três atalhos (Horários · Como chegar · WhatsApp) é opcional e recomendada.
-- Parágrafos limitados a `medida-texto` (68ch).
+## Components
 
-## Formas e motivos
+| Folder | What it is |
+|---|---|
+| `Cabecalho`, `Gaveta`, `BarraMobile`, `Rodape` | Header, phone drawer menu, phone shortcut bar, footer |
+| `Hero` | Home opening: title, next Mass, the facade in an arch |
+| `Botao`, `Aviso`, `SeloLiturgico`, `DivisorTerco` | Buttons and text links, notices, liturgical badge, rosary divider |
+| `SecaoPagina`, `Paginacao`, `EstadoVazio` | Section header, pagination and date navigation, empty state |
+| `Horarios`, `Evento`, `Pastoral`, `DoacaoPix` | Schedule cards and grid, agenda card, community card, Pix donation |
+| `LiturgiaDoDia`, `SantoDoDia` | Readings card (sequence, text size), saint of the day |
+| `CardPost` | Blog post card, text or YouTube video |
+| `PaginaLiturgia`, `PaginaBlog`, `PaginaPost` | Page compositions |
 
-- **O arco.** As janelas da fachada no logo são arcos. Molduras de foto e o bloco de data dos eventos têm só os cantos de cima arredondados com `raio-arco`. É o único lugar onde aparece um canto totalmente redondo.
-- **As contas do terço.** O divisor de seções é uma fileira de contas em `ouro`: dez pequenas e uma maior, como uma dezena. Use entre grandes seções, nunca dentro de cards.
-- Cantos: `raio-m` (8px) em botões e cards, `raio-g` (16px) em faixas grandes.
-- Sombra: só `sombra-card`, quase imperceptível, e só em cards sobre `fundo`. Bordas de 1–1.5px.
-
-## Logo e iconografia
-
-- O logo é a **fachada da igreja** em marrom `#3f2610` com janelas em creme `#fbf8cd` (grupo *Logos*). Há a versão original (fundo branco) e uma com fundo transparente.
-- Ao lado do logo, a assinatura "IGREJA DO ROSÁRIO" em Nunito Sans 700, caixa alta, 0.08em, com "Paróquia Nossa Senhora do Rosário" embaixo em `pequeno`.
-- Área de respiro mínima ao redor do logo: metade da largura da cruz. Tamanho mínimo: 32px de altura.
-- No tema escuro, o logo vai sobre um quadrado `creme` com `raio-m`. Não inverta as cores do logo.
-- Ícones: traço de 1.75px, cantos arredondados, em `currentColor` (sugestão: Lucide). Nada de emoji na interface.
-
-## O que o site deve ter (arquitetura sugerida)
-
-1. **Início**: hero com próxima missa, cor litúrgica do dia, Evangelho de hoje, avisos da semana, próximos eventos, doação.
-2. **Horários**: missas, confissões, adoração, secretaria. É também o destaque "Horários 2026" do Instagram.
-3. **Liturgia**: leituras do dia em abas, santo do dia e a missa de hoje. Na página inicial aparece como um resumo de uma linha ("Evangelho de hoje").
-4. **Agenda**: festa da padroeira (outubro), Semana Santa, Perdão de Assis, eventos da juventude.
-5. **Pastorais e movimentos**: EJC, catequese, juventude, Projeto Cestas Básicas, reciclagem. Cada um com página própria.
-6. **Sacramentos**: batismo, crisma, casamento, primeira eucaristia. Requisitos, documentos e cursos.
-7. **Blog**: colunas do pároco e da juventude, em texto ou vídeo do YouTube, com filtros por coluna.
-8. **Nossa história**: Frei Martinho, a "campanha do centavo", a construção (1927–1929), os 100 anos dos franciscanos.
-9. **Contribua**: dízimo e doações por Pix, com prestação de contas.
-10. **Secretaria e contato**: endereço (Rua Frei Martinho, s/n, Jaguaribe), mapa, WhatsApp, horários de atendimento.
-
-## Componentes
-
-Os componentes são classes CSS com prefixo `ros-` em `components/bundle.css`, sem JavaScript obrigatório. Cada um tem um preview e um guia:
-
-- **Cabeçalho**: logo + assinatura, menu completo ou gaveta, botão "Horários" sempre visível.
-- **Hero**: título romano + itálico, próxima missa, moldura em arco.
-- **Botão**: primário (`acao`), secundário (mariano contornado), fantasma.
-- **Horários**: lista de missas por dia, que vira grade em telas largas.
-- **Evento**: bloco de data em arco + sobrelinha + título.
-- **Pastoral**: card de movimento com encontro, responsável e ação.
-- **Aviso**: faixa de comunicado (informativo, festa, mudança).
-- **Selo litúrgico**: a cor litúrgica do dia.
-- **Divisor terço**: fileira de contas entre seções.
-- **Liturgia do dia**: card limpo com data, semana, celebração e leituras em abas de texto (Evangelho aberto); resumo de uma linha para a página inicial.
-- **Santo do dia**: card só de texto (nome, grau, bio curta); a família franciscana ou mariana aparece só como cor na linha de metadados.
-- **Página Liturgia**: a composição da aba, em duas colunas no desktop e uma no celular.
-- **Card de post**: coluna do blog, de texto ou de vídeo (miniatura do YouTube que carrega o player ao clicar).
-- **Página Blog**: filtros por coluna, post em destaque e grade.
-- **Página do post**: leitura em faixa central, com vídeo no topo quando houver.
-- **Doação Pix**: chave com botão de copiar.
-
-Todo componente carrega `tokens.css` e `bundle.css`. As fontes vêm do Google Fonts pelo `@import` no topo de `bundle.css`.
+Not part of the design system, kept in `site/src/styles/global.css`: the skip link, the footer-at-the-bottom layout, scroll padding under the sticky header and the page-transition animation.

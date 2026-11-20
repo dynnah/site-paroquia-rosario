@@ -1,6 +1,6 @@
 # Logos
 
-- `logo-fachada.png`: a fachada da igreja, original do Instagram, sobre fundo branco. Marrom `#3f2610`, janelas creme `#fbf8cd`.
-- `logo-fachada-transparente.png`: a mesma imagem com o branco removido, para usar sobre `fundo` e `fundo-afundado`.
+- `logo-fachada.png`: the church facade, original from Instagram, on a white background. Brown `#3f2610`, cream windows `#fbf8cd`.
+- `logo-fachada-transparente.png`: the same image with the white removed, for use on `fundo` and `fundo-afundado`.
 
-São PNG de 447px. Para impressão e telas grandes, vale pedir à paróquia o arquivo vetorial original (SVG/PDF). No tema escuro, coloque o logo sobre um quadrado `creme`; não inverta as cores.
+Both are 447px PNGs. For print and large screens, ask the parish for the original vector file (SVG/PDF). On the dark theme, put the logo on a `creme` square; never invert its colours. Never recolour it.

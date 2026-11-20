@@ -160,6 +160,8 @@ O visual vem do design system **Igreja do Rosário**, em [`design-system/`](desi
 
 > O design system é a fonte da verdade. Os arquivos em `site/src/styles/` são cópias geradas por `npm run sync:design`: altere o design system, não a cópia.
 
+> Os guias, os comentários e os rótulos do design system estão em inglês. Nomes de tokens, classes `ros-*` e pastas de componentes continuam em português, porque o site depende deles. Os textos de exemplo dos previews seguem em português.
+
 ### Componentes
 
 | Componente                        | Componente                      |
