@@ -510,13 +510,16 @@ body:has(dialog:modal) {
     grid-row: 2;
   }
 
-  /* `contain: size` tira o texto da conta: a altura da linha vem da coluna ao lado (ou do mínimo). */
+  /* `contain: size` tira o texto da conta: a altura da linha vem da coluna ao lado (santo + missa) ou
+     do mínimo. O mínimo acompanha a janela: o card ocupa a tela abaixo do título (15rem são o
+     cabeçalho, o título e um respiro embaixo), no mínimo 480px e no máximo 60rem. Assim o texto
+     tem bastante área para ler mesmo quando o santo do dia tem pouca informação. */
   .ros-pagina--liturgia .ros-pagina__leitura--com-lateral {
     display: flex;
     flex-direction: column;
     gap: var(--espaco-4);
     contain: size;
-    min-height: calc(var(--espaco-12) * 10);
+    min-height: clamp(calc(var(--espaco-12) * 10), calc(100dvh - 15rem), 60rem);
   }
 
   .ros-pagina--liturgia .ros-pagina__leitura--com-lateral .ros-liturgia {
