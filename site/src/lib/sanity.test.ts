@@ -9,6 +9,7 @@ import { evaluate, parse } from 'groq-js';
 // Teste lê o seed do outro workspace de propósito: é a fonte única dos exemplos.
 import { gerarComunidade } from '../../../studio/seed/comunidade.ts';
 import { gerarDocumentos } from '../../../studio/seed/exemplos.ts';
+import { gerarHistoria } from '../../../studio/seed/historia.ts';
 import {
   buscarNoSanity,
   criarConteudo,
@@ -20,7 +21,7 @@ import {
 
 // Terça, 17 de novembro de 2026, 10h em São Paulo.
 const AGORA = new Date('2026-11-17T13:00:00Z');
-const documentos = [...gerarDocumentos(AGORA), ...gerarComunidade()];
+const documentos = [...gerarDocumentos(AGORA), ...gerarComunidade(), ...gerarHistoria()];
 
 function fonteEmMemoria(): Buscar {
   return async <T>(consulta: string, params: Record<string, unknown>) => {
@@ -230,7 +231,7 @@ test('slugs para getStaticPaths: posts só os publicáveis, o resto todos', asyn
   assert.equal((await conteudo.slugs('evento')).length, 4);
   assert.equal((await conteudo.slugs('pastoral')).length, 13);
   assert.equal((await conteudo.slugs('sacramento')).length, 4);
-  assert.deepEqual((await conteudo.slugs('pagina')).sort(), ['contribua', 'nossa-historia']);
+  assert.deepEqual(await conteudo.slugs('pagina'), ['nossa-historia']);
 });
 
 test('minutosDeLeitura', () => {

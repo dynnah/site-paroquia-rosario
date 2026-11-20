@@ -1,28 +1,38 @@
 ---
 import DoacaoPix from '../components/DoacaoPix.astro';
-import PaginaDeTexto from '../layouts/PaginaDeTexto.astro';
+import EstadoVazio from '../components/EstadoVazio.astro';
+import ArtigoLayout from '../layouts/ArtigoLayout.astro';
 import { conteudo } from '../lib/sanity';
 
 const config = await conteudo.configuracoes();
 // Chave Pix, titular e conta bancária ficam no documento "Configurações" do Studio.
+// A página é só o card do Pix: não tem texto próprio no Sanity.
 const pix =
   config?.pixChave && config.pixTitular
     ? { chave: config.pixChave, titular: config.pixTitular, conta: config.pixConta }
     : null;
 ---
 
-<PaginaDeTexto
-  slug="contribua"
-  tituloReserva="Contribua"
-  descricaoReserva="Dízimo e doações por Pix para manter a igreja e os projetos da Paróquia Nossa Senhora do Rosário."
+<ArtigoLayout
+  title="Contribua"
+  description="Dízimo e doações por Pix para manter a igreja e os projetos da Paróquia Nossa Senhora do Rosário."
+  titulo="Contribua"
 >
-  {pix && (
+  {pix ? (
     <div class="pix">
       <h2 class="sr-only">Como contribuir</h2>
       <DoacaoPix chave={pix.chave} titular={pix.titular} conta={pix.conta} />
     </div>
+  ) : (
+    <div class="ros-artigo__vazio">
+      <EstadoVazio
+        titulo="Esta página está sendo preparada."
+        texto="Volte em breve."
+        acao={{ rotulo: 'Voltar ao início', href: '/' }}
+      />
+    </div>
   )}
-</PaginaDeTexto>
+</ArtigoLayout>
 
 <style>
   .pix {

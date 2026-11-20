@@ -13,7 +13,8 @@
     "seed:gerar": "node scripts/gerar-seed.ts",
     "seed:comunidade": "node scripts/gerar-comunidade.ts",
     "seed:blog": "node scripts/gerar-blog.ts",
-    "seed:agenda": "node scripts/gerar-agenda.ts"
+    "seed:agenda": "node scripts/gerar-agenda.ts",
+    "seed:historia": "node scripts/gerar-historia.ts"
   },
   "dependencies": {
     "@sanity/icons": "^5.4.0",

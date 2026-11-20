@@ -24,7 +24,6 @@ const TIPOS = [
   'autor',
   'post',
   'santo',
-  'pagina',
 ];
 
 test('todos os tipos do modelo têm ao menos um exemplo', () => {
@@ -44,7 +43,7 @@ test('documentos únicos usam o nome do tipo como _id', () => {
 
 test('todo conteúdo inventado carrega o marcador [EXEMPLO]', () => {
   const semMarca = documentos.filter((d) => {
-    if (['configuracoes', 'horarios', 'pagina', 'santo'].includes(d._type)) return false;
+    if (['configuracoes', 'horarios', 'santo'].includes(d._type)) return false;
     return !JSON.stringify(d).includes('[EXEMPLO]');
   });
   assert.deepEqual(

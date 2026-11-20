@@ -397,28 +397,5 @@ export function gerarDocumentos(agora: Date = new Date()): DocumentoSeed[] {
       familia: 'nenhuma',
       bio: 'Garante que sempre haja um santo cadastrado para a data de hoje durante os testes.',
     },
-
-    // ── Páginas de texto ──────────────────────────────────────────────────────────
-    {
-      _id: 'exemplo-pagina-nossa-historia',
-      _type: 'pagina',
-      titulo: 'Nossa história',
-      slug: { _type: 'slug', current: 'nossa-historia' },
-      resumo: 'A igreja neoclássica construída pelos frades franciscanos entre 1927 e 1929.',
-      corpo: [
-        bloco(
-          `${MARCA} A igreja foi construída pelos frades franciscanos entre 1927 e 1929, em estilo neoclássico.`,
-        ),
-        bloco('Frei Martinho e a campanha do centavo', 'h2'),
-        bloco(`${MARCA} Texto da história a ser fornecido pela paróquia.`),
-      ],
-    },
-    {
-      _id: 'exemplo-pagina-contribua',
-      _type: 'pagina',
-      titulo: 'Contribua',
-      slug: { _type: 'slug', current: 'contribua' },
-      corpo: [bloco(`${MARCA} Como contribuir com a paróquia. Texto de exemplo.`)],
-    },
   ];
 }
