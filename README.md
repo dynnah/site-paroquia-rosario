@@ -195,11 +195,13 @@ Algumas regras importantes:
 | 3    | Modelo de conteúdo no Sanity                           | Concluída     |
 | 4    | Páginas lendo do Sanity                                | Concluída     |
 | 5    | Liturgia e santo do dia automáticos                    | Concluída     |
-| 6    | Qualidade: SEO, acessibilidade e desempenho            | A fazer       |
-| 7    | Reajustes de layout                                    | A fazer       |
-| 8    | Publicação e automações                                | A fazer       |
+| 6    | Qualidade: SEO, acessibilidade e desempenho            | Concluída     |
+| 7    | Reajustes de layout                                    | Concluída     |
+| 8    | Publicação e automações                                | Em andamento  |
 | 9    | Conteúdo real e equipe                                 | A fazer       |
 | 10   | Lançamento                                             | A fazer       |
+
+A Fase 8 já tem os workflows do GitHub Actions (rebuild diário e backup mensal) e o passo a passo dos painéis do Cloudflare, do Sanity e do Registro.br em [`docs/deploy.md`](docs/deploy.md).
 
 Antes do lançamento ainda faltam informações da paróquia (horários 2026/2027, chave Pix e titular, contatos, lista de pastorais, requisitos dos sacramentos, texto da história e fotos). Enquanto isso, o código usa marcadores `TODO(paroquia)`.
 
